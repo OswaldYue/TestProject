@@ -14,6 +14,10 @@ public class TestHttpServerHandler extends SimpleChannelInboundHandler<HttpObjec
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
 
+        System.out.println(msg.getClass());
+
+        System.out.println(ctx.channel().remoteAddress());
+        Thread.sleep(8000);
         if (msg instanceof HttpRequest) {
 
             System.out.println("执行channelRead0()");
@@ -35,6 +39,8 @@ public class TestHttpServerHandler extends SimpleChannelInboundHandler<HttpObjec
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH,content.readableBytes());
 
             ctx.writeAndFlush(response);
+            //连接关闭
+            ctx.channel().close();
         }
 
     }
