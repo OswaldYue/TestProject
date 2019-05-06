@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'com.mgw'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile(
+            "junit:junit:4.12"
+    )
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.10.Final'
+}
