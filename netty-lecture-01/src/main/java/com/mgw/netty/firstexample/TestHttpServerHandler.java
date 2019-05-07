@@ -23,11 +23,11 @@ public class TestHttpServerHandler extends SimpleChannelInboundHandler<HttpObjec
             System.out.println("执行channelRead0()");
 
             HttpRequest httpRequest = (HttpRequest) msg;
-            System.out.println("请求方法名:"+httpRequest.method().name());
+            System.out.println("httpRequest.method:"+httpRequest.method().name());
 
             URI uri = new URI(httpRequest.uri());
             if ("/favicon.ico".equals(uri.getPath())) {
-                System.out.println("请求favicon.ico");
+                System.out.println("寻找favicon.ico");
                 return;
             }
 

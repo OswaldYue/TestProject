@@ -8,14 +8,15 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
  *
- * 1.netty用来做http服务器
+ * 1.netty用来开发http协议的应用
  *
  * */
 public class TestServer {
 
     public static void main(String[] args) throws Exception{
 
-        // 定义两个事件循环组 其实就是线程组
+
+        //初始化两个线程池
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 

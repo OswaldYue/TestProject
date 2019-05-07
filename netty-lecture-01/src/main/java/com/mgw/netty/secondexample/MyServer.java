@@ -6,7 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
- * 2.netty用来socket客户端与服务端
+ * 2.netty用来开发socket程序
  * */
 public class MyServer {
 
@@ -19,7 +19,7 @@ public class MyServer {
 
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(boosGroup,workerGroup).channel(NioServerSocketChannel.class).
-                    childHandler(null);
+                    childHandler(new MyServerInitalizer());
 
             ChannelFuture channelFuture = bootstrap.bind(8899).sync();
 
