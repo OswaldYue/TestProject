@@ -26,6 +26,9 @@ public class MyServer {
             channelFuture.channel().closeFuture().sync();
 
 
+
+
+
         }finally {
 
             boosGroup.shutdownGracefully();
