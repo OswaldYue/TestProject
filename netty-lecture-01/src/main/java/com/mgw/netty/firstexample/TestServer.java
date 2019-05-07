@@ -6,6 +6,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+/**
+ *
+ * 1.netty用来做http服务器
+ *
+ * */
 public class TestServer {
 
     public static void main(String[] args) throws Exception{
