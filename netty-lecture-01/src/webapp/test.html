@@ -13,8 +13,9 @@
 
             socket.onmessage = function (event) {
 
+                //alert("收到信息！"+event.data);
                 var  ta = document.getElementById("responseText");
-                ta.value + "\n" + event.data;
+                ta.value += "\n" + event.data;
             }
 
             socket.onopen = function (ev) {
@@ -35,12 +36,28 @@
 
         }
 
+        function send(message) {
+
+            if (socket.WebSocket) {
+
+                return;
+            }
+            if (socket.readyState == WebSocket.OPEN) {
+
+                socket.send(message);
+            }else {
+
+                alert("连接尚未开启!");
+            }
+
+        }
+
     </script>
 
     <form onsubmit="return false;">
 
         <textarea name="message" style="width: 400px;height: 200px;"></textarea>
-        <input type="button" value="发送数据" onclick="">
+        <input type="button" value="发送数据" onclick="send(this.form.message.value)">
 
         <h3>服务端输出:</h3>
         <textarea id="responseText" style="width: 400px;height: 300px;"></textarea>

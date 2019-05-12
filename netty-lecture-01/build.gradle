@@ -9,7 +9,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-    mavenCentral()
+    //mavenCentral()
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
 }
 
 //编译使用UTF-8
@@ -20,5 +21,7 @@ dependencies {
             "junit:junit:4.12"
     )
     compile group: 'io.netty', name: 'netty-all', version: '4.1.10.Final'
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.7.1'
+    compile group: 'com.google.protobuf', name: 'protobuf-java-util', version: '3.7.1'
 }
 
