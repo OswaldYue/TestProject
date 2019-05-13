@@ -2,6 +2,10 @@ package com.mgw.protobuf;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+/**
+ * 测试protobuf的使用
+ *
+ * */
 public class ProtoBufTest {
 
     public static void main(String[] args) throws InvalidProtocolBufferException {

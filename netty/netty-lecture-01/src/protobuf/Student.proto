@@ -3,8 +3,8 @@ syntax = "proto2";
 package com.mgw.protobuf;
 
 option optimize_for = SPEED;
-option java_package = "com.mgw.protobuf";
-option java_outer_classname = "DataInfo";
+option java_package = "com.mgw.netty.sixthexample";
+option java_outer_classname = "MyDataInfo";
 
 message Student {
 
