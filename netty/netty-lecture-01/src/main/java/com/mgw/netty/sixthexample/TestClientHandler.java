@@ -9,7 +9,15 @@ public class TestClientHandler extends SimpleChannelInboundHandler<MyDataInfo.St
     protected void channelRead0(ChannelHandlerContext ctx, MyDataInfo.Student msg) throws Exception {
 
 
+    }
 
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
+        MyDataInfo.Student student = MyDataInfo.Student.newBuilder().
+                setName("ls").setAge(30).setAddress("sz").build();
+
+        ctx.channel().writeAndFlush(student);
 
     }
 }
