@@ -1,0 +1,35 @@
+---
+spring:
+  application:
+    name: spring-cloud-eureka-cluster
+  profiles: peer1
+server:
+  port: 9000
+eureka:
+  client:
+    service-url:
+      defaultZone:  http://localhost:9001/eureka/,http://localhost:9002/eureka/
+
+---
+spring:
+  application:
+    name: spring-cloud-eureka-cluster
+  profiles: peer2
+server:
+  port: 9001
+eureka:
+  client:
+    service-url:
+      defaultZone:  http://localhost:9000/eureka/,http://localhost:9003/eureka/
+
+---
+spring:
+  application:
+    name: spring-cloud-eureka-cluster
+  profiles: peer3
+server:
+  port: 9002
+eureka:
+  client:
+    service-url:
+      defaultZone:  http://localhost:9001/eureka/,http://localhost:9002/eureka/
