@@ -8,7 +8,26 @@ public class TestServerHandler extends SimpleChannelInboundHandler<MyDataInfoPer
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MyDataInfoPerson.MyMessage msg) throws Exception {
 
-        System.out.println(msg);
+        MyDataInfoPerson.MyMessage.DataType dataType = msg.getDataType();
+
+        if (dataType == MyDataInfoPerson.MyMessage.DataType.PersonType) {
+
+            System.out.println("person ==>");
+            System.out.println(msg);
+
+        }else if (dataType == MyDataInfoPerson.MyMessage.DataType.DogType) {
+
+            System.out.println("dog ==>");
+            System.out.println(msg);
+
+        }else {
+
+            System.out.println("cat ==>");
+            System.out.println(msg);
+
+        }
+        
+
     }
 
 }
