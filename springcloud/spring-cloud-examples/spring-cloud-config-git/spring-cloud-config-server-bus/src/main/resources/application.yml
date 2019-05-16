@@ -1,0 +1,36 @@
+server:
+  port: 9105
+
+spring:
+  application:
+    name: spring-cloud-config-server-bus
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/OswaldYue/TestProject
+          search-paths: springcloud/spring-cloud-examples/spring-cloud-config-git/config-repo
+          username: 2690653101@qq.com
+          password: mgw1234566
+      discovery:
+        enabled: true
+    bus:
+      enabled: true
+
+  rebbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: mgw
+    password: 1213
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9000/eureka
+
+management:
+  security:
+    enabled: false
+
+
+
