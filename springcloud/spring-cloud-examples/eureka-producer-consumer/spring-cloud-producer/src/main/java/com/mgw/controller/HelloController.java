@@ -13,11 +13,11 @@ public class HelloController {
 
         System.out.println("------> request /hello name is "+name);
 
-        try {
-            Thread.sleep(10000000);
-        } catch (InterruptedException e) {
-            System.out.println("------> request /hello error ");
-        }
+//        try {
+//            Thread.sleep(10000000);
+//        } catch (InterruptedException e) {
+//            System.out.println("------> request /hello error ");
+//        }
 
         return "hello," + name + ",this is producer 2 first message";
 
