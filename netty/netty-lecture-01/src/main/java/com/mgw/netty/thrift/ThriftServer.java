@@ -8,6 +8,14 @@ import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import thrift.generated.PersonService;
 
+
+/**
+ * 案例:thrift的rpc调用
+ *
+ * 此案例的主要目的在于，告诫自己不要一想到传输就用http，实际在分布式项目中，内网之间的服务调用，
+ * 实际rpc的效率要远远高于http
+ *
+ * */
 public class ThriftServer {
 
     public static void main(String[] args) throws Exception{
