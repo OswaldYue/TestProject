@@ -3,8 +3,8 @@
 
 package com.mgw.protobuf;
 
-public final class DataInfo {
-  private DataInfo() {}
+public final class MyDataInfo {
+  private MyDataInfo() {}
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -134,15 +134,15 @@ public final class DataInfo {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.mgw.protobuf.DataInfo.internal_static_com_mgw_protobuf_Student_descriptor;
+      return com.mgw.protobuf.MyDataInfo.internal_static_com_mgw_protobuf_Student_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.mgw.protobuf.DataInfo.internal_static_com_mgw_protobuf_Student_fieldAccessorTable
+      return com.mgw.protobuf.MyDataInfo.internal_static_com_mgw_protobuf_Student_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.mgw.protobuf.DataInfo.Student.class, com.mgw.protobuf.DataInfo.Student.Builder.class);
+              com.mgw.protobuf.MyDataInfo.Student.class, com.mgw.protobuf.MyDataInfo.Student.Builder.class);
     }
 
     private int bitField0_;
@@ -301,10 +301,10 @@ public final class DataInfo {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof com.mgw.protobuf.DataInfo.Student)) {
+      if (!(obj instanceof com.mgw.protobuf.MyDataInfo.Student)) {
         return super.equals(obj);
       }
-      com.mgw.protobuf.DataInfo.Student other = (com.mgw.protobuf.DataInfo.Student) obj;
+      com.mgw.protobuf.MyDataInfo.Student other = (com.mgw.protobuf.MyDataInfo.Student) obj;
 
       if (hasName() != other.hasName()) return false;
       if (hasName()) {
@@ -349,69 +349,69 @@ public final class DataInfo {
       return hash;
     }
 
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(byte[] data)
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(java.io.InputStream input)
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseDelimitedFrom(java.io.InputStream input)
+    public static com.mgw.protobuf.MyDataInfo.Student parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseDelimitedFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static com.mgw.protobuf.DataInfo.Student parseFrom(
+    public static com.mgw.protobuf.MyDataInfo.Student parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -424,7 +424,7 @@ public final class DataInfo {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(com.mgw.protobuf.DataInfo.Student prototype) {
+    public static Builder newBuilder(com.mgw.protobuf.MyDataInfo.Student prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -445,21 +445,21 @@ public final class DataInfo {
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:com.mgw.protobuf.Student)
-        com.mgw.protobuf.DataInfo.StudentOrBuilder {
+        com.mgw.protobuf.MyDataInfo.StudentOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return com.mgw.protobuf.DataInfo.internal_static_com_mgw_protobuf_Student_descriptor;
+        return com.mgw.protobuf.MyDataInfo.internal_static_com_mgw_protobuf_Student_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return com.mgw.protobuf.DataInfo.internal_static_com_mgw_protobuf_Student_fieldAccessorTable
+        return com.mgw.protobuf.MyDataInfo.internal_static_com_mgw_protobuf_Student_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                com.mgw.protobuf.DataInfo.Student.class, com.mgw.protobuf.DataInfo.Student.Builder.class);
+                com.mgw.protobuf.MyDataInfo.Student.class, com.mgw.protobuf.MyDataInfo.Student.Builder.class);
       }
 
-      // Construct using com.mgw.protobuf.DataInfo.Student.newBuilder()
+      // Construct using com.mgw.protobuf.MyDataInfo.Student.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -489,17 +489,17 @@ public final class DataInfo {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return com.mgw.protobuf.DataInfo.internal_static_com_mgw_protobuf_Student_descriptor;
+        return com.mgw.protobuf.MyDataInfo.internal_static_com_mgw_protobuf_Student_descriptor;
       }
 
       @java.lang.Override
-      public com.mgw.protobuf.DataInfo.Student getDefaultInstanceForType() {
-        return com.mgw.protobuf.DataInfo.Student.getDefaultInstance();
+      public com.mgw.protobuf.MyDataInfo.Student getDefaultInstanceForType() {
+        return com.mgw.protobuf.MyDataInfo.Student.getDefaultInstance();
       }
 
       @java.lang.Override
-      public com.mgw.protobuf.DataInfo.Student build() {
-        com.mgw.protobuf.DataInfo.Student result = buildPartial();
+      public com.mgw.protobuf.MyDataInfo.Student build() {
+        com.mgw.protobuf.MyDataInfo.Student result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -507,8 +507,8 @@ public final class DataInfo {
       }
 
       @java.lang.Override
-      public com.mgw.protobuf.DataInfo.Student buildPartial() {
-        com.mgw.protobuf.DataInfo.Student result = new com.mgw.protobuf.DataInfo.Student(this);
+      public com.mgw.protobuf.MyDataInfo.Student buildPartial() {
+        com.mgw.protobuf.MyDataInfo.Student result = new com.mgw.protobuf.MyDataInfo.Student(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
@@ -562,16 +562,16 @@ public final class DataInfo {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.mgw.protobuf.DataInfo.Student) {
-          return mergeFrom((com.mgw.protobuf.DataInfo.Student)other);
+        if (other instanceof com.mgw.protobuf.MyDataInfo.Student) {
+          return mergeFrom((com.mgw.protobuf.MyDataInfo.Student)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(com.mgw.protobuf.DataInfo.Student other) {
-        if (other == com.mgw.protobuf.DataInfo.Student.getDefaultInstance()) return this;
+      public Builder mergeFrom(com.mgw.protobuf.MyDataInfo.Student other) {
+        if (other == com.mgw.protobuf.MyDataInfo.Student.getDefaultInstance()) return this;
         if (other.hasName()) {
           bitField0_ |= 0x00000001;
           name_ = other.name_;
@@ -603,11 +603,11 @@ public final class DataInfo {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.mgw.protobuf.DataInfo.Student parsedMessage = null;
+        com.mgw.protobuf.MyDataInfo.Student parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.mgw.protobuf.DataInfo.Student) e.getUnfinishedMessage();
+          parsedMessage = (com.mgw.protobuf.MyDataInfo.Student) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -818,12 +818,12 @@ public final class DataInfo {
     }
 
     // @@protoc_insertion_point(class_scope:com.mgw.protobuf.Student)
-    private static final com.mgw.protobuf.DataInfo.Student DEFAULT_INSTANCE;
+    private static final com.mgw.protobuf.MyDataInfo.Student DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new com.mgw.protobuf.DataInfo.Student();
+      DEFAULT_INSTANCE = new com.mgw.protobuf.MyDataInfo.Student();
     }
 
-    public static com.mgw.protobuf.DataInfo.Student getDefaultInstance() {
+    public static com.mgw.protobuf.MyDataInfo.Student getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
@@ -848,7 +848,7 @@ public final class DataInfo {
     }
 
     @java.lang.Override
-    public com.mgw.protobuf.DataInfo.Student getDefaultInstanceForType() {
+    public com.mgw.protobuf.MyDataInfo.Student getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -870,8 +870,8 @@ public final class DataInfo {
     java.lang.String[] descriptorData = {
       "\n\032src/protobuf/Student.proto\022\020com.mgw.pr" +
       "otobuf\"5\n\007Student\022\014\n\004name\030\001 \002(\t\022\013\n\003age\030\002" +
-      " \001(\005\022\017\n\007address\030\003 \001(\tB\036\n\020com.mgw.protobu" +
-      "fB\010DataInfoH\001"
+      " \001(\005\022\017\n\007address\030\003 \001(\tB \n\020com.mgw.protobu" +
+      "fB\nMyDataInfoH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

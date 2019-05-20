@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+
+
+package com.mgw.proto;
+
+option java_package = "com.mgw.proto";
+option java_outer_classname = "TeacherProto";
+option java_multiple_files = true;
+
+service TeacherService {
+
+    rpc getRealNameByUserName(MyRequest) returns (MyResponse) {}
+}
+
+message MyRequest {
+
+    string username = 1;
+}
+
+message MyResponse {
+
+    string realname = 2;
+}
+
+
+

@@ -10,6 +10,8 @@ import io.netty.handler.logging.LoggingHandler;
 /**
  * 案例:protobuf的案例使用
  *
+ * 当protobuf有多个对象组织时的解决方案
+ *
  * */
 public class TestServer {
 
