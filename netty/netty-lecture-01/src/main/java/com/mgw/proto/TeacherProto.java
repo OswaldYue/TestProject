@@ -15,6 +15,16 @@ public final class TeacherProto {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_mgw_proto_TeacherRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_mgw_proto_TeacherRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_mgw_proto_TeacherResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_mgw_proto_TeacherResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_mgw_proto_MyRequest_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -33,12 +43,17 @@ public final class TeacherProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rTeacher.proto\022\rcom.mgw.proto\"\035\n\tMyRequ" +
-      "est\022\020\n\010username\030\001 \001(\t\"\036\n\nMyResponse\022\020\n\010r" +
-      "ealname\030\002 \001(\t2`\n\016TeacherService\022N\n\025getRe" +
-      "alNameByUserName\022\030.com.mgw.proto.MyReque" +
-      "st\032\031.com.mgw.proto.MyResponse\"\000B\037\n\rcom.m" +
-      "gw.protoB\014TeacherProtoP\001b\006proto3"
+      "\n\rTeacher.proto\022\rcom.mgw.proto\"\035\n\016Teache" +
+      "rRequest\022\013\n\003age\030\001 \001(\005\":\n\017TeacherResponse" +
+      "\022\014\n\004name\030\001 \001(\t\022\013\n\003age\030\002 \001(\005\022\014\n\004city\030\003 \001(" +
+      "\t\"\035\n\tMyRequest\022\020\n\010username\030\001 \001(\t\"\036\n\nMyRe" +
+      "sponse\022\020\n\010realname\030\002 \001(\t2\266\001\n\016TeacherServ" +
+      "ice\022N\n\025getRealNameByUserName\022\030.com.mgw.p" +
+      "roto.MyRequest\032\031.com.mgw.proto.MyRespons" +
+      "e\"\000\022T\n\017getTeacherByAge\022\035.com.mgw.proto.T" +
+      "eacherRequest\032\036.com.mgw.proto.TeacherRes" +
+      "ponse\"\0000\001B\037\n\rcom.mgw.protoB\014TeacherProto" +
+      "P\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -52,14 +67,26 @@ public final class TeacherProto {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_com_mgw_proto_MyRequest_descriptor =
+    internal_static_com_mgw_proto_TeacherRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_com_mgw_proto_TeacherRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_mgw_proto_TeacherRequest_descriptor,
+        new java.lang.String[] { "Age", });
+    internal_static_com_mgw_proto_TeacherResponse_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_com_mgw_proto_TeacherResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_mgw_proto_TeacherResponse_descriptor,
+        new java.lang.String[] { "Name", "Age", "City", });
+    internal_static_com_mgw_proto_MyRequest_descriptor =
+      getDescriptor().getMessageTypes().get(2);
     internal_static_com_mgw_proto_MyRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_mgw_proto_MyRequest_descriptor,
         new java.lang.String[] { "Username", });
     internal_static_com_mgw_proto_MyResponse_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_com_mgw_proto_MyResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_mgw_proto_MyResponse_descriptor,

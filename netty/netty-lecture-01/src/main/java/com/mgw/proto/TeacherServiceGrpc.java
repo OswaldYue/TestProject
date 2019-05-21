@@ -59,6 +59,38 @@ public final class TeacherServiceGrpc {
      return getGetRealNameByUserNameMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.mgw.proto.TeacherRequest,
+      com.mgw.proto.TeacherResponse> getGetTeacherByAgeMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "getTeacherByAge",
+      requestType = com.mgw.proto.TeacherRequest.class,
+      responseType = com.mgw.proto.TeacherResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
+  public static io.grpc.MethodDescriptor<com.mgw.proto.TeacherRequest,
+      com.mgw.proto.TeacherResponse> getGetTeacherByAgeMethod() {
+    io.grpc.MethodDescriptor<com.mgw.proto.TeacherRequest, com.mgw.proto.TeacherResponse> getGetTeacherByAgeMethod;
+    if ((getGetTeacherByAgeMethod = TeacherServiceGrpc.getGetTeacherByAgeMethod) == null) {
+      synchronized (TeacherServiceGrpc.class) {
+        if ((getGetTeacherByAgeMethod = TeacherServiceGrpc.getGetTeacherByAgeMethod) == null) {
+          TeacherServiceGrpc.getGetTeacherByAgeMethod = getGetTeacherByAgeMethod = 
+              io.grpc.MethodDescriptor.<com.mgw.proto.TeacherRequest, com.mgw.proto.TeacherResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
+              .setFullMethodName(generateFullMethodName(
+                  "com.mgw.proto.TeacherService", "getTeacherByAge"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.mgw.proto.TeacherRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.mgw.proto.TeacherResponse.getDefaultInstance()))
+                  .setSchemaDescriptor(new TeacherServiceMethodDescriptorSupplier("getTeacherByAge"))
+                  .build();
+          }
+        }
+     }
+     return getGetTeacherByAgeMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -93,6 +125,13 @@ public final class TeacherServiceGrpc {
       asyncUnimplementedUnaryCall(getGetRealNameByUserNameMethod(), responseObserver);
     }
 
+    /**
+     */
+    public void getTeacherByAge(com.mgw.proto.TeacherRequest request,
+        io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponse> responseObserver) {
+      asyncUnimplementedUnaryCall(getGetTeacherByAgeMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -102,6 +141,13 @@ public final class TeacherServiceGrpc {
                 com.mgw.proto.MyRequest,
                 com.mgw.proto.MyResponse>(
                   this, METHODID_GET_REAL_NAME_BY_USER_NAME)))
+          .addMethod(
+            getGetTeacherByAgeMethod(),
+            asyncServerStreamingCall(
+              new MethodHandlers<
+                com.mgw.proto.TeacherRequest,
+                com.mgw.proto.TeacherResponse>(
+                  this, METHODID_GET_TEACHER_BY_AGE)))
           .build();
     }
   }
@@ -131,6 +177,14 @@ public final class TeacherServiceGrpc {
       asyncUnaryCall(
           getChannel().newCall(getGetRealNameByUserNameMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void getTeacherByAge(com.mgw.proto.TeacherRequest request,
+        io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponse> responseObserver) {
+      asyncServerStreamingCall(
+          getChannel().newCall(getGetTeacherByAgeMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -156,6 +210,14 @@ public final class TeacherServiceGrpc {
     public com.mgw.proto.MyResponse getRealNameByUserName(com.mgw.proto.MyRequest request) {
       return blockingUnaryCall(
           getChannel(), getGetRealNameByUserNameMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public java.util.Iterator<com.mgw.proto.TeacherResponse> getTeacherByAge(
+        com.mgw.proto.TeacherRequest request) {
+      return blockingServerStreamingCall(
+          getChannel(), getGetTeacherByAgeMethod(), getCallOptions(), request);
     }
   }
 
@@ -187,6 +249,7 @@ public final class TeacherServiceGrpc {
   }
 
   private static final int METHODID_GET_REAL_NAME_BY_USER_NAME = 0;
+  private static final int METHODID_GET_TEACHER_BY_AGE = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -208,6 +271,10 @@ public final class TeacherServiceGrpc {
         case METHODID_GET_REAL_NAME_BY_USER_NAME:
           serviceImpl.getRealNameByUserName((com.mgw.proto.MyRequest) request,
               (io.grpc.stub.StreamObserver<com.mgw.proto.MyResponse>) responseObserver);
+          break;
+        case METHODID_GET_TEACHER_BY_AGE:
+          serviceImpl.getTeacherByAge((com.mgw.proto.TeacherRequest) request,
+              (io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -271,6 +338,7 @@ public final class TeacherServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new TeacherServiceFileDescriptorSupplier())
               .addMethod(getGetRealNameByUserNameMethod())
+              .addMethod(getGetTeacherByAgeMethod())
               .build();
         }
       }

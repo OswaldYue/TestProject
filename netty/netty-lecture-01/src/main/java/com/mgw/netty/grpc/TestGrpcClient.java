@@ -1,12 +1,11 @@
 package com.mgw.netty.grpc;
 
-import com.mgw.proto.MyRequest;
-import com.mgw.proto.MyResponse;
-import com.mgw.proto.TeacherServiceGrpc;
+import com.mgw.proto.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 public class TestGrpcClient {
@@ -58,6 +57,15 @@ public class TestGrpcClient {
 
         System.out.println("realname is " + response.getRealname() + " ..." );
 
+        System.out.println("-------------------------------------------------------------");
+
+        Iterator<TeacherResponse> teachers = blockingStub.getTeacherByAge(TeacherRequest.newBuilder().setAge(100).build());
+        while (teachers.hasNext()) {
+
+            TeacherResponse teacherResponse = teachers.next();
+            System.out.println(teacherResponse);
+
+        }
 
     }
 
