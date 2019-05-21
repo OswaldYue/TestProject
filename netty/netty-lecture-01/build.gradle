@@ -38,6 +38,7 @@ buildscript {
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
     }
+
 }
 
 protobuf {
@@ -49,9 +50,15 @@ protobuf {
             artifact = 'io.grpc:protoc-gen-grpc-java:1.20.0'
         }
     }
+    //生成文件的基本路径
+    generatedFilesBaseDir = "src"
+
     generateProtoTasks {
         all()*.plugins {
-            grpc {}
+            grpc {
+                //生产文件的子基础路径
+                outputSubDir = "java"
+            }
         }
     }
 }
