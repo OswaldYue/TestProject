@@ -14,6 +14,8 @@ service TeacherService {
 
     rpc getTeacherByAge(TeacherRequest) returns (stream TeacherResponse) {}
 
+    rpc getTeachersWrapperByAges(stream TeacherRequest) returns (TeacherResponseList)  {}
+
 }
 
 message TeacherRequest{
@@ -28,6 +30,11 @@ message TeacherResponse {
     string city = 3;
 
 }
+message TeacherResponseList {
+
+    repeated TeacherResponse teacherResponse = 1;
+}
+
 
 message MyRequest {
 

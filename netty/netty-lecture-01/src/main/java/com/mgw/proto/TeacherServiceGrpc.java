@@ -91,6 +91,38 @@ public final class TeacherServiceGrpc {
      return getGetTeacherByAgeMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.mgw.proto.TeacherRequest,
+      com.mgw.proto.TeacherResponseList> getGetTeachersWrapperByAgesMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "getTeachersWrapperByAges",
+      requestType = com.mgw.proto.TeacherRequest.class,
+      responseType = com.mgw.proto.TeacherResponseList.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.CLIENT_STREAMING)
+  public static io.grpc.MethodDescriptor<com.mgw.proto.TeacherRequest,
+      com.mgw.proto.TeacherResponseList> getGetTeachersWrapperByAgesMethod() {
+    io.grpc.MethodDescriptor<com.mgw.proto.TeacherRequest, com.mgw.proto.TeacherResponseList> getGetTeachersWrapperByAgesMethod;
+    if ((getGetTeachersWrapperByAgesMethod = TeacherServiceGrpc.getGetTeachersWrapperByAgesMethod) == null) {
+      synchronized (TeacherServiceGrpc.class) {
+        if ((getGetTeachersWrapperByAgesMethod = TeacherServiceGrpc.getGetTeachersWrapperByAgesMethod) == null) {
+          TeacherServiceGrpc.getGetTeachersWrapperByAgesMethod = getGetTeachersWrapperByAgesMethod = 
+              io.grpc.MethodDescriptor.<com.mgw.proto.TeacherRequest, com.mgw.proto.TeacherResponseList>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.CLIENT_STREAMING)
+              .setFullMethodName(generateFullMethodName(
+                  "com.mgw.proto.TeacherService", "getTeachersWrapperByAges"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.mgw.proto.TeacherRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.mgw.proto.TeacherResponseList.getDefaultInstance()))
+                  .setSchemaDescriptor(new TeacherServiceMethodDescriptorSupplier("getTeachersWrapperByAges"))
+                  .build();
+          }
+        }
+     }
+     return getGetTeachersWrapperByAgesMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -132,6 +164,13 @@ public final class TeacherServiceGrpc {
       asyncUnimplementedUnaryCall(getGetTeacherByAgeMethod(), responseObserver);
     }
 
+    /**
+     */
+    public io.grpc.stub.StreamObserver<com.mgw.proto.TeacherRequest> getTeachersWrapperByAges(
+        io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponseList> responseObserver) {
+      return asyncUnimplementedStreamingCall(getGetTeachersWrapperByAgesMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -148,6 +187,13 @@ public final class TeacherServiceGrpc {
                 com.mgw.proto.TeacherRequest,
                 com.mgw.proto.TeacherResponse>(
                   this, METHODID_GET_TEACHER_BY_AGE)))
+          .addMethod(
+            getGetTeachersWrapperByAgesMethod(),
+            asyncClientStreamingCall(
+              new MethodHandlers<
+                com.mgw.proto.TeacherRequest,
+                com.mgw.proto.TeacherResponseList>(
+                  this, METHODID_GET_TEACHERS_WRAPPER_BY_AGES)))
           .build();
     }
   }
@@ -184,6 +230,14 @@ public final class TeacherServiceGrpc {
         io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponse> responseObserver) {
       asyncServerStreamingCall(
           getChannel().newCall(getGetTeacherByAgeMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public io.grpc.stub.StreamObserver<com.mgw.proto.TeacherRequest> getTeachersWrapperByAges(
+        io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponseList> responseObserver) {
+      return asyncClientStreamingCall(
+          getChannel().newCall(getGetTeachersWrapperByAgesMethod(), getCallOptions()), responseObserver);
     }
   }
 
@@ -250,6 +304,7 @@ public final class TeacherServiceGrpc {
 
   private static final int METHODID_GET_REAL_NAME_BY_USER_NAME = 0;
   private static final int METHODID_GET_TEACHER_BY_AGE = 1;
+  private static final int METHODID_GET_TEACHERS_WRAPPER_BY_AGES = 2;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -286,6 +341,9 @@ public final class TeacherServiceGrpc {
     public io.grpc.stub.StreamObserver<Req> invoke(
         io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
+        case METHODID_GET_TEACHERS_WRAPPER_BY_AGES:
+          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.getTeachersWrapperByAges(
+              (io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponseList>) responseObserver);
         default:
           throw new AssertionError();
       }
@@ -339,6 +397,7 @@ public final class TeacherServiceGrpc {
               .setSchemaDescriptor(new TeacherServiceFileDescriptorSupplier())
               .addMethod(getGetRealNameByUserNameMethod())
               .addMethod(getGetTeacherByAgeMethod())
+              .addMethod(getGetTeachersWrapperByAgesMethod())
               .build();
         }
       }

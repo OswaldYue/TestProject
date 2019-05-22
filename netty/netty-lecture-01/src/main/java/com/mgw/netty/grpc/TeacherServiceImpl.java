@@ -39,4 +39,46 @@ public class TeacherServiceImpl extends TeacherServiceGrpc.TeacherServiceImplBas
         responseObserver.onCompleted();
 
     }
+
+    /**
+     * 3.客户端发送流式数据 服务器端返回简单数据
+     *
+     * */
+    @Override
+    public StreamObserver<TeacherRequest> getTeachersWrapperByAges(StreamObserver<TeacherResponseList> responseObserver) {
+
+        //通过回调完成
+        return new StreamObserver<TeacherRequest>() {
+
+            @Override
+            public void onNext(TeacherRequest value) {
+                System.out.println("onNext : " + value.getAge());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+                System.out.println("onError : " + t.getMessage());
+
+
+            }
+
+            @Override
+            public void onCompleted() {
+
+                TeacherResponse teacherResponse = TeacherResponse.newBuilder().
+                        setName("张三").setAge(20).setCity("SZ").build();
+                TeacherResponse teacherResponse2 = TeacherResponse.newBuilder().
+                        setName("李四").setAge(30).setCity("GZ").build();
+
+                TeacherResponseList teacherResponseList = TeacherResponseList.newBuilder().addTeacherResponse(teacherResponse).
+                        addTeacherResponse(teacherResponse2).build();
+
+                responseObserver.onNext(teacherResponseList);
+                responseObserver.onCompleted();
+
+            }
+        };
+
+    }
 }
