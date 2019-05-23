@@ -98,11 +98,13 @@ public class TeacherServiceImpl extends TeacherServiceGrpc.TeacherServiceImplBas
                 System.out.println("biTalk onNext : " + value.getRequestInfo() );
 
                 responseObserver.onNext(StreamResponse.newBuilder().setResponseInfo(UUID.randomUUID().toString()).build());
+
             }
 
             @Override
             public void onError(Throwable t) {
                 System.out.println("biTalk onNext : " + t.getMessage());
+                t.printStackTrace();
             }
 
             @Override
