@@ -16,6 +16,8 @@ service TeacherService {
 
     rpc getTeachersWrapperByAges(stream TeacherRequest) returns (TeacherResponseList)  {}
 
+    rpc biTalk(stream StreamRequest) returns (StreamResponse) {}
+
 }
 
 message TeacherRequest{
@@ -30,10 +32,25 @@ message TeacherResponse {
     string city = 3;
 
 }
+
 message TeacherResponseList {
 
     repeated TeacherResponse teacherResponse = 1;
 }
+
+message StreamRequest {
+
+    string request_info = 1;
+
+}
+
+message StreamResponse {
+
+    string response_info = 1;
+
+}
+
+
 
 
 message MyRequest {

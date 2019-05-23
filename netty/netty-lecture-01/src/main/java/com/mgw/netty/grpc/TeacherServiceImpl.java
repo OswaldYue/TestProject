@@ -3,11 +3,13 @@ package com.mgw.netty.grpc;
 import com.mgw.proto.*;
 import io.grpc.stub.StreamObserver;
 
+import java.util.UUID;
+
 public class TeacherServiceImpl extends TeacherServiceGrpc.TeacherServiceImplBase {
 
     /**
      *
-     * 1.简单数据的互传
+     * 1.单一消息类型
      *
      * */
     @Override
@@ -22,7 +24,7 @@ public class TeacherServiceImpl extends TeacherServiceGrpc.TeacherServiceImplBas
     }
 
     /**
-     * 2.客户端发送简单数据 服务器返回流式数据
+     * 2.客户端发送单一消息类型 服务器返回流式数据
      *
      * */
 
@@ -79,6 +81,36 @@ public class TeacherServiceImpl extends TeacherServiceGrpc.TeacherServiceImplBas
 
             }
         };
+
+    }
+
+
+    /**
+     * 4.客户端发送流式数据 服务器端返回流式数据
+     *
+     * */
+    @Override
+    public StreamObserver<StreamRequest> biTalk(StreamObserver<StreamResponse> responseObserver) {
+
+        return new StreamObserver<StreamRequest>() {
+            @Override
+            public void onNext(StreamRequest value) {
+                System.out.println("biTalk onNext : " + value.getRequestInfo() );
+
+                responseObserver.onNext(StreamResponse.newBuilder().setResponseInfo(UUID.randomUUID().toString()).build());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                System.out.println("biTalk onNext : " + t.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
+            }
+        };
+
 
     }
 }

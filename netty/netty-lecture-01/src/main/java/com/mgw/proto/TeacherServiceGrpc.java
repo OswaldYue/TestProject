@@ -123,6 +123,38 @@ public final class TeacherServiceGrpc {
      return getGetTeachersWrapperByAgesMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.mgw.proto.StreamRequest,
+      com.mgw.proto.StreamResponse> getBiTalkMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "biTalk",
+      requestType = com.mgw.proto.StreamRequest.class,
+      responseType = com.mgw.proto.StreamResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.CLIENT_STREAMING)
+  public static io.grpc.MethodDescriptor<com.mgw.proto.StreamRequest,
+      com.mgw.proto.StreamResponse> getBiTalkMethod() {
+    io.grpc.MethodDescriptor<com.mgw.proto.StreamRequest, com.mgw.proto.StreamResponse> getBiTalkMethod;
+    if ((getBiTalkMethod = TeacherServiceGrpc.getBiTalkMethod) == null) {
+      synchronized (TeacherServiceGrpc.class) {
+        if ((getBiTalkMethod = TeacherServiceGrpc.getBiTalkMethod) == null) {
+          TeacherServiceGrpc.getBiTalkMethod = getBiTalkMethod = 
+              io.grpc.MethodDescriptor.<com.mgw.proto.StreamRequest, com.mgw.proto.StreamResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.CLIENT_STREAMING)
+              .setFullMethodName(generateFullMethodName(
+                  "com.mgw.proto.TeacherService", "biTalk"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.mgw.proto.StreamRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.mgw.proto.StreamResponse.getDefaultInstance()))
+                  .setSchemaDescriptor(new TeacherServiceMethodDescriptorSupplier("biTalk"))
+                  .build();
+          }
+        }
+     }
+     return getBiTalkMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -171,6 +203,13 @@ public final class TeacherServiceGrpc {
       return asyncUnimplementedStreamingCall(getGetTeachersWrapperByAgesMethod(), responseObserver);
     }
 
+    /**
+     */
+    public io.grpc.stub.StreamObserver<com.mgw.proto.StreamRequest> biTalk(
+        io.grpc.stub.StreamObserver<com.mgw.proto.StreamResponse> responseObserver) {
+      return asyncUnimplementedStreamingCall(getBiTalkMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -194,6 +233,13 @@ public final class TeacherServiceGrpc {
                 com.mgw.proto.TeacherRequest,
                 com.mgw.proto.TeacherResponseList>(
                   this, METHODID_GET_TEACHERS_WRAPPER_BY_AGES)))
+          .addMethod(
+            getBiTalkMethod(),
+            asyncClientStreamingCall(
+              new MethodHandlers<
+                com.mgw.proto.StreamRequest,
+                com.mgw.proto.StreamResponse>(
+                  this, METHODID_BI_TALK)))
           .build();
     }
   }
@@ -238,6 +284,14 @@ public final class TeacherServiceGrpc {
         io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponseList> responseObserver) {
       return asyncClientStreamingCall(
           getChannel().newCall(getGetTeachersWrapperByAgesMethod(), getCallOptions()), responseObserver);
+    }
+
+    /**
+     */
+    public io.grpc.stub.StreamObserver<com.mgw.proto.StreamRequest> biTalk(
+        io.grpc.stub.StreamObserver<com.mgw.proto.StreamResponse> responseObserver) {
+      return asyncClientStreamingCall(
+          getChannel().newCall(getBiTalkMethod(), getCallOptions()), responseObserver);
     }
   }
 
@@ -305,6 +359,7 @@ public final class TeacherServiceGrpc {
   private static final int METHODID_GET_REAL_NAME_BY_USER_NAME = 0;
   private static final int METHODID_GET_TEACHER_BY_AGE = 1;
   private static final int METHODID_GET_TEACHERS_WRAPPER_BY_AGES = 2;
+  private static final int METHODID_BI_TALK = 3;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -344,6 +399,9 @@ public final class TeacherServiceGrpc {
         case METHODID_GET_TEACHERS_WRAPPER_BY_AGES:
           return (io.grpc.stub.StreamObserver<Req>) serviceImpl.getTeachersWrapperByAges(
               (io.grpc.stub.StreamObserver<com.mgw.proto.TeacherResponseList>) responseObserver);
+        case METHODID_BI_TALK:
+          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.biTalk(
+              (io.grpc.stub.StreamObserver<com.mgw.proto.StreamResponse>) responseObserver);
         default:
           throw new AssertionError();
       }
@@ -398,6 +456,7 @@ public final class TeacherServiceGrpc {
               .addMethod(getGetRealNameByUserNameMethod())
               .addMethod(getGetTeacherByAgeMethod())
               .addMethod(getGetTeachersWrapperByAgesMethod())
+              .addMethod(getBiTalkMethod())
               .build();
         }
       }
