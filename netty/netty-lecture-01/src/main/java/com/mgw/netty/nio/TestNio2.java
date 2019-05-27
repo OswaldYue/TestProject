@@ -17,7 +17,7 @@ public class TestNio2 {
         channel.read(byteBuffer);
 
 
-        
+
         byteBuffer.flip();
 
         while (byteBuffer.hasRemaining()) {
