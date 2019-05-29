@@ -5,7 +5,11 @@ import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-public class TestNio4 {
+/**
+ *  NIO中的直接缓冲
+ *
+ * */
+public class TestNio8 {
 
     public static void main(String[] args) throws Exception{
 
@@ -15,12 +19,13 @@ public class TestNio4 {
         FileChannel inputStreamChannel = fileInputStream.getChannel();
         FileChannel outputStreamChannel = fileOutputStream.getChannel();
 
-        ByteBuffer buffer = ByteBuffer.allocate(512);
+        // 分配直接缓冲
+        ByteBuffer buffer = ByteBuffer.allocateDirect(512);
 
         while (true) {
 
             //如果这句代码去掉，那么将会不断往文件里面写，是死循环
-            //buffer.clear();
+            buffer.clear();
 
             int read = inputStreamChannel.read(buffer);
 
