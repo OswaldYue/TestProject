@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- *  NIO中的直接缓冲
+ *  NIO中的直接缓冲 直接分配内存在非jvm管理的内存中  实现零拷贝
  *
  * */
 public class TestNio8 {
