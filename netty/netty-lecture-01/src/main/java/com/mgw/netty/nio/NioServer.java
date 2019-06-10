@@ -2,10 +2,12 @@ package com.mgw.netty.nio;
 
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +54,23 @@ public class NioServer {
                             clientMap.put(key,client);
 
                         }else if (selectionKey.isReadable()) {
+
+                            client = (SocketChannel)selectionKey.channel();
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+
+                            int read = client.read(byteBuffer);
+
+                            if (read > 0) {
+
+                                byteBuffer.flip();
+                                Charset charset = Charset.forName("utf-8");
+                                String receivedMessage = String.valueOf(charset.decode(byteBuffer).array());
+
+                                System.out.println(client + ": " + receivedMessage);
+
+
+                            }
+
 
 
                         }
