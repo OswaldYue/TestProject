@@ -1,11 +1,12 @@
 package com.mgw;
 
+import java.io.FileInputStream;
 import java.util.function.Function;
 
 public class FunctionTest {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
 
         FunctionTest test = new FunctionTest();
 
@@ -17,6 +18,12 @@ public class FunctionTest {
 
         System.out.println(test.compose(2,value-> 3 * value,value -> value * value));
         System.out.println(test.andThen(2,value -> 3 * value, value -> value * value));
+
+
+        FileInputStream fileInputStream = new FileInputStream("");
+
+
+
     }
 
 
