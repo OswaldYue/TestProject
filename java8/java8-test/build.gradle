@@ -1,7 +1,10 @@
+import com.sun.org.apache.xalan.internal.xsltc.cmdline.Compile
+
 plugins {
     id 'java'
 }
 apply plugin: 'war'
+//apply plugin: 'org.junit.platform.gradle.plugin'
 
 group 'com.mgw'
 version '1.0-SNAPSHOT'
@@ -21,8 +24,9 @@ repositories {
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    //testCompile group: 'junit', name: 'junit', version: '4.12'
     // https://mvnrepository.com/artifact/org.springframework/spring-context
+    compile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.springframework', name: 'spring-context', version: '5.1.8.RELEASE'
     compile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.8.RELEASE'
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
