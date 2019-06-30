@@ -34,5 +34,17 @@ dependencies {
     //spring aop模块 需要依赖核心 以及aspectjrt 但是spring-aspects中已经包含了aspectjrt的包装类 所以不用引入
     compile group: 'org.springframework', name: 'spring-aspects', version: '5.1.8.RELEASE'
 //    compile group: 'org.aspectj', name: 'aspectjrt', version: '1.8.0'
+    // https://mvnrepository.com/artifact/org.springframework/spring-tx
+    //spring 事务模块 依赖aop模块
+    compile group: 'org.springframework', name: 'spring-tx', version: '5.1.8.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-jdbc
+    //spring jdbc模块 依赖于事务模块
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '5.1.8.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework/spring-orm
+    //spring orm模块  依赖于事务 通常与jdbc结合在一起使用
+    compile group: 'org.springframework', name: 'spring-orm', version: '5.1.8.RELEASE'
+
+
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 }
