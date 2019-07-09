@@ -13,6 +13,15 @@ public class CaculatorProxy {
         ClassLoader loader = caculator.getClass().getClassLoader();
         Class<?>[] interfaces = caculator.getClass().getInterfaces();
 
+//        Object instance = Proxy.newProxyInstance(caculator.getClass().getClassLoader(), caculator.getClass().getInterfaces(), ((proxy, method, args) -> {
+//
+//
+//            Object result = method.invoke(args);
+//
+//            return result;
+//
+//        }));
+
         Object proxyInstance = Proxy.newProxyInstance(loader, interfaces, new InvocationHandler() {
 
             /*
@@ -21,9 +30,20 @@ public class CaculatorProxy {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-                Object invoke = method.invoke(caculator, args);
+                Object result = null;
 
-                return invoke;
+                try {
+                    LogUtils.logStart(method,args);
+                    result = method.invoke(caculator, args);
+                    LogUtils.logReturn(method,result);
+                }catch (Exception e) {
+
+                    LogUtils.logException(method,e);
+
+                }finally {
+                    LogUtils.logAfter(method);
+                }
+                return result;
             }
         });
 

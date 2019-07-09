@@ -4,6 +4,6 @@ public interface Caculator {
 
     int add(int i,int j);
 
-    int div(float i,float j);
+    float div(int i,int j);
 
 }

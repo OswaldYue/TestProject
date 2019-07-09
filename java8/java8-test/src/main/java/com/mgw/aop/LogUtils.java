@@ -1,40 +1,29 @@
 package com.mgw.aop;
 
 
-import org.aspectj.lang.annotation.*;
-import org.springframework.stereotype.Component;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
-
-@Component
-@Aspect
 public class LogUtils {
 
-    @Pointcut("execution(* com.mgw.aop.MyCaculator.add(int,int))")
-    public void point() {}
 
-    @Before("point()")
-    public void logBefore() {
+    public static void logStart(Method method,Object... args) {
 
-        System.out.println("[xxx]方法开始前");
-
+        System.out.println("["+method.getName()+"]方法开始执行,参数列表是:"+ Arrays.asList(args));
     }
-    @After("point()")
-    public void logAfter() {
 
-        System.out.println("[xxx]方法结束");
+    public static void logAfter(Method method) {
+        System.out.println("["+method.getName()+"]方法最终结束");
 
     }
 
-
-    @AfterReturning("point()")
-    public void logReturn() {
-        System.out.println("[xxx]方法返回");
+    public static void logReturn(Method method,Object result) {
+        System.out.println("["+method.getName()+"]方法正常执行返回,结果是:"+result);
     }
 
-    @AfterThrowing("point()")
-    public void logException() {
 
-        System.out.println("[xxx]方法异常");
+    public static void logException(Method method,Exception e) {
+        System.out.println("["+method.getName()+"]方法异常,异常信息是:" + e.getCause());
     }
 
 }
