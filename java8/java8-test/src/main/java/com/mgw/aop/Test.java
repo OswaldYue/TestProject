@@ -7,26 +7,36 @@ public class Test {
 
 
 
-    @org.junit.Test
-    public void test1() {
+
+    public static void test1() {
 
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationcontext.xml");
 
         Caculator caculator = context.getBean(Caculator.class);
 
+        int add = caculator.add(2, 3);
+
+
+
         System.out.println(caculator.getClass());
+
+    }
+
+    public static void test2() {
+
+        Caculator caculator = new MyCaculator();
+        //使用动态代理实现aop功能
+        Caculator proxy = CaculatorProxy.getProxy(caculator);
 
     }
 
 
     public static void main(String[] args) {
 
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationcontext.xml");
 
-        Caculator caculator = context.getBean(Caculator.class);
+        //test1();
+        System.out.println("=============================");
 
-        caculator.add(1,1);
 
-        System.out.println(caculator.getClass());
     }
 }

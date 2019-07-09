@@ -12,6 +12,7 @@ public class MyCaculator implements Caculator {
 
     @Override
     public int div(float i, float j) {
+        System.out.println("div 执行");
         return 0;
     }
 }
