@@ -16,6 +16,7 @@ public class BookService {
         int price = bookDao.getPrice(isbn);
         bookDao.updateBalance(username,price);
 
+        int i = 10 / 0;
     }
 
 }

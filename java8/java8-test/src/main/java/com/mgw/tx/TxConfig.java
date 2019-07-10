@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @PropertySource(value = "classpath:/jdbc.properties")
+//相当于<tx:annotation-driven></tx:annotation-driven>这个注解
 @EnableTransactionManagement
 public class TxConfig {
 
@@ -40,7 +41,8 @@ public class TxConfig {
     }
 
     /**
-     * 配置事务管理器
+     * 配置事务管理器,控住数据源
+     *
      * */
     @Bean
     public DataSourceTransactionManager dataSourceTransactionManager() {

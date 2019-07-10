@@ -32,9 +32,9 @@
 
         </aop:aspect>
 
-
-
     </aop:config>
 
+    <!-- 开启基于注解的事务 -->
+<!--    <tx:annotation-driven></tx:annotation-driven>-->
 
 </beans>
