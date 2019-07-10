@@ -17,4 +17,10 @@ public class MyCaculator implements Caculator {
         return i/j;
     }
 
+    @Override
+    public int muti(int i, int j) {
+        System.out.println("muti 执行");
+        return i - j;
+    }
+
 }

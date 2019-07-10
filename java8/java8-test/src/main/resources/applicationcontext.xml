@@ -3,12 +3,38 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <context:component-scan base-package="com.mgw"></context:component-scan>
 
 
     <!-- 开启基于注解的aop功能:aop名称空间 -->
 <!--    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>-->
+
+    <!-- 基于配置的aop -->
+    <bean id="xmlAspect" class="com.mgw.aop.XmlAspect"></bean>
+
+    <aop:config>
+
+        <!-- 指定切面 -->
+        <aop:aspect ref="xmlAspect">
+            <aop:pointcut id="MyPointcut" expression="execution(public int com.mgw.aop.MyCaculator.muti(int , int))"/>
+            <!-- 配置切面通知方法何时运行 -->
+            <aop:before method="logBefore" pointcut="execution(public int com.mgw.aop.MyCaculator.muti(int , int))"></aop:before>
+
+            <aop:after method="logAfter" pointcut-ref="MyPointcut"></aop:after>
+
+            <aop:after-returning method="logReturn" pointcut-ref="MyPointcut" returning="result"></aop:after-returning>
+
+            <aop:after-throwing method="logException" pointcut-ref="MyPointcut" throwing="e"></aop:after-throwing>
+
+            <aop:around method="myAround" pointcut-ref="MyPointcut" ></aop:around>
+
+        </aop:aspect>
+
+
+
+    </aop:config>
+
 
 </beans>

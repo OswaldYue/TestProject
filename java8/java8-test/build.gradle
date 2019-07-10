@@ -45,6 +45,13 @@ dependencies {
     //spring orm模块  依赖于事务 通常与jdbc结合在一起使用
     compile group: 'org.springframework', name: 'spring-orm', version: '5.1.8.RELEASE'
 
+    // https://mvnrepository.com/artifact/com.alibaba/druid
+    //JDBC连接池
+    compile group: 'com.alibaba', name: 'druid', version: '1.1.18'
+
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    //mysql的JDBC连接驱动
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.39'
 
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 }

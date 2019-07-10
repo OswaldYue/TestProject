@@ -6,4 +6,6 @@ public interface Caculator {
 
     float div(int i,int j);
 
+    int muti(int i,int j);
+
 }

@@ -142,6 +142,15 @@ public class Test {
         bean.div(3,0);
     }
 
+    public static void test7() {
+
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationcontext.xml");
+        Caculator bean = context.getBean(Caculator.class);
+
+        bean.muti(4,2);
+
+    }
+
     public static void main(String[] args) {
 
 //        test1();
@@ -151,9 +160,10 @@ public class Test {
 //        test3();
 //        System.out.println("=============================");
 //        test5();
+//        System.out.println("=============================");
+//        test6();
 
         System.out.println("=============================");
-
-        test6();
+        test7();
     }
 }
