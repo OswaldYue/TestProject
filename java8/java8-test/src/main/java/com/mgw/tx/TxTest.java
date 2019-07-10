@@ -26,16 +26,24 @@ public class TxTest {
 
         bookService.checkout("Tom","ISBN-01");
 
-
     }
 
+    public static void test3() {
+
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationcontext.xml");
+
+        BookService bookService = context.getBean(BookService.class);
+        bookService.checkout2("Jerry","ISBN-02");
+
+    }
 
     public static void main(String[] args)  throws Exception{
 
 //        System.out.println("=================================================");
 //        test1();
+//        System.out.println("=================================================");
+//        test2();
         System.out.println("=================================================");
-        test2();
-
+        test3();
     }
 }
