@@ -11,7 +11,7 @@
     <!-- 开启基于注解的aop功能:aop名称空间 -->
 <!--    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>-->
 
-    <!-- 基于配置的aop -->
+    <!-- 基于xml配置的aop -->
     <bean id="xmlAspect" class="com.mgw.aop.XmlAspect"></bean>
 
     <aop:config>
@@ -36,5 +36,26 @@
 
     <!-- 开启基于注解的事务 -->
 <!--    <tx:annotation-driven></tx:annotation-driven>-->
+
+    <!-- 基于xml配置的tx管理 -->
+    <bean id="bookServiceXml" class="com.mgw.tx.BookServiceXml"></bean>
+
+    <!-- 配置出事务方法 让切面按照我们的切入点表达式切入事务 -->
+    <aop:config>
+        <aop:pointcut id="txPoint" expression="execution(* com.mgw.tx.BookServiceXml.*(..))"/>
+        <!-- 事务增强 -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"></aop:advisor>
+    </aop:config>
+
+    <!-- 配置事务管理器-->
+    <tx:advice transaction-manager="dataSourceTransactionManager" id="txAdvice">
+        <!-- 事务属性 -->
+        <tx:attributes>
+            <!-- 指明那些方法时事务方法;切入点表达式只是说,事务管理器要切入这些方法,那些方法要加事务是用<tx:method> -->
+            <tx:method name="checkout" rollback-for="Exception.class"/>
+            <tx:method name="get*" read-only="true"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+
 
 </beans>

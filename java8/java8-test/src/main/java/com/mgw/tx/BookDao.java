@@ -42,5 +42,16 @@ public class BookDao {
         jdbcTemplate.update(sql,isbn);
     }
 
+    /**
+     * 4.修改图书价格
+     *
+     * */
+    public void updatePrice(String isbn,int price) {
+
+        String sql = "UPDATE test_book SET price=? WHERE isbn=?";
+
+        jdbcTemplate.update(sql,price,isbn);
+
+    }
 
 }
