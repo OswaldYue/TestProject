@@ -1,6 +1,7 @@
 package com.mgw.ioc;
 
 import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 
@@ -29,13 +30,27 @@ public class IocTest  {
 
     }
 
+    public static void test3() {
+
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(IocConfig.class);
+
+        BYD byd = context.getBean(BYD.class);
+
+        System.out.println(byd);
+
+    }
+
     public static void main(String[] args) {
 
 //        System.out.println("=====================================================");
 //        test1();
 
+//        System.out.println("=====================================================");
+//        test2();
+
         System.out.println("=====================================================");
-        test2();
+        test3();
     }
 
 }
