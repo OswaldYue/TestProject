@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>2.SpringMVC_helloworld</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- The front controller of this Spring Web application, responsible for 
+		handling all application requests -->
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Map all requests to the DispatcherServlet for handling -->
+	<!--  *.do   *.action  *.haha -->
+	<!--  
+		/：拦截所有请求，不拦截jsp页面，*.jsp请求
+		/*：拦截所有请求，拦截jsp页面，*.jsp请求
+		
+		
+		处理*.jsp是tomcat做的事；所有项目的小web.xml都是继承于大web.xml
+		DefaultServlet是Tomcat中处理静态资源的？
+			除过jsp，和servlet外剩下的都是静态资源；
+			index.html：静态资源，tomcat就会在服务器下找到这个资源并返回;
+			我们前端控制器的/禁用了tomcat服务器中的DefaultServlet
+			
+		
+		1）服务器的大web.xml中有一个DefaultServlet是url-pattern=/
+		2）我们的配置中前端控制器 url-pattern=/
+				静态资源会来到DispatcherServlet（前端控制器）看那个方法的RequestMapping是这个index.html
+		3）为什么jsp又能访问；因为我们没有覆盖服务器中的JspServlet的配置
+		4） /*  直接就是拦截所有请求；我们写/；也是为了迎合后来Rest风格的URL地址
+	-->
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+</web-app>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+	
+	<context:component-scan base-package="com.atguigu"></context:component-scan>
+	
+	<!--可以导入JSTL包；fmt:message；
+	InternalResourceViewResolver：优先级是最低的
+	  -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/pages/"></property>
+		<property name="suffix" value=".jsp"></property>
+		<!-- <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property> -->
+	</bean>
+	<!--自定义的视图解析器    value="1"数字越小优先级越高-->
+	<bean class="com.atguigu.view.MyMeiNVViewResolver">
+		<property name="order" value="1"></property>
+	</bean>
+	
+	<!--让SpringMVC管理国际化资源文件；配置一个资源文件管理器;id是必须叫messageSource  -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<!--  basename指定基础名-->
+		<property name="basename" value="i18n"></property>
+	</bean>
+	
+	<!-- 发送一个请求("toLoginPage")；直接来到web-inf下的login页面；mvc名称空间下有一个请求映射标签 -->
+	<!-- path="":指定哪个请求 
+	    view-name：指定映射给哪个视图；
+	    走了SpringMVC的整个流程；视图解析。。。。
+	    其他的请求就不好使了？
+	 -->
+	<mvc:view-controller path="/toLoginPage" view-name="login"/>
+	<!-- 开启mvc注解驱动模式；开启了mvc的开挂模式 -->
+	<mvc:annotation-driven></mvc:annotation-driven>
+	
+
+</beans>

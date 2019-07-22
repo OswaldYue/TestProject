@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>1.SpringMVC_helloworld</display-name>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- SpringMVC思想是有一个前端控制器能拦截所有请求，并智能派发;
+  	这个前端控制器是一个servlet；应该在web.xml中配置这个servlet来拦截所有请求
+   -->
+   
+   <!-- The front controller of this Spring Web application, 
+   responsible for handling all application requests -->
+	<servlet>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		
+		<init-param>
+			<!-- contextConfigLocation:指定SpringMVC配置文件位置 -->
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:springmvc.xml</param-value>
+		</init-param>
+		<!-- servlet启动加载，servlet原本是第一次访问创建对象；
+		load-on-startup:服务器启动的时候创建对象；值越小优先级越高，越先创建对象；
+		 -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Map all requests to the DispatcherServlet for handling -->
+	<servlet-mapping>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<!--  
+			/*和/都是拦截所有请求； /：会拦截所有请求，但是不会拦截*.jsp；能保证jsp访问正常；
+			/*的范围更大；还会拦截到*.jsp这些请求；一但拦截jsp页面就不能显示了；
+		  -->
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+  
+</web-app>

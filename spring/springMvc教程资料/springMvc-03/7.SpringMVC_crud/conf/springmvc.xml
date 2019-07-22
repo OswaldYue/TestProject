@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<context:component-scan base-package="com.atguigu"></context:component-scan>
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/pages/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+
+	<!-- 默认前端控制器是拦截所有资源（除过jsp），js文件就404了；要js文件的请求是交给tomcat处理的
+	http://localhost:8080/7.SpringMVC_crud/scripts/jquery-1.9.1.min.js -->
+	<!-- 告诉SpringMVC，自己映射的请求就自己处理，不能处理的请求直接交给tomcat -->
+	<!-- 静态资源能访问，动态映射的请求就不行 -->
+	<mvc:default-servlet-handler/>
+	<!-- springmvc可以保证动态请求和静态请求都能访问 -->
+	<mvc:annotation-driven></mvc:annotation-driven>
+</beans>
