@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group 'org.springframework'
+version '5.1.6.RELEASE'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
+repositories {
+//    mavenCentral()
+
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+}
+
+//编译使用UTF-8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+dependencies {
+    compile project(':spring-context')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
