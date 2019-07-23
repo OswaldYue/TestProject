@@ -13,8 +13,22 @@ public class IocTest {
 //		Car car = context.getBean(Car.class);
 //		System.out.println(car);
 
-		BYD byd = context.getBean(BYD.class);
-		System.out.println(byd);
+		BWM bwm = context.getBean(BWM.class);
+		System.out.println(bwm);
+
+		BYD byd1 = context.getBean(BYD.class);
+		System.out.println(byd1);
+
+		BYD byd2 = context.getBean(BYD.class);
+		System.out.println(byd2);
+
+
+		BYD byd3 = context.getBean(BYD.class);
+		System.out.println(byd3);
+
+
+		BYD byd4 = context.getBean(BYD.class);
+		System.out.println(byd4);
 
 	}
 
