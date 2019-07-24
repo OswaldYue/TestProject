@@ -49,11 +49,17 @@ public class Test {
 
         bean.add(2,3);
 
+        System.out.println("----------------------------------");
 
-        //此时强转会出错,因为代理对象已经不是原来的对象了,但是可以转为接口,可以用接口
+        //当一个类在spring容器中有代理时,此时强转会出错,因为代理对象已经不是原来的对象了,但是可以转为接口(jdk动态代理时),可以用接口
+        //com.sun.proxy.$Proxy30 cannot be cast to com.mgw.aop.MyCaculator
         //MyCaculator myCaculator = (MyCaculator)context.getBean("myCaculator");
         Caculator caculator = (Caculator)context.getBean("myCaculator");
+
+        //com.mgw.aop.MyCaculator@491b9b8
+        //class com.sun.proxy.$Proxy30
         System.out.println(caculator);
+        System.out.println(caculator.getClass());
 
         bean.div(3,0);
 
@@ -156,14 +162,14 @@ public class Test {
 //        test1();
 //        System.out.println("=============================");
 //        test2();
-//        System.out.println("=============================");
-//        test3();
+        System.out.println("=============================");
+        test3();
 //        System.out.println("=============================");
 //        test5();
 //        System.out.println("=============================");
 //        test6();
 
-        System.out.println("=============================");
-        test7();
+//        System.out.println("=============================");
+//        test7();
     }
 }
