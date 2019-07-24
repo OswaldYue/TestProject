@@ -17,7 +17,6 @@ public class Test2 {
 		相当于
 		// 静态变量的声明
     	public static int _i;
-
     	// 静态变量的初始化
     	static {
         	_i = 10;
