@@ -19,6 +19,9 @@ package org.springframework.beans.factory.config;
 import org.springframework.beans.BeansException;
 
 /**
+ * 这个BeanFactory的后置处理器很重要,是spring用来给beanFactory增强功能的主要手段。就整个概念而言和BeanPostProcessor这个概念类似
+ *
+ *
  * Allows for custom modification of an application context's bean definitions,
  * adapting the bean property values of the context's underlying bean factory.
  *

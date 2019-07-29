@@ -17,6 +17,15 @@ public class IocTest {
 		System.out.println(bwm);
 		System.out.println(bwm.getClass());
 
+		//@Lazy这个注解  bean不会在加载容器时实例化,而是在需要用到时实例化,且只实例化一次
+		/*
+		*
+		---lazy BYD---
+		com.mgw.ioc.BYD@27abe2cd
+		com.mgw.ioc.BYD@27abe2cd
+		com.mgw.ioc.BYD@27abe2cd
+		com.mgw.ioc.BYD@27abe2cd
+		* */
 		BYD byd1 = context.getBean(BYD.class);
 		System.out.println(byd1);
 
@@ -60,6 +69,14 @@ public class IocTest {
 
 	public static void test3() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
+
+		IocConfig iocConfig = context.getBean(IocConfig.class);
+		
+//		com.mgw.ioc.IocConfig$$EnhancerBySpringCGLIB$$a6b74037@29444d75
+//		class com.mgw.ioc.IocConfig$$EnhancerBySpringCGLIB$$a6b74037
+		System.out.println(iocConfig);
+		System.out.println(iocConfig.getClass());
+
 	}
 
 	public static void main(String[] args) {
