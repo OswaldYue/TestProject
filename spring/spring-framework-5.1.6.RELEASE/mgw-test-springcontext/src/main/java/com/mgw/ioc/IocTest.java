@@ -71,7 +71,7 @@ public class IocTest {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
 
 		IocConfig iocConfig = context.getBean(IocConfig.class);
-		
+
 //		com.mgw.ioc.IocConfig$$EnhancerBySpringCGLIB$$a6b74037@29444d75
 //		class com.mgw.ioc.IocConfig$$EnhancerBySpringCGLIB$$a6b74037
 		System.out.println(iocConfig);
