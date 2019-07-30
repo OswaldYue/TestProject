@@ -42,6 +42,10 @@ public class IocTest {
 
 	}
 
+	/**
+	 * 证明无论是接口类型拿bean,还是实现类类型拿bean,
+	 * 实例化的bean其实是实现类的bean
+	 * */
 	public static void test2() {
 
 		//此测试案例的前提是Car接口只有一个BWM的实现类
@@ -67,6 +71,9 @@ public class IocTest {
 		System.out.println(bwm.getClass());
 	}
 
+	/**
+	 * 证明配置类是代理类
+	 * */
 	public static void test3() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
 
@@ -79,6 +86,16 @@ public class IocTest {
 
 	}
 
+	/**
+	 * spring的循环依赖
+	 * spring可以解决循环依赖,但是必须其中一个类是单例
+	 * */
+	public static void test4() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
+
+
+	}
+
 	public static void main(String[] args) {
 
 //		System.out.println("=============================================");
@@ -87,8 +104,10 @@ public class IocTest {
 //		System.out.println("=============================================");
 //		test2();
 
-		System.out.println("=============================================");
-		test3();
+//		System.out.println("=============================================");
+//		test3();
 
+		System.out.println("=============================================");
+		test4();
 	}
 }
