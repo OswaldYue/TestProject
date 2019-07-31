@@ -60,11 +60,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	/** Cache of singleton objects: bean name to bean instance. */
-	//spring存放完全初始化完成的bean  单例池 当需要用时直接拿出使用
+	//spring存放完全初始化完成的bean,从该缓存中取出的 bean 可以直接使用  单例池
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
-	//存放bean工厂对象解决循环依赖
+	//存放 bean 工厂对象，用于解决循环依赖,目前看来这个是主要处理循环依赖的
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
@@ -126,9 +126,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
+			//将创建好的bean(完全创建完毕,可以直接拿来使用)加入singletonObjects中
 			this.singletonObjects.put(beanName, singletonObject);
+
+			//从singletonFactories,earlySingletonObjects中移除
 			this.singletonFactories.remove(beanName);
 			this.earlySingletonObjects.remove(beanName);
+
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -145,6 +149,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
 			if (!this.singletonObjects.containsKey(beanName)) {
+
+				//将正在创建此bean的beanFactory加入到singletonFactories中
 				this.singletonFactories.put(beanName, singletonFactory);
 				this.earlySingletonObjects.remove(beanName);
 				this.registeredSingletons.add(beanName);
@@ -168,14 +174,21 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		//尝试从缓存池中直接拿到已经创建好的bean
 		Object singletonObject = this.singletonObjects.get(beanName);
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
+				//尝试从earlySingletonObjects中拿到不完全的bean,主要解决循环依赖
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				if (singletonObject == null && allowEarlyReference) {
+					//尝试拿到一个beanName对应的beanFactory,解决循环依赖
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						//从singletonFactory中获取早期引用   提前曝光bean实例(原始bean),用于解决循环依赖
 						singletonObject = singletonFactory.getObject();
+
+						//放入earlySingletonObjects中,解决循环依赖的主要步骤之一
+						// 将 singletonObject 放入缓存中，并将 singletonFactory 从缓存中移除
 						this.earlySingletonObjects.put(beanName, singletonObject);
 						this.singletonFactories.remove(beanName);
 					}
@@ -208,9 +221,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				}
 				/*
 				 * 把beanName加到singletonsCurrentlyInCreation这个set集合中,表示对应的beanName的bean正在创建
+				 * this.singletonsCurrentlyInCreation.add(beanName)
 				 *
 				 * spring支持循环依赖的条件:其中至少一个对象是单例的,如果都是多实例的,则不支持
-				 * 这句代码是解决循环依赖的
 				 *
 				 * */
 				beforeSingletonCreation(beanName);
