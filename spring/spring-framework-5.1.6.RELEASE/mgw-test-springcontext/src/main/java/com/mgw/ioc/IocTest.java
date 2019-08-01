@@ -87,13 +87,34 @@ public class IocTest {
 	}
 
 	/**
-	 * spring的循环依赖
+	 * spring的循环依赖 CircularReference1 CircularReference2
 	 * spring可以解决循环依赖,但是必须其中一个类是单例
 	 * */
 	public static void test4() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
+		AA aa = context.getBean(AA.class);
 
+//		System.out.println(aa.getAutowireService1());
 
+	}
+
+	/**
+	 * spring的注入方式 AA AutowireService1 AutowireService2 AutowireService3
+	 *
+	 * */
+	public static void test5() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
+		AA aa = context.getBean(AA.class);
+
+//		System.out.println(aa.getAutowireService1());
+
+	}
+
+	/**
+	 * spring-mybatis
+	 * */
+	public static void test6() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
 	}
 
 	public static void main(String[] args) {
