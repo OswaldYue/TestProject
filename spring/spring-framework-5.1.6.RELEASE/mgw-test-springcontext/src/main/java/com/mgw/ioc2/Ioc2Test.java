@@ -1,6 +1,7 @@
 package com.mgw.ioc2;
 
 import com.mgw.ioc2.service.UserService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Ioc2Test {
@@ -18,11 +19,24 @@ public class Ioc2Test {
 
 	}
 
+	/**
+	 * 使用配置类进行依赖
+	 * */
+	public static void test2() {
+
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Ioc2Config.class);
+
+		System.out.println(context);
+
+	}
+
 	public static void main(String[] args) {
 
-		System.out.println("------------------------------------------------------");
-		test1();
+//		System.out.println("------------------------------------------------------");
+//		test1();
 
+		System.out.println("------------------------------------------------------");
+		test2();
 
 	}
 }

@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean id="userDao" class="com.mgw.ioc2.dao.UserDaoImpl">
+	<!-- context:annotation-config这个配置不加亦可以  spring4开始context:component-scan这个配置已经可以既开启注解,又可以扫描包了 -->
+<!--	<context:annotation-config></context:annotation-config>-->
+	<context:component-scan base-package="com.mgw.ioc2"></context:component-scan>
 
-	</bean>
+	<!-- 注解与xml配置可以一起混合使用 以com.mgw.ioc2.dao.UserDaoImpl类为例 -->
+<!--	<bean id="userDao" class="com.mgw.ioc2.dao.UserDaoImpl">-->
+
+<!--	</bean>-->
 
 	<bean id="userService" class="com.mgw.ioc2.service.UserServiceImpl">
 
-		<property name="userDao" ref="userDao"></property>
-
+<!--		<property name="userDao" ref="userDao"></property>-->
+		<constructor-arg ref="userDao"></constructor-arg>
 	</bean>
 
 </beans>
