@@ -52,6 +52,8 @@ dependencies {
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     //mysql的JDBC连接驱动
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.39'
+    compile group: 'org.mybatis', name: 'mybatis-spring', version: '2.0.2'
+    compile group: 'org.mybatis', name: 'mybatis', version: '3.5.0'
 
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 }
