@@ -238,7 +238,7 @@ class ConstructorResolver {
 				* constructorToUse != null表示至少找到了一个可用
 				* argsToUse.length > paramTypes.length  argsToUse由于一般是指定给的值,那么当argsToUse.length > paramTypes.length时,
 				* 就意味着你给定的参数个数大于了实际spring此时拿到的构造方法参数,由于上面对构造方法进行了排序,参数少的排在参数多的后面,所以此时spring拿到的构造方法已经不满足给定要求的参数个数了
-				* 那么久没有必要再继续去寻找可用的构造放了,可以直接break了
+				* 那么就没有必要再继续去寻找可用的构造放了,可以直接break了
 				*
 				* 这句代码很妙 就像HashMap的源码e.hash & (newCap - 1)这句代码一样  具有画龙点睛之笔
 				*
