@@ -89,7 +89,7 @@ public class JdbcTest {
 		System.out.println(myFactoryBean2.getClass());
 		System.out.println(myFactoryBean2);
 
-		//测试前需要先将JdbcConfig配置类的@MapperScan("com.mgw.jdbc")注解去掉 让其使用ProxyFactoryBean1中的自己产生的代理对象
+		//测试前需要先将JdbcConfig配置类的@MapperScan("com.mgw.jdbc")注解与@MyMapperScan去掉 让其使用ProxyFactoryBean1中的自己产生的代理对象
 		AccountMapper accountMapper = context.getBean(AccountMapper.class);
 		accountMapper.getAccountByUsername("xxx");
 		System.out.println(accountMapper.getClass());

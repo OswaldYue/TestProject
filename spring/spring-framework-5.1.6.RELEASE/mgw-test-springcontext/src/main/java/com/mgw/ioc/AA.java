@@ -66,7 +66,7 @@ public class AA  {
 
 	/*
 	* spring的注入方式:byName  byType
-	* spring的注入技术:AUTOWIRE_NO AUTOWIRE_BY_NAME AUTOWIRE_BY_TYPE AUTOWIRE_CONSTRUCTOR
+	* spring的注入技术(模型):AUTOWIRE_NO AUTOWIRE_BY_NAME AUTOWIRE_BY_TYPE AUTOWIRE_CONSTRUCTOR
 	*
 	* */
 	@PostConstruct

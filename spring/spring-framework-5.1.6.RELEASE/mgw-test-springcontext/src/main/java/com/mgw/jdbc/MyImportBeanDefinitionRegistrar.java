@@ -14,6 +14,7 @@ public class MyImportBeanDefinitionRegistrar implements ImportBeanDefinitionRegi
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 
 		//给出一个包名 com.mgw.jdbc 可以得到这个包下所有的类
+		//进行for() 可以将所有需要进行代理的Mapper接口类全部注入
 
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ProxyFactoryBean.class);
 		GenericBeanDefinition genericBeanDefinition = (GenericBeanDefinition)beanDefinitionBuilder.getBeanDefinition();
