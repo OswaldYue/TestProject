@@ -9,6 +9,12 @@ public  class UserDaoImpl implements UserDao {
 
     }
 
+    @Override
+    public String proxy() {
+        System.out.println("---UserDaoImpl---proxy()---操作数据库---");
+        return "mmmmmmmmmmmmmmmmm";
+    }
+
 //    @Override
 //    public void query(String p) {
 //        System.out.println(p);

@@ -5,5 +5,5 @@ public interface UserDao {
     void query();
 //    void query(String p);
 //    String query(String p1,Integer p2);
-
+    String proxy();
 }

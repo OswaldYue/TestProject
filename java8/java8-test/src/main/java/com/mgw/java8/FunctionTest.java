@@ -1,4 +1,4 @@
-package com.mgw;
+package com.mgw.java8;
 
 import java.io.FileInputStream;
 import java.util.function.Function;

@@ -14,9 +14,9 @@ public class ProxyInvocationHandlerImpl implements ProxyInvocationHandler {
     @Override
     public Object invoke(Method method) {
 
-        System.out.println("-----------------------------------oooooooooo----------------------");
+        System.out.println("--------------------ProxyInvocationHandlerImpl代理处理类----------------------");
         try {
-            method.invoke(target);
+            return method.invoke(target);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

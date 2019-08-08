@@ -72,10 +72,18 @@ public class ProxyUtil1 {
 
             methodContent += tab + "public " + returnTypeFullName + " " + methodName + "(" + argsContent + ") {" + line
                     + tab + tab + "try {" + line
-                    + tab + tab + tab + "java.lang.reflect.Method method = Class.forName(\"" + targetInterface.getName() + "\").getDeclaredMethod(\"" + methodName + "\");" + line
-                    + tab + tab + tab +"h.invoke(method);" + line
-                    + tab + tab + "}catch(java.lang.Exception e) {" + line
+                    + tab + tab + tab + "java.lang.reflect.Method method = Class.forName(\"" + targetInterface.getName() + "\").getDeclaredMethod(\"" + methodName + "\");" + line;
+                    if("void".equals(returnTypeFullName)) {
+                        methodContent += tab + tab + tab +"h.invoke(method);" + line;
+                    }else {
+                        methodContent += tab + tab + tab +"return ("+returnTypeFullName+")h.invoke(method);" + line;
+                    }
+//            methodContent += tab + tab + tab +"h.invoke(method);" + line
+            methodContent += tab + tab + "}catch(java.lang.Exception e) {" + line
                     + tab + tab + "}" + line;
+            if(!"void".equals(returnTypeFullName)) {
+                methodContent += tab + tab + "return null;" + line;
+            }
             methodContent += tab + "}" + line;
 
         }
@@ -108,10 +116,9 @@ public class ProxyUtil1 {
         URLClassLoader urlClassLoader = new URLClassLoader(urls);
         Class<?> clazz = urlClassLoader.loadClass("com.mgw.proxy.proxyCoustom.utils.$Proxy");
 
-//        return clazz.newInstance();
         //使用构造方法创建一个对象
-//        Constructor<?> constructor = clazz.getConstructor(targetInterface);
-//        Object proxy = constructor.newInstance(target);
+        Constructor<?> constructor = clazz.getConstructor(h.getClass());
+        Object proxy = constructor.newInstance(h);
 
         //善后删除临时创建的java源文件以及class文件
 //        deleteFileOrDirectory(pathFile);
@@ -122,7 +129,7 @@ public class ProxyUtil1 {
 //            pathnFile.delete();
 //        }
 
-//        return proxy;
+        return proxy;
 
     }
 
