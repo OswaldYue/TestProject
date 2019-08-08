@@ -55,5 +55,10 @@ dependencies {
     compile group: 'org.mybatis', name: 'mybatis-spring', version: '2.0.2'
     compile group: 'org.mybatis', name: 'mybatis', version: '3.5.0'
 
+    //dom4j解析xml
+    // https://mvnrepository.com/artifact/dom4j/dom4j
+    compile group: 'dom4j', name: 'dom4j', version: '1.6.1'
+
+
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 }

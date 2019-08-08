@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+1.那些类需要去关联
+2.怎么告诉这么类?
+3.怎么维护依赖关系?(set,构造方法)
+4.怎么体现这种依赖关系?
+-->
+<beans>
+
+    <bean id="userDao" class="com.mgw.spring.dao.UserDaoImpl"/>
+
+    <bean id="userService" class="com.mgw.spring.service.UserServiceImpl">
+        <property name="userDao" ref="userDao"></property>
+
+    </bean>
+
+</beans>
