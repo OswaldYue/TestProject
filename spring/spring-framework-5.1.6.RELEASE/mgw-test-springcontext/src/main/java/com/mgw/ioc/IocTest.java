@@ -8,6 +8,7 @@ public class IocTest {
 	public static void test1() {
 
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
+//		context.register(null);
 
 		//Exception in thread "main" org.springframework.beans.factory.NoUniqueBeanDefinitionException: No qualifying bean of type 'com.mgw.ioc.Car' available: expected single matching bean but found 2: BWM,BYD
 //		Car car = context.getBean(Car.class);
@@ -94,6 +95,7 @@ public class IocTest {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
 		AA aa = context.getBean(AA.class);
 
+
 //		System.out.println(aa.getAutowireService1());
 
 	}
@@ -111,10 +113,12 @@ public class IocTest {
 	}
 
 	/**
-	 * spring-mybatis
+	 * 测试AnnotationConfigApplicationContext.scan() 扫描
 	 * */
 	public static void test6() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(IocConfig.class);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		context.scan("com.mgw.ioc");
+		context.refresh();
 	}
 
 	public static void main(String[] args) {
@@ -128,7 +132,13 @@ public class IocTest {
 //		System.out.println("=============================================");
 //		test3();
 
+//		System.out.println("=============================================");
+//		test4();
+
+//		System.out.println("=============================================");
+//		test5();
+
 		System.out.println("=============================================");
-		test4();
+		test6();
 	}
 }

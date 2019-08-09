@@ -153,8 +153,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	//---------------------------------------------------------------------
 
 	/**
-	 * 注册配置类,将其解析为一个BeanDefinntion,并放入beanFactory中
-	 *
+	 * 注册配置类或者普通的java类,将其解析为一个BeanDefinntion,并放入beanFactory中
+	 * 此处可以传两种类:一种是config配置类,另一种是普通的java类,例如:service,dao等
 	 *
 	 * Register one or more annotated classes to be processed.
 	 * <p>Note that {@link #refresh()} must be called in order for the context

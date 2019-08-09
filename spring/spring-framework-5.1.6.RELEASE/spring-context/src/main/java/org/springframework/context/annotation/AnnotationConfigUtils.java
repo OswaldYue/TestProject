@@ -131,6 +131,7 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * 此处注册beanFactory需要的用来处理后续bean创建过程中的后置处理器
+	 *
 	 * Register all relevant annotation post processors in the given registry.
 	 * @param registry the registry to operate on
 	 */

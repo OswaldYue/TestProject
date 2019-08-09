@@ -16,16 +16,16 @@
 
 package org.springframework.core.type.classreading;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.asm.ClassReader;
 import org.springframework.core.NestedIOException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.lang.Nullable;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * {@link MetadataReader} implementation based on an ASM
@@ -62,6 +62,7 @@ final class SimpleMetadataReader implements MetadataReader {
 		}
 
 		AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
+		//此处就可以将解析完的resource信息填入visitor这个类中  具体的解析是将class类转为流去解析  暂时没看懂
 		classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 
 		this.annotationMetadata = visitor;

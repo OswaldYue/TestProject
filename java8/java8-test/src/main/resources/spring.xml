@@ -6,13 +6,13 @@
 3.怎么维护依赖关系?(set,构造方法)
 4.怎么体现这种依赖关系?
 -->
-<beans>
+<beans default-autowire="byType">
 
     <bean id="userDao" class="com.mgw.spring.dao.UserDaoImpl"/>
+    <bean id="userDao1" class="com.mgw.spring.dao.UserDaoImpl1"/>
 
     <bean id="userService" class="com.mgw.spring.service.UserServiceImpl">
-        <property name="userDao" ref="userDao"></property>
-
+<!--        <property name="userDao" ref="userDao"></property>-->
     </bean>
 
 </beans>

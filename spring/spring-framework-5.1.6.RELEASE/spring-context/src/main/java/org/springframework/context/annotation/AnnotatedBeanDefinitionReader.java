@@ -16,9 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.annotation.Annotation;
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
@@ -32,6 +29,9 @@ import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.lang.annotation.Annotation;
+import java.util.function.Supplier;
 
 /**
  * Convenient adapter for programmatic registration of annotated bean classes.
@@ -71,6 +71,8 @@ public class AnnotatedBeanDefinitionReader {
 	}
 
 	/**
+	 * 注册几个后续需要使用的其他工具类
+	 *
 	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry and using
 	 * the given {@link Environment}.
 	 * @param registry the {@code BeanFactory} to load bean definitions into,
@@ -219,10 +221,16 @@ public class AnnotatedBeanDefinitionReader {
 		}
 
 		abd.setInstanceSupplier(instanceSupplier);
+		//解析出作用域并设置
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
 
+		/*
+		* 对于此类的其他注解的处理
+		* 例如:Lazy,DependsOn等等
+		* 从侧面说明这里不止能够处理config类,普通的bean其实也可以处理,例如:注册某个service,dao都是可以的
+		* */
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
