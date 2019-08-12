@@ -25,6 +25,33 @@ import org.springframework.lang.Nullable;
  * bean的后置处理这个东西可以用来做很多事情,例如:aop,tx,注解的解析,自动注入,循环依赖,@PostConstruct生命周期的回调等等
  * 可以算是spring中最重要的几个接口之一了
  *
+ * ApplicationContextAwareProcessor:
+ * 为实现了EnvironmentAware接口的bean注入beanEnvironment
+ * 为实现了EmbeddedValueResolverAware注入的bean添加EmbeddedValueResolver
+ * 为实现了ResourceLoaderAware接口的bean注入ResourceLoader
+ * 为实现了ApplicationEventPublisherAware接口的bean注入ApplicationEventPublisher
+ * 为实现了MessageSourceAware接口的bean注入MessageSource
+ * 为实现了ApplicationContextAware接口的bean注入ApplicationContext
+ *
+ * InitDestroyAnnotationBeanPostProcessor:
+ * 处理自定义的初始化方法和销毁方法
+ * 3种方式:
+ * 方式1:通过@Bean指定init-method和destroy-method属性
+ * 方式2:Bean实现InitializingBean和DisposableBean接口
+ * 方式3:@PostConstruct和@PreDestroy注解的方法
+ *
+ * InstantiationAwareBeanPostProcessor
+ *
+ * CommonAnnotationBeanPostProcessor
+ *
+ * AutowiredAnnotationBeanPostProcessor
+ *
+ * RequiredAnnotationBeanPostProcessor
+ *
+ * BeanValidationPostProcessor
+ *
+ * AbstractAutoProxyCreator
+ *
  *
  * Factory hook that allows for custom modification of new bean instances,
  * e.g. checking for marker interfaces or wrapping them with proxies.
