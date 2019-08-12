@@ -52,8 +52,14 @@ import java.util.function.Supplier;
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
 
+	/*
+	* 维护一个读取器 用来读取BeanDefinition
+	* */
 	private final AnnotatedBeanDefinitionReader reader;
 
+	/*
+	* 维护一个扫描器 用来扫描BeanDefinition  执行scan(String... basePackages)方法时会去扫描并注册BeanDefinition
+	* */
 	private final ClassPathBeanDefinitionScanner scanner;
 
 
@@ -70,8 +76,16 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		* org.springframework.context.event.internalEventListenerFactory
 		* org.springframework.context.annotation.internalCommonAnnotationProcessor(可选)
 		*
-		* */
+		*/
+		/*
+		*  AnnotatedBeanDefinitionReader为一个reader 就是用来读取AnnotatedBeanDefinition  一句话:获取一个读取器
+		*
+		*/
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		/*
+		*  拿到一个扫描器 Scanner Mybatis的@MapperScan注解就使用了ClassPathBeanDefinitionScanner这个这个扫描器
+		*
+		* */
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -169,6 +183,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		this.reader.register(annotatedClasses);
 	}
 
+
 	/**
 	 * Perform a scan within the specified base packages.
 	 * <p>Note that {@link #refresh()} must be called in order for the context
@@ -181,7 +196,6 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		this.scanner.scan(basePackages);
 	}
-
 
 	//---------------------------------------------------------------------
 	// Convenient methods for registering individual beans

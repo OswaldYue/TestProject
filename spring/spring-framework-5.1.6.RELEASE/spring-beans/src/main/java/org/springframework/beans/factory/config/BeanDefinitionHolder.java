@@ -39,10 +39,17 @@ import org.springframework.util.StringUtils;
  */
 public class BeanDefinitionHolder implements BeanMetadataElement {
 
+	/*
+	* BeanDefinitionHolder这个类感觉很像一个Map 用来关联bean与BeanDefinition  但是比Map更加丰富
+	* */
+
+	//存放BeanDefinition
 	private final BeanDefinition beanDefinition;
 
+	//存放beanName
 	private final String beanName;
 
+	//存放bean的aliases
 	@Nullable
 	private final String[] aliases;
 

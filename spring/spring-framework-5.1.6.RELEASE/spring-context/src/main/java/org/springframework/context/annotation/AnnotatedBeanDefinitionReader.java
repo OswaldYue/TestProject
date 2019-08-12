@@ -215,7 +215,18 @@ public class AnnotatedBeanDefinitionReader {
 	<T> void doRegisterBean(Class<T> annotatedClass, @Nullable Supplier<T> instanceSupplier, @Nullable String name,
 			@Nullable Class<? extends Annotation>[] qualifiers, BeanDefinitionCustomizer... definitionCustomizers) {
 
+		/*
+		* 根据bean信息创建一个AnnotatedGenericBeanDefinition  这个BeanDefinition就是用来定义bean信息的  例如:是否是懒加载 是否是单实例等等
+		* */
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(annotatedClass);
+		/*
+		* 判断是否需要跳过不解析  这个方法目前没看懂 和理解的不一样
+		*
+		* 怎么判断是否需要跳过?
+		* 这个类是用来装注解相关的BeanDefinition 如果这个bean没有注解  自然会被跳过
+		*
+		* 传入的参数是元注解
+		* */
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}
@@ -224,6 +235,7 @@ public class AnnotatedBeanDefinitionReader {
 		//解析出作用域并设置
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
+		//生成beanName  传入的registry实际没有使用
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
 
 		/*
@@ -232,6 +244,12 @@ public class AnnotatedBeanDefinitionReader {
 		* 从侧面说明这里不止能够处理config类,普通的bean其实也可以处理,例如:注册某个service,dao都是可以的
 		* */
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
+		/*
+		* 如果向容器注册注解bean定义时,使用了额外的限定符(例如:qualifier)注解  则在这里就解析
+		* 一个bean可以再其上面加@Lazy @Primary 等注解,同样spring允许你不在bean上加这些注解
+		* 让你调用doRegisterBean()这个方法时,允许你传入一个Class<? extends Annotation>[] qualifiers 这样的参数来定义是否后续加入这些参数
+		*
+		* */
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
 				if (Primary.class == qualifier) {
@@ -241,15 +259,21 @@ public class AnnotatedBeanDefinitionReader {
 					abd.setLazyInit(true);
 				}
 				else {
+					//如果使用了除@Primary @Lazy的注解 则为bean添加一个根据名字自动装配的限定符  目前还没感觉到此处有啥意义
 					abd.addQualifier(new AutowireCandidateQualifier(qualifier));
 				}
 			}
 		}
+		//自定义的BeanDefinition在此设置  目前没发现那里使用了自定义的BeanDefinition  感觉意义不大
 		for (BeanDefinitionCustomizer customizer : definitionCustomizers) {
 			customizer.customize(abd);
 		}
 
+		//BeanDefinitionHolder算是一个比BeanDefinition更加丰富一些的一个结构  算是BeanDefinition的包装
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
+		/*
+		* ScopedProxyMode比较复杂  与springMvc结合的较紧密
+		* */
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}

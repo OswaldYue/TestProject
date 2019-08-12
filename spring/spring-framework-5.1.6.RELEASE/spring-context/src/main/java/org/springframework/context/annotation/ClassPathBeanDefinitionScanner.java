@@ -249,6 +249,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		doScan(basePackages);
 
 		// Register annotation config processors, if necessary.
+		/*
+		* 此处与reader(AnnotatedBeanDefinitionReader)的初始化一样,也需要注册一些spring自己需要使用的类 以达到后续处理其他bean的目的
+		* */
 		if (this.includeAnnotationConfig) {
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 		}
