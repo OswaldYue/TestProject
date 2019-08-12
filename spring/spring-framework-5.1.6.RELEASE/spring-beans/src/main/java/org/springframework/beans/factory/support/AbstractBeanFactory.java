@@ -166,6 +166,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * spring容器管理的所有bean最后全部都是依赖此方法进行拿到 无论是提前创建好从缓存中拿还是没有创建用的时候去创建 都必须调用此方法去实现
+	 *
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 * @param name the name of the bean to retrieve
 	 * @param requiredType the required type of the bean to retrieve

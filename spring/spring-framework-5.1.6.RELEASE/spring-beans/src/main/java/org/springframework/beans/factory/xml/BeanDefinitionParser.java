@@ -22,6 +22,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.lang.Nullable;
 
 /**
+ * 这个接口是spring中一个很重要的接口 主要是用来解析配置文件标签或者配置类的解析的  算是一个解析器的工具类
+ *
+ *
  * Interface used by the {@link DefaultBeanDefinitionDocumentReader} to handle custom,
  * top-level (directly under {@code <beans/>}) tags.
  *

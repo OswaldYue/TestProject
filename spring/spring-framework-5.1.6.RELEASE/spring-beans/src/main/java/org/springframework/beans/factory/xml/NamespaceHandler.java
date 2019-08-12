@@ -24,6 +24,13 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.lang.Nullable;
 
 /**
+ * 这个接口为spring中比较重要的一个接口 其主要作用是解析xml配置文件时 使用名称空间名称去找相关标签配置类处理器解析标签
+ *
+ * 例如:
+ * <context:component-scan base-package="com.mgw"></context:component-scan>
+ * <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+ * ...
+ *
  * Base interface used by the {@link DefaultBeanDefinitionDocumentReader}
  * for handling custom namespaces in a Spring XML configuration file.
  *

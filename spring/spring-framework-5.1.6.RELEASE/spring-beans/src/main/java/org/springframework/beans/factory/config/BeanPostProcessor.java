@@ -20,6 +20,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
+ * 这个接口是spring中的顶级接口之一
+ * spring提供除出来的允许使用者干预bean的创建过程的5种方式之一:bean的后置处理器
+ * bean的后置处理这个东西可以用来做很多事情,例如:aop,tx,注解的解析,自动注入,循环依赖,@PostConstruct生命周期的回调等等
+ * 可以算是spring中最重要的几个接口之一了
+ *
+ *
  * Factory hook that allows for custom modification of new bean instances,
  * e.g. checking for marker interfaces or wrapping them with proxies.
  *

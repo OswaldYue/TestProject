@@ -170,6 +170,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * 注册配置类或者普通的java类,将其解析为一个BeanDefinntion,并放入beanFactory中
 	 * 此处可以传两种类:一种是config配置类,另一种是普通的java类,例如:service,dao等
 	 *
+	 * 这里的注册其实只是注册了一个单一的bean 如果是config配置类 就算标有扫描注解 其也不会去扫描的 而是会在后面的刷新容器时使用后置处理器进行扫描将需要扫描的bean注册进容器
+	 *
 	 * Register one or more annotated classes to be processed.
 	 * <p>Note that {@link #refresh()} must be called in order for the context
 	 * to fully process the new classes.
@@ -185,6 +187,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 
 	/**
+	 * 扫描bean 提前将要扫描的包下的注册进工厂中
+	 *
 	 * Perform a scan within the specified base packages.
 	 * <p>Note that {@link #refresh()} must be called in order for the context
 	 * to fully process the new classes.

@@ -16,6 +16,8 @@
 
 package org.springframework.core.io;
 
+import org.springframework.lang.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,9 +26,11 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-import org.springframework.lang.Nullable;
-
 /**
+ * 资源类的接口  这是一个spring中比较顶级的一个接口类型  其主要是做资源加载使用的 不要狭隘的理解为就是做配置文件资源解析用的
+ * 这是极为狭隘的 spring中的顶级接口一般都是做一类事情的  其抽象能力是恐怖的
+ * 可以去看其子类,有很多 无论是文件系统的资源 还是网络资源 又或者是关于流的资源  应有尽有  全部抽象为一个Resource
+ *
  * Interface for a resource descriptor that abstracts from the actual
  * type of underlying resource, such as a file or class path resource.
  *
