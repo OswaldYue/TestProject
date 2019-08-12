@@ -19,7 +19,8 @@ package org.springframework.beans.factory.config;
 import org.springframework.beans.BeansException;
 
 /**
- * 这个接口也是spring提供给使用者让其干预bean创建过程的5种方法之一 属于spring中的顶级接口之一
+ * 这个接口也是spring提供给使用者让其干预bean创建过程的5种方法之一
+ * 属于spring中的顶级接口之一
  *
  * 这个BeanFactory的后置处理器很重要,是spring用来给beanFactory增强功能的主要手段。就整个概念而言和BeanPostProcessor这个概念类似
  * BeanPostProcessor是拦截bean并增强bean的功能，那么BeanFactoryPostProcessor这个就是用来拦截BeanFactory的，并给其增强功能
