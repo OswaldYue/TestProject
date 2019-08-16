@@ -23,6 +23,7 @@ public class IocTest  {
         ClassPathResource resource = new ClassPathResource("applicationcontext.xml");
         XmlBeanFactory factory = new XmlBeanFactory(resource);
 
+//        Object bwm = factory.getBean("BWM");
         Car bean = factory.getBean(BWM.class);
 
         System.out.println(bean);
@@ -43,14 +44,14 @@ public class IocTest  {
 
     public static void main(String[] args) {
 
-//        System.out.println("=====================================================");
-//        test1();
+        System.out.println("=====================================================");
+        test1();
 
 //        System.out.println("=====================================================");
 //        test2();
 
-        System.out.println("=====================================================");
-        test3();
+//        System.out.println("=====================================================");
+//        test3();
     }
 
 }
