@@ -316,10 +316,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
-			//使用解析器进行解析
+			//使用解析器进行解析  解析:从bean原始信息->BeanDefinition 这个过程有些BeanDefinition被注册了  有些则还没有
 			parser.parse(candidates);
 			parser.validate();
 
+			//从configurationClasses中拿到经过parser.parse(candidates)解析的BeanDefinition 并做了去重处理
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());
 			configClasses.removeAll(alreadyParsed);
 
@@ -329,6 +330,15 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
+			/*
+			* 加载再次尝试注册这些BeanDefinition
+			*
+			* 这么做的目的是:举例说明
+			* 加入配置了@Import(Audi.class)这样一个普通类 那么在parser.parse(candidates)过程中是没有合适的方法去注册这个普通类的
+			* 这里就是为了注册这些解析过但是没有注册的类的
+			* 而有些就可以在parser.parse(candidates)过程中就注册了 例如:扫描某个包下就可以@ComponentScan(value = "com.mgw.ioc")
+			*
+			* */
 			this.reader.loadBeanDefinitions(configClasses);
 			alreadyParsed.addAll(configClasses);
 

@@ -274,6 +274,7 @@ class ConfigurationClassParser {
 
 				//扫描普通类
 				//调用ComponentScanAnnotationParser.parse()方法去解析包下可以被扫描的类
+				//拿到所有加了@Component的类  注意:@Repository @Service @Controller这三个注解里面其实也是使用@Component注解
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
@@ -285,7 +286,9 @@ class ConfigurationClassParser {
 					if (bdCand == null) {
 						bdCand = holder.getBeanDefinition();
 					}
+					//此处还是继续判断扫描出来的BeanDefinition中是否有@Configuration @Component @ComponentScan @Import @ImportResource类以及是否其方法标注了@Bean注解
 					if (ConfigurationClassUtils.checkConfigurationClassCandidate(bdCand, this.metadataReaderFactory)) {
+						//有就递归继续去解析  递归调用继续去解析
 						parse(bdCand.getBeanClassName(), holder.getBeanName());
 					}
 				}

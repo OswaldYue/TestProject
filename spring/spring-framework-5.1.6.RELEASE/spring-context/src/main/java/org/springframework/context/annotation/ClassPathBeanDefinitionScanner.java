@@ -292,14 +292,17 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				//如果是AbstractBeanDefinition子类  则为他设置默认值
 				//例如:LazyInit AutowireMode DependencyCheck MethodName EnforceInitMethod DestroyMethodName EnforceDestroyMethod
 				//从代码层面上看  前面只是为beanDefinitionDefaults设置了是否懒加载  其实是spring先将一些设置放到了BeanDefinitionDefaults这个类中保存一下 再设置到BeanDefinition中
-				//实际上是使用config类上的属性默认值  但是针对所扫描到的类 每一个都可能会有自己不同的值  所以下面processCommonDefinitionAnnotations才会去做扫描到的类的个性解析
+				//实际上是使用config类上的属性默认值 也就是统一使用config类的默认属性
+				//但是针对所扫描到的类 每一个都可能会有自己不同的值  所以下面AnnotationConfigUtils.processCommonDefinitionAnnotations()才会去做扫描到的类的个性解析 也就是使用自己个性属性
 				//ScannedGenericBeanDefinition继承了AbstractBeanDefinition
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+				//结合上面postProcessBeanDefinition()代码与下面的AnnotationConfigUtils.processCommonDefinitionAnnotations()
+				//一起看就是 有自己个性属性就用自己个性属性 没有就用config类的属性
 				//ScannedGenericBeanDefinition实现了AnnotatedBeanDefinition
 				if (candidate instanceof AnnotatedBeanDefinition) {
-					//解析注解
+					//解析注解  解析出自己的个性属性
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
 				if (checkCandidate(beanName, candidate)) {

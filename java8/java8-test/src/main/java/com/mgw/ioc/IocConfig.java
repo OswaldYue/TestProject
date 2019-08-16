@@ -1,11 +1,10 @@
 package com.mgw.ioc;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Import;
 
-@ComponentScan(value = "com.mgw.ioc")
-@Configuration
+//@ComponentScan(value = "com.mgw.ioc")
+//@Configuration
+@Import(Audi.class)
 public class IocConfig {
 
 
