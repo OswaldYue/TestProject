@@ -32,6 +32,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
+ *
+ * 这是一个扫描器
+ *
+ * 无论是配置@ComponentScan扫描还是使用xml配置的包扫描或者直接使用context.scan("xxx.xxx") 都是使用这个类去做扫描
+ * mybatis与spring整合时底层也有使用它去做扫描
+ *
+ *
  * A bean definition scanner that detects bean candidates on the classpath,
  * registering corresponding bean definitions with a given registry ({@code BeanFactory}
  * or {@code ApplicationContext}).
@@ -272,16 +279,25 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
 		for (String basePackage : basePackages) {
 			//解析出扫描到的class的BeanDefinition
+			//这个方法是扫描的核心
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+			//此时返回的BeanDefinition为ScannedGenericBeanDefinition
 			for (BeanDefinition candidate : candidates) {
 				//解析出作用域并设置
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
 				//生成bean的名称
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+
+				//如果是AbstractBeanDefinition子类  则为他设置默认值
+				//例如:LazyInit AutowireMode DependencyCheck MethodName EnforceInitMethod DestroyMethodName EnforceDestroyMethod
+				//从代码层面上看  前面只是为beanDefinitionDefaults设置了是否懒加载  其实是spring先将一些设置放到了BeanDefinitionDefaults这个类中保存一下 再设置到BeanDefinition中
+				//实际上是使用config类上的属性默认值  但是针对所扫描到的类 每一个都可能会有自己不同的值  所以下面processCommonDefinitionAnnotations才会去做扫描到的类的个性解析
+				//ScannedGenericBeanDefinition继承了AbstractBeanDefinition
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+				//ScannedGenericBeanDefinition实现了AnnotatedBeanDefinition
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					//解析注解
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
@@ -310,6 +326,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param beanName the generated bean name for the given bean
 	 */
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
+		//为beanDefinition填充一些默认值
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
 		if (this.autowireCandidatePatterns != null) {
 			beanDefinition.setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));

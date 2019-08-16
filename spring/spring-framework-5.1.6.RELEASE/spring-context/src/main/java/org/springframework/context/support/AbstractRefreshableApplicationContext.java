@@ -135,7 +135,6 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			/*
 			* 加载BeanDefinition
 			* 如果是解析xml配置相关的就使用AbstractXmlApplicationContext.loadBeanDefinitions()
-			* 如果是使用config配置相关的就使用...
 			* */
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {

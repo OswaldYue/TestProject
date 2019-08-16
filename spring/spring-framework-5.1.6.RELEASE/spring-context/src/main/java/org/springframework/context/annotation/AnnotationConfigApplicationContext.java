@@ -59,6 +59,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 	/*
 	* 维护一个扫描器 用来扫描BeanDefinition  执行scan(String... basePackages)方法时会去扫描并注册BeanDefinition
+	* 这个scanner其实用的不多 只是在这个类中提供一个扫描器  允许你自己手动去做扫描
+	* 而在后面的ConfigurationClassPostProcessor这个beanFactory后置处理器中去解析@ComponentScan扫描类时则会新new ClassPathBeanDefinitionScanner()去扫描
+	*
+	* 如果是使用xml配置的包扫描 则使用ComponentScanBeanDefinitionParser这个解析器去解析 里面依然是使用ClassPathBeanDefinitionScanner这个类去做扫描
+	* 这个扫描器类很强大  mybatis与spring整合时底层也有使用它去做扫描
+	*
 	* */
 	private final ClassPathBeanDefinitionScanner scanner;
 
@@ -75,7 +81,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		* org.springframework.context.event.internalEventListenerProcessor
 		* org.springframework.context.event.internalEventListenerFactory
 		* org.springframework.context.annotation.internalCommonAnnotationProcessor(可选)
-		*
+		* 以及设置两个比较重要的类
+		* AnnotationAwareOrderComparator 主要是处理排序
+		* ContextAnnotationAutowireCandidateResolver 解决延时加载
 		*/
 		/*
 		*  AnnotatedBeanDefinitionReader为一个reader 就是用来读取AnnotatedBeanDefinition  一句话:获取一个读取器
@@ -83,8 +91,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		*/
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		/*
-		*  拿到一个扫描器 Scanner Mybatis的@MapperScan注解就使用了ClassPathBeanDefinitionScanner这个这个扫描器
-		*
+		*  拿到一个扫描器 Scanner  但是这个扫描器只是给使用者使用者  其spring内部自己去扫描类时自己又重新new ClassPathBeanDefinitionScanner()
+		*  扫描器其实就是可以扫描一个路径并将相关可以注册的类注册
+		*  Mybatis的@MapperScan注解就使用了ClassPathBeanDefinitionScanner这个这个扫描器
 		* */
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}

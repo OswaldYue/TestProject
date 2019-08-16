@@ -2,6 +2,7 @@ package com.mgw.ioc;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+
 public class IocTest {
 
 
@@ -135,10 +136,11 @@ public class IocTest {
 //		System.out.println("=============================================");
 //		test4();
 
-//		System.out.println("=============================================");
-//		test5();
-
 		System.out.println("=============================================");
-		test6();
+		test5();
+
+//		System.out.println("=============================================");
+//		test6();
+
 	}
 }

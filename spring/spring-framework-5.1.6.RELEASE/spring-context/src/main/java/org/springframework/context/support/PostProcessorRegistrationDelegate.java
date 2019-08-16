@@ -42,19 +42,34 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 	/**
-	 * 此方法是先实例化BeanDefinitionRegistryPostProcessor这个工厂后置处理器
+	 * 此方法是先实例化并执行BeanDefinitionRegistryPostProcessor这个工厂后置处理器(先执行BeanDefinitionRegistryPostProcessor接口特有的方法再执行其父接口BeanFactoryPostProcessor的特有的方法)
+	 * 再实例化并执行BeanFactoryPostProcessor工厂后置处理器
+	 *
+	 * 具体如下:
+	 * 1.优先执行beanFactoryPostProcessors中自定义的BeanDefinitionRegistryPostProcessor类的特有方法,并存起来(registryProcessors)
+	 * 	如果beanFactoryPostProcessors中有自定义的BeanFactoryPostProcessor则先存起来(regularPostProcessors)
+	 * 2.再执行容器中所有能找到的BeanDefinitionRegistryPostProcessor方法,按PriorityOrdered,Ordered,无顺序标识  依次执行,并存起来(registryProcessors)
+	 * 3.执行存起来的registryProcessors中的BeanDefinitionRegistryPostProcessor父类BeanFactoryPostProcessor特有的方法
+	 * 4.执行先前存起来的regularPostProcessors中自定义的BeanFactoryPostProcessor类特有方法
+	 * 5.执行容器中所有未重复的BeanFactoryPostProcessor类特有的方法,按PriorityOrdered,Ordered,无顺序标识  依次执行
 	 *
 	 * */
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
 		//先执行BeanDefinitionRegistryPostProcessor
+		//processedBeans这个set的目的是为了下面执行BeanFactoryPostProcessor接口的后置处理器防止重复执行,
+		//因为先执行BeanDefinitionRegistryPostProcessor类型的后置处理器,执行了这种类型的处理器那么BeanFactoryPostProcessor这种也会紧跟其后而执行,故做去重复操作
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<>();
 
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+			//regularPostProcessors这个list是放beanFactoryPostProcessors中的BeanFactoryPostProcessor  其实就是想放使用者自定义的BeanFactoryPostProcessor
+			//目的是在所有的BeanDefinitionRegistryPostProcessor类执行完后 执行BeanFactoryPostProcessor的方法
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
+			//registryProcessors这个list里面即放了beanFactoryPostProcessors中使用者自定义的BeanDefinitionRegistryPostProcessor
+			//还放了后面容器中所有的BeanDefinitionRegistryPostProcessor 目的就是为了后面去执行其父类BeanFactoryPostProcessor的特有方法
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
 			/*
@@ -64,6 +79,7 @@ final class PostProcessorRegistrationDelegate {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
+					//执行beanFactoryPostProcessors中自定义的BeanDefinitionRegistryPostProcessor类的postProcessBeanDefinitionRegistry()方法
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryProcessors.add(registryProcessor);
 				}
@@ -72,6 +88,10 @@ final class PostProcessorRegistrationDelegate {
 				}
 			}
 
+			/*
+			* currentRegistryProcessors中放的是spring自己实现BeanDefinitionRegistryPostProcessor接口的
+			* 而上面的registryProcessors这个list是使用者通过context.addBeanFactoryPostProcessor()加入容器中
+			*/
 			// Do not initialize FactoryBeans here: We need to leave all regular beans
 			// uninitialized to let the bean factory post-processors apply to them!
 			// Separate between BeanDefinitionRegistryPostProcessors that implement
@@ -81,6 +101,9 @@ final class PostProcessorRegistrationDelegate {
 			/*
 			* 从工厂中寻找BeanDefinitionRegistryPostProcessor类型的工厂后置处理器 有就实例化并加入到list中
 			* 并优先执行PriorityOrdered的类
+			*
+			* 这里一般是spring去找其内部需要使用的类 当然你自定义的BeanDefinitionRegistryPostProcessor如果已经注册到工厂中了那么也会拿出来 比如:先通过context.scan()过包再context.refresh()的类就有
+			* 而new AnnotationConfigApplicationContext(IocConfig.class)这样来刷新容器的此时就还没有,因为此时容器只是注册了config类,而还没注册BeanDefinitionRegistryPostProcessor类
 			* */
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
 			String[] postProcessorNames =
@@ -90,6 +113,7 @@ final class PostProcessorRegistrationDelegate {
 					/*
 					* 实例化org.springframework.context.annotation.internalConfigurationAnnotationProcessor = ConfigurationClassPostProcessor这个BeanFactoryPostProcessor后置处理器,
 					* 并将其放入beanFactory
+					* 如果使用config配置类加@ComponentScan(value = "com.mgw.ioc")扫描 那么ConfigurationClassPostProcessor这个后置处理器此时就会去扫描包并注册
 					* */
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
@@ -140,8 +164,11 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			/*
-			* 调用到目前为止处理的所有处理器的postProcessBeanFactory回调
-			* 为何要这么做?我也没有看懂
+			* 调用到目前为止处理的所有处理器的BeanDefinitionRegistryPostProcessor接口的特有postProcessBeanDefinitionRegistry()的回调
+			* 下面就要去回调BeanDefinitionRegistryPostProcessor接口的父接口BeanFactoryPostProcessor的postProcessBeanFactory()的回调
+			*
+			* 也就是说先按顺序前后回调BeanDefinitionRegistryPostProcessor的特有方法
+			* 再回调其父接口BeanFactoryPostProcessor的特有方法
 			*
 			* */
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.

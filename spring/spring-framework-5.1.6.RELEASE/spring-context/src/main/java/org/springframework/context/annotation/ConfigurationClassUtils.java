@@ -16,14 +16,8 @@
 
 package org.springframework.context.annotation;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -38,6 +32,11 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Utilities for identifying {@link Configuration} classes.
  *
@@ -47,8 +46,10 @@ import org.springframework.stereotype.Component;
  */
 abstract class ConfigurationClassUtils {
 
+	//标识为全注解  @Configuration
 	private static final String CONFIGURATION_CLASS_FULL = "full";
 
+	//标识为部分注解 @Component @ComponentScan @Import @ImportResource或者有标了@Bean注解的方法
 	private static final String CONFIGURATION_CLASS_LITE = "lite";
 
 	private static final String CONFIGURATION_CLASS_ATTRIBUTE =
@@ -87,6 +88,8 @@ abstract class ConfigurationClassUtils {
 		}
 
 		AnnotationMetadata metadata;
+		//判断beanDef是否是AnnotatedBeanDefinition(一般自己写的bean注册进来时会解析成AnnotatedBeanDefinition,spring自己的则注册为RootBeanDefinition)
+		//这里做这几个if判断是因为BeanDefinition不同,拿取元数据的方式也有所不同  从而做到兼容
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
@@ -111,10 +114,13 @@ abstract class ConfigurationClassUtils {
 				return false;
 			}
 		}
-
+		//判断是否加了@Configuration 注解 如果有加full标识
+		//full 标识为全注解
 		if (isFullConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+		//判断是否加了@Component @ComponentScan @Import @ImportResource注解或者有标了@Bean注解的方法 如果有加lite标识
+		//lite标识为部分注解
 		else if (isLiteConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
@@ -122,6 +128,7 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
+		//如果设置了@Order注解 则拿到注解的value值并设置
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
 		Integer order = getOrder(metadata);
 		if (order != null) {

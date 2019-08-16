@@ -19,6 +19,9 @@ package org.springframework.context.annotation;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
+ *
+ * 自定义逻辑返回需要导入的组件
+ *
  * Interface to be implemented by types that determine which @{@link Configuration}
  * class(es) should be imported based on a given selection criteria, usually one or
  * more annotation attributes.
@@ -48,6 +51,10 @@ import org.springframework.core.type.AnnotationMetadata;
 public interface ImportSelector {
 
 	/**
+	 *
+	 * 返回值  要导入到容器中的组件全类名
+	 * AnnotationMetadata:当前标注@Import注解的类的所有注解信息
+	 *
 	 * Select and return the names of which class(es) should be imported based on
 	 * the {@link AnnotationMetadata} of the importing @{@link Configuration} class.
 	 */

@@ -16,16 +16,13 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.io.support.PropertySourceFactory;
 
+import java.lang.annotation.*;
+
 /**
+ * 这个注解是加载指定的属性文件 例如加载xxx.Propertites文件
+ *
  * Annotation providing a convenient and declarative mechanism for adding a
  * {@link org.springframework.core.env.PropertySource PropertySource} to Spring's
  * {@link org.springframework.core.env.Environment Environment}. To be used in

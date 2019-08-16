@@ -508,10 +508,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			* 1.设置BeanFactory的类加载器、支持表达式解析器...
 			* 2.添加部分BeanPostProcessor[ApplicationContextAwareProcessor]
 			* 3.设置忽略的自动装配的接口EnvironmentAware、EmbeddedValueResolverAware、xxx
-			* 4.注册可以解析的自动装配;我们能直接在任何组件中自动注入:BeanFactory、ResourceLoader、ApplicationEventPublisher、ApplicationContext
-			* 5.添加BeanPostProcessor[ApplicationListenerDetector] 与事件派发器有关
+			* 4.注册可以解析的自动装配;可以进行依赖替换 我们能直接在任何组件中自动注入:BeanFactory、ResourceLoader、ApplicationEventPublisher、ApplicationContext
+			* 5.添加BeanPostProcessor[ApplicationListenerDetector]
 			* 6.添加编译时的AspectJ;
 			* 7.给BeanFactory中注册一些能用的组件;environment[ConfigurableEnvironment]、 systemProperties[Map<String, Object>]、 systemEnvironment[Map<String, Object>]
+			* 	这里你就可以拿到关于系统的一些信息 例如:你的操作系统是啥 你的jdk安装在哪儿 等等
 			* */
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
@@ -713,7 +714,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		/*
 		* 刷新工厂,其实就是有工厂就先销毁,再重新创建,没有就创建  使用委派模式调用它的子类
 		* 当是使用ClassPathXmlApplicationContext时使用的是AbstractRefreshableApplicationContext中的refreshBeanFactory()方法
-		* 当是使用AnnotationConfigApplicationContext时使用的是...
+		* 当是使用AnnotationConfigApplicationContext时使用的是DefaultListableBeanFactory中的refreshBeanFactory()方法
 		* */
 		refreshBeanFactory();
 		/*
@@ -733,13 +734,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Tell the internal bean factory to use the context's class loader etc.
 		beanFactory.setBeanClassLoader(getClassLoader());
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
+		//对象与String类型的转化 <property ref="xxx">
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		//2.添加部分BeanPostProcessor[ApplicationContextAwareProcessor]等
 		// Configure the bean factory with context callbacks.
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
-		//3.设置忽略的自动装配的接口EnvironmentAware、EmbeddedValueResolverAware、xxx;
+		/*
+		* 3.设置忽略的自动装配的接口EnvironmentAware、EmbeddedValueResolverAware、xxx
+		*
+		* 当你的bean想要自动注入这些接口bean时  spring是不会给你注入的
+		* spring想要你使用ApplicationContextAwareProcessor这个后置处理器去做
+		* 只要你实现EnvironmentAware,EmbeddedValueResolverAware,ResourceLoaderAware,ApplicationEventPublisherAware,ApplicationContextAware这些接口时
+		* spring会以回调的形式给你
+		* */
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
@@ -747,7 +756,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.ignoreDependencyInterface(MessageSourceAware.class);
 		beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
 
-		//4.注册可以解析的自动装配; 我们能直接在任何组件中自动注入,例如:@Autowire ApplicationContext applicationContext
+		//4.注册可以解析的自动装配; 可以进行依赖替换 例如当你需要注入BeanFactory时 容器会把现在正在用的这个BeanFactory给你 同理ApplicationContext也是
 		// BeanFactory interface not registered as resolvable type in a plain factory.
 		// MessageSource registered (and found for autowiring) as a bean.
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
@@ -755,7 +764,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
-		//5.添加BeanPostProcessor[ApplicationListenerDetector] 与事件派发器有关
+		//5.添加BeanPostProcessor[ApplicationListenerDetector]
 		// Register early post-processor for detecting inner beans as ApplicationListeners.
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
@@ -768,7 +777,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		/*
-		* 7.给BeanFactory中注册一些能用的组件;
+		* 7.给BeanFactory中注册一些能用的组件; 这里你就可以拿到关于系统的一些信息 例如:你的操作系统是啥 你的jdk安装在哪儿 等等
 		* environment[ConfigurableEnvironment]
 		* systemProperties[Map<String, Object>]
 		* systemEnvironment[Map<String, Object>]
@@ -801,6 +810,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		/*
+		* getBeanFactoryPostProcessors()方法是获取自定义的BeanFactoryPostProcessor(就是使用者自己定义的,但是没有交给容器去管理,例如:没有配置在xml中,没有加@Component,以及没有加入config配置类中)
+		* 但是可以在容器context.refresh()之前使用context.addBeanFactoryPostProcessor()加入容器中
+		* 无论是手动加入容器还是扫描配置进容器都是可以生效的 只是执行的时机稍有不同
+		* */
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime

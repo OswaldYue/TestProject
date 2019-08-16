@@ -21,6 +21,10 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
+ * 使用者手工注入想要注入的bean的BeanDefinition
+ * mybatis与spring整合时底层就是使用此接口完成整合为其加一个MapperScannerConfigurer,再在MapperScannerConfigurer中依次扫描包,为其注入MapperFactoryBean这种FactoryBean从而完成整合
+ *
+ *
  * Interface to be implemented by types that register additional bean definitions when
  * processing @{@link Configuration} classes. Useful when operating at the bean definition
  * level (as opposed to {@code @Bean} method/instance level) is desired or necessary.
@@ -50,6 +54,13 @@ import org.springframework.core.type.AnnotationMetadata;
 public interface ImportBeanDefinitionRegistrar {
 
 	/**
+	 * AnnotationMetadata：当前类的注解信息
+	 * BeanDefinitionRegistry:BeanDefinition注册类
+	 *
+	 * 把所有需要添加到容器中的bean 调用BeanDefinitionRegistry.registerBeanDefinition手工注册进来
+	 * 但是如果手工注测近jdk动态代理的bean 那么实际根本拿不出来 因为代理类的类型与原始类的类型已经不同了
+	 *
+	 *
 	 * Register bean definitions as necessary based on the given annotation metadata of
 	 * the importing {@code @Configuration} class.
 	 * <p>Note that {@link BeanDefinitionRegistryPostProcessor} types may <em>not</em> be

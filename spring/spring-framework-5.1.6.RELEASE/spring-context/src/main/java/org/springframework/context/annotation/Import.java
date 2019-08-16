@@ -23,6 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 此注解是主要用来导入一个类的
+ * 分三种主要情况:
+ * 1.普通类
+ * 2.ImportSelector接口类  自定义逻辑返回需要导入的组件
+ * 3.ImportBeanDefinitionRegistrar接口类
+ *
  * Indicates one or more {@link Configuration @Configuration} classes to import.
  *
  * <p>Provides functionality equivalent to the {@code <import/>} element in Spring XML.

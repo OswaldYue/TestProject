@@ -23,6 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 这个注解是复合@ComponentScan注解  spring中经常这么写
+ *
  * Container annotation that aggregates several {@link ComponentScan} annotations.
  *
  * <p>Can be used natively, declaring several nested {@link ComponentScan} annotations.

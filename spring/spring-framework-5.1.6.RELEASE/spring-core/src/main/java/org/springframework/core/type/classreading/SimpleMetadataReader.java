@@ -62,7 +62,7 @@ final class SimpleMetadataReader implements MetadataReader {
 		}
 
 		AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
-		//此处就可以将解析完的resource信息填入visitor这个类中  具体的解析是将class类转为流去解析  暂时没看懂
+		//此处就可以将解析完的resource信息填入visitor这个类中  具体的解析是使用asm去操作class类   暂时没看懂
 		classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 
 		this.annotationMetadata = visitor;
