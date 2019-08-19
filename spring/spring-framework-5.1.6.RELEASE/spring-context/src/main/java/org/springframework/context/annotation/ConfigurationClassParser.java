@@ -302,6 +302,7 @@ class ConfigurationClassParser {
 		* 2.ImportSelector接口的类
 		* 3.ImportBeanDefinitionRegistrar接口的类
 		* */
+		//getImports(sourceClass)拿到的是@Import(xxx.class)中的xxx.class的值 当@Import(MyImportSelector.class)中的类是ImportSelector接口类时 递归调用此方法时 第三个参数则传的是MyImportSelector接口类返回的数组类全名
 		// Process any @Import annotations
 		processImports(configClass, sourceClass, getImports(sourceClass), true);
 
@@ -565,9 +566,12 @@ class ConfigurationClassParser {
 					if (candidate.isAssignable(ImportSelector.class)) {
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
+						//反射实例一个对象
 						ImportSelector selector = BeanUtils.instantiateClass(candidateClass, ImportSelector.class);
 						ParserStrategyUtils.invokeAwareMethods(
 								selector, this.environment, this.resourceLoader, this.registry);
+
+						//DeferredImportSelector是ImportSelector的子接口 做延迟处理的
 						if (selector instanceof DeferredImportSelector) {
 							this.deferredImportSelectorHandler.handle(
 									configClass, (DeferredImportSelector) selector);
@@ -576,6 +580,7 @@ class ConfigurationClassParser {
 							//拿到使用者自己添加的bean的全名
 							String[] importClassNames = selector.selectImports(currentSourceClass.getMetadata());
 							Collection<SourceClass> importSourceClasses = asSourceClasses(importClassNames);
+							//递归调用 因为使用者加入的类也可以继续加@Import注解 但是最后一定会解析成普通类 进入普通类的处理
 							processImports(configClass, currentSourceClass, importSourceClasses, false);
 						}
 					}
@@ -588,6 +593,7 @@ class ConfigurationClassParser {
 								BeanUtils.instantiateClass(candidateClass, ImportBeanDefinitionRegistrar.class);
 						ParserStrategyUtils.invokeAwareMethods(
 								registrar, this.environment, this.resourceLoader, this.registry);
+						//将实现了ImportBeanDefinitionRegistrar接口的类放入importBeanDefinitionRegistrars中
 						configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
 					}
 					//处理普通类

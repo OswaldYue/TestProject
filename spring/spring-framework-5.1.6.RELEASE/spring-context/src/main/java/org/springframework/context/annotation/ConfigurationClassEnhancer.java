@@ -16,15 +16,8 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.scope.ScopedProxyFactoryBean;
 import org.springframework.asm.Type;
 import org.springframework.beans.factory.BeanFactory;
@@ -38,13 +31,7 @@ import org.springframework.cglib.core.ClassGenerator;
 import org.springframework.cglib.core.Constants;
 import org.springframework.cglib.core.DefaultGeneratorStrategy;
 import org.springframework.cglib.core.SpringNamingPolicy;
-import org.springframework.cglib.proxy.Callback;
-import org.springframework.cglib.proxy.CallbackFilter;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.Factory;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.cglib.proxy.NoOp;
+import org.springframework.cglib.proxy.*;
 import org.springframework.cglib.transform.ClassEmitterTransformer;
 import org.springframework.cglib.transform.TransformingClassGenerator;
 import org.springframework.lang.Nullable;
@@ -54,6 +41,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 /**
  * Enhances {@link Configuration} classes by generating a CGLIB subclass which
@@ -119,11 +112,15 @@ class ConfigurationClassEnhancer {
 	 */
 	private Enhancer newEnhancer(Class<?> configSuperClass, @Nullable ClassLoader classLoader) {
 		Enhancer enhancer = new Enhancer();
+		//设置父类  cglib是基于继承来的
 		enhancer.setSuperclass(configSuperClass);
+		//设置接口  EnhancedConfiguration接口继承BeanFactoryAware  设置了这个接口就可以让使用者获得一个BeanFactory
 		enhancer.setInterfaces(new Class<?>[] {EnhancedConfiguration.class});
 		enhancer.setUseFactory(false);
 		enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
+		//cglib生成类的策略  主要是为生成的代理类中添加一个变量$$beanFactory  其实就是接收上面说的BeanFactory
 		enhancer.setStrategy(new BeanFactoryAwareGeneratorStrategy(classLoader));
+		//为了给config配置类中的方法做拦截主要配置了两个拦截器:BeanMethodInterceptor BeanFactoryAwareMethodInterceptor
 		enhancer.setCallbackFilter(CALLBACK_FILTER);
 		enhancer.setCallbackTypes(CALLBACK_FILTER.getCallbackTypes());
 		return enhancer;
@@ -203,6 +200,8 @@ class ConfigurationClassEnhancer {
 
 
 	/**
+	 * DefaultGeneratorStrategy为默认的生成策略 DefaultGeneratorStrategy是cglib提供的
+	 *
 	 * Custom extension of CGLIB's DefaultGeneratorStrategy, introducing a {@link BeanFactory} field.
 	 * Also exposes the application ClassLoader as thread context ClassLoader for the time of
 	 * class generation (in order for ASM to pick it up when doing common superclass resolution).
@@ -268,6 +267,7 @@ class ConfigurationClassEnhancer {
 	 */
 	private static class BeanFactoryAwareMethodInterceptor implements MethodInterceptor, ConditionalCallback {
 
+		//自动注入一个BeanFactory
 		@Override
 		@Nullable
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
@@ -306,6 +306,10 @@ class ConfigurationClassEnhancer {
 	private static class BeanMethodInterceptor implements MethodInterceptor, ConditionalCallback {
 
 		/**
+		 * enhancedConfigInstance 代理对象
+		 * beanMethod 目标方法
+		 * beanMethodArgs 参数
+		 *
 		 * Enhance a {@link Bean @Bean} method to check the supplied BeanFactory for the
 		 * existence of this bean object.
 		 * @throws Throwable as a catch-all for any exception that may be thrown when invoking the
@@ -316,7 +320,9 @@ class ConfigurationClassEnhancer {
 		public Object intercept(Object enhancedConfigInstance, Method beanMethod, Object[] beanMethodArgs,
 					MethodProxy cglibMethodProxy) throws Throwable {
 
+			//通过$$beanFactory获得BeanFactory
 			ConfigurableBeanFactory beanFactory = getBeanFactory(enhancedConfigInstance);
+			//拿到方法名
 			String beanName = BeanAnnotationHelper.determineBeanNameFor(beanMethod);
 
 			// Determine whether this bean is a scoped-proxy
@@ -336,11 +342,13 @@ class ConfigurationClassEnhancer {
 			// is the same as that of referring to a FactoryBean within XML. See SPR-6602.
 			if (factoryContainsBean(beanFactory, BeanFactory.FACTORY_BEAN_PREFIX + beanName) &&
 					factoryContainsBean(beanFactory, beanName)) {
+				//从容器中拿到一个&beanName的对象 如果可以拿到就说明是一个FactoryBean对象
 				Object factoryBean = beanFactory.getBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName);
 				if (factoryBean instanceof ScopedProxyFactoryBean) {
 					// Scoped proxy factory beans are a special case and should not be further proxied
 				}
 				else {
+					//解决对象是FactoryBean的 在enhanceFactoryBean中又创建一层代理
 					// It is a candidate FactoryBean - go ahead with enhancement
 					return enhanceFactoryBean(factoryBean, beanMethod.getReturnType(), beanFactory, beanName);
 				}
@@ -479,6 +487,12 @@ class ConfigurationClassEnhancer {
 		}
 
 		/**
+		 * 解决对象是FactoryBean的  再次做一层代理 为什么?
+		 * 可能原因如下:
+		 * FactoryBean的getobject()方法会返回一个对象  如果返回的对象需要是单例的 那么直接调用getobject()方法就不可能返回一个单例而是每次都去拿新的  此时就需要使用代理去解决
+		 * 因为代理可以改变代码运行逻辑  从工厂中拿到需要的单例bean
+		 *
+		 *
 		 * Create a subclass proxy that intercepts calls to getObject(), delegating to the current BeanFactory
 		 * instead of creating a new instance. These proxies are created only when calling a FactoryBean from
 		 * within a Bean method, allowing for proper scoping semantics even when working against the FactoryBean
@@ -500,6 +514,7 @@ class ConfigurationClassEnhancer {
 									(finalClass ? "implementation class" : "getObject() method") +
 									" is final: Otherwise a getObject() call would not be routed to the factory.");
 						}
+						//创建jdk动态代理
 						return createInterfaceProxyForFactoryBean(factoryBean, exposedType, beanFactory, beanName);
 					}
 					else {
@@ -518,6 +533,7 @@ class ConfigurationClassEnhancer {
 				// No getObject() method -> shouldn't happen, but as long as nobody is trying to call it...
 			}
 
+			//再创建一层cglib代理
 			return createCglibProxyForFactoryBean(factoryBean, beanFactory, beanName);
 		}
 

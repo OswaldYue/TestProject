@@ -222,6 +222,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
+	 * BeanFactoryPostProcessor接口特有的方法
+	 *
 	 * Prepare the Configuration classes for servicing bean requests at runtime
 	 * by replacing them with CGLIB-enhanced subclasses.
 	 */
@@ -239,6 +241,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
 
+		//对config配置类可能进行增强(cglib代理)
 		enhanceConfigurationClasses(beanFactory);
 		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
 	}
@@ -264,6 +267,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			//判断是否是配置类
 			//是不是被加了注解 加了什么注解
 			//判断是否是标注了@Configuration @Component @ComponentScan @Import @ImportResource类以及是否其方法标注了@Bean注解以及如果有@Order注解拿到value值
+			//以及如果标注了@Configuration 则将CONFIGURATION_CLASS_ATTRIBUTE标记置为full 此处很重要 因为再执行BeanFactoryPostProcessor特有的方法时 如果config配置类是full 会进行cglib代理
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
@@ -335,6 +339,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			*
 			* 这么做的目的是:举例说明
 			* 加入配置了@Import(Audi.class)这样一个普通类 那么在parser.parse(candidates)过程中是没有合适的方法去注册这个普通类的
+			* 加了配置了@Import(MyImportBeanDefinitionRegistrar.class)的ImportBeanDefinitionRegistrar接口的实现类也是预先放在importBeanDefinitionRegistrars这个Map中
 			* 这里就是为了注册这些解析过但是没有注册的类的
 			* 而有些就可以在parser.parse(candidates)过程中就注册了 例如:扫描某个包下就可以@ComponentScan(value = "com.mgw.ioc")
 			*
@@ -386,6 +391,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Map<String, AbstractBeanDefinition> configBeanDefs = new LinkedHashMap<>();
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
+			//判断CONFIGURATION_CLASS_ATTRIBUTE标记是否为full 其实也就是判断config配置类是否标注了@Configuration
 			if (ConfigurationClassUtils.isFullConfigurationClass(beanDef)) {
 				if (!(beanDef instanceof AbstractBeanDefinition)) {
 					throw new BeanDefinitionStoreException("Cannot enhance @Configuration bean definition '" +
@@ -400,11 +406,33 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				configBeanDefs.put(beanName, (AbstractBeanDefinition) beanDef);
 			}
 		}
+
+		//如果configBeanDefs为空 为空的原因是config配置类没有标注@Configuration 则直接返回 不再执行下面的cglib代理
 		if (configBeanDefs.isEmpty()) {
 			// nothing to enhance -> return immediately
 			return;
 		}
 
+		/*
+		* 对标注了@Configuration的config配置类进行cglib代理 为什么?
+		* 举例说明:
+		* @Configuration
+		* public class IocConfig {
+		* 	@Bean
+		* 	public Audi1 audi1() {
+		* 		return new Audi1();
+		* 	}
+		* 	@Bean
+		* 	public Audi audi() {
+		* 		audi1();
+		* 		return new Audi();
+		* 	}
+		* }
+		* 假如IocConfig这个配置类不加@Configuration 那么Audi1这个类就会被实例化两次 假如加了  那么只会被实例化一次
+		* 原因是:加了@Configuration 则会为IocConfig做一个cglib代理 在代理类中它改变了逻辑 每次去执行audi()方法时 audi1()只会去beanFactory中拿 而不是每次去重新new Audi1()
+		* 如果不加@Configuration 则IocConfig这个配置类不会做代理 那么每次执行audi()方法时 它都会重新去new Audi1() 所以会实例化多次
+		*
+		* */
 		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer();
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();
@@ -414,6 +442,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				// Set enhanced subclass of the user-specified bean class
 				Class<?> configClass = beanDef.resolveBeanClass(this.beanClassLoader);
 				if (configClass != null) {
+					//进行cglib增强
 					Class<?> enhancedClass = enhancer.enhance(configClass, this.beanClassLoader);
 					if (configClass != enhancedClass) {
 						if (logger.isTraceEnabled()) {
