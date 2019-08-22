@@ -42,7 +42,7 @@ import org.springframework.lang.Nullable;
  *
  * InstantiationAwareBeanPostProcessor
  *
- * CommonAnnotationBeanPostProcessor
+ * CommonAnnotationBeanPostProcessor 处理生命周期回调相关
  *
  * AutowiredAnnotationBeanPostProcessor
  *

@@ -65,6 +65,10 @@ import java.util.Arrays;
  */
 class ConfigurationClassEnhancer {
 
+	/*
+	*  BeanMethodInterceptor 这个拦截器主要是用来增强方法的 控制@Bean的作用域  让其不会每次都去new一个实例
+	*  BeanFactoryAwareMethodInterceptor 这个拦截器主要是增强一个beanFactory的
+	* */
 	// The callbacks to use. Note that these callbacks must be stateless.
 	private static final Callback[] CALLBACKS = new Callback[] {
 			new BeanMethodInterceptor(),
@@ -88,6 +92,7 @@ class ConfigurationClassEnhancer {
 	 * @return the enhanced subclass
 	 */
 	public Class<?> enhance(Class<?> configClass, @Nullable ClassLoader classLoader) {
+		//判断是否被代理 判断此类是否被添加了EnhancedConfiguration接口  因为下面创建代理时为其添加了EnhancedConfiguration接口
 		if (EnhancedConfiguration.class.isAssignableFrom(configClass)) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(String.format("Ignoring request to enhance %s as it has " +
@@ -99,6 +104,7 @@ class ConfigurationClassEnhancer {
 			}
 			return configClass;
 		}
+		//创建代理
 		Class<?> enhancedClass = createClass(newEnhancer(configClass, classLoader));
 		if (logger.isTraceEnabled()) {
 			logger.trace(String.format("Successfully enhanced %s; enhanced class name is: %s",
@@ -298,6 +304,9 @@ class ConfigurationClassEnhancer {
 
 
 	/**
+	 * 这个类是方法执行拦截器
+	 * 也就是说 这个类是在实例化加了@Bean的方法时执行  所以他的执行时机是bean的实例化时
+	 *
 	 * Intercepts the invocation of any {@link Bean}-annotated methods in order to ensure proper
 	 * handling of bean semantics such as scoping and AOP proxying.
 	 * @see Bean
@@ -308,7 +317,27 @@ class ConfigurationClassEnhancer {
 		/**
 		 * enhancedConfigInstance 代理对象
 		 * beanMethod 目标方法
-		 * beanMethodArgs 参数
+		 * beanMethodArgs 方法参数
+		 * cglibMethodProxy 代理类的方法
+		 *
+		 * 这个拦截方法有点儿特殊
+		 * 例如:
+		 * @Configuration
+		 * public class IocConfig {
+		 * 	@Bean
+		 *	public Audi1 audi1() {
+		 * 		return new Audi1();
+		 *	}
+		 *	@Bean
+		 *	public Audi audi() {
+		 *		audi1();
+		 *		return new Audi();
+		 *	}
+		 * }
+		 *
+		 * cglib会对每个被调用的方法都去做拦截
+		 * 当直接调用audi1方法时 beanMethod是audi1 cglibMethodProxy是代理类的audi1
+		 * 当audi方法中调用audi1方法时 则拦截时beanMethod指的是audi1 cglibMethodProxy指的也也是代理类的audi1
 		 *
 		 * Enhance a {@link Bean @Bean} method to check the supplied BeanFactory for the
 		 * existence of this bean object.
@@ -353,7 +382,26 @@ class ConfigurationClassEnhancer {
 					return enhanceFactoryBean(factoryBean, beanMethod.getReturnType(), beanFactory, beanName);
 				}
 			}
-
+			/*
+			* 判断执行的方法和调用的方法是不是同一个
+			* beanMethod为当前调用的方法
+			* spring中的cglib代理时 每次调用方法时都会拦截 例如:a方法是代理方法 a方法中调用b方法 那么其也会去拦截b方法
+			* @Configuration
+			* public class IocConfig {
+			* 	@Bean
+			* 	public Audi1 audi1() {
+			* 		return new Audi1();
+			* 	}
+			* 	@Bean
+			* 	public Audi audi() {
+			* 		audi1();
+			* 		return new Audi();
+			* 	}
+			* }
+			* 当执行audi1方法时就会判断执行的方法与调用的方法是否是同一个  如果是同一个 那么相当于初次调用 就会去new Audi1()
+			* 如果不是 那么就是audi方法中调用audi1方法  此时就会去工厂中拿
+			*
+			* */
 			if (isCurrentlyInvokedFactoryMethod(beanMethod)) {
 				// The factory is calling the bean method in order to instantiate and register the bean
 				// (i.e. via a getBean() call) -> invoke the super implementation of the method to actually
@@ -368,9 +416,10 @@ class ConfigurationClassEnhancer {
 									"these container lifecycle issues; see @Bean javadoc for complete details.",
 							beanMethod.getDeclaringClass().getSimpleName(), beanMethod.getName()));
 				}
+				//执行的方法和调用的方法是同一个时 调用父类的方法 cglib是基于继承的代理 所以父类就相当于目标类  也就是示例中的的代理类直接调用audi1()
 				return cglibMethodProxy.invokeSuper(enhancedConfigInstance, beanMethodArgs);
 			}
-
+			//执行的方法和调用的方法不是同一个时  也就是示例中的的代理类audi()方法中调用audi1()
 			return resolveBeanReference(beanMethod, beanMethodArgs, beanFactory, beanName);
 		}
 
@@ -398,6 +447,7 @@ class ConfigurationClassEnhancer {
 						}
 					}
 				}
+				//从工厂中去拿
 				Object beanInstance = (useArgs ? beanFactory.getBean(beanName, beanMethodArgs) :
 						beanFactory.getBean(beanName));
 				if (!ClassUtils.isAssignableValue(beanMethod.getReturnType(), beanInstance)) {
@@ -429,6 +479,7 @@ class ConfigurationClassEnhancer {
 				Method currentlyInvoked = SimpleInstantiationStrategy.getCurrentlyInvokedFactoryMethod();
 				if (currentlyInvoked != null) {
 					String outerBeanName = BeanAnnotationHelper.determineBeanNameFor(currentlyInvoked);
+					//将依赖注册到工厂  dependentBeanMap 和 dependenciesForBeanMap
 					beanFactory.registerDependentBean(beanName, outerBeanName);
 				}
 				return beanInstance;
@@ -481,7 +532,10 @@ class ConfigurationClassEnhancer {
 		 * to happen on Groovy classes).
 		 */
 		private boolean isCurrentlyInvokedFactoryMethod(Method method) {
+			//当前执行的方法 如果是audi方法中调用audi1方法 则此时currentlyInvoked就是audi方法
 			Method currentlyInvoked = SimpleInstantiationStrategy.getCurrentlyInvokedFactoryMethod();
+			//判断当前调用的方法与执行的方法是否是一个名称以及参数是否相同
+			//如果相同 则是调用的方法与执行的方法是同一个
 			return (currentlyInvoked != null && method.getName().equals(currentlyInvoked.getName()) &&
 					Arrays.equals(method.getParameterTypes(), currentlyInvoked.getParameterTypes()));
 		}

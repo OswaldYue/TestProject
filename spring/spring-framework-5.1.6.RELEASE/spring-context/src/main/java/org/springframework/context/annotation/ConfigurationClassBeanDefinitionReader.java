@@ -200,6 +200,7 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		//将加了@Bean的方法的需要注入的bean 进行注册
 		ConfigurationClassBeanDefinition beanDef = new ConfigurationClassBeanDefinition(configClass, metadata);
 		beanDef.setResource(configClass.getResource());
 		beanDef.setSource(this.sourceExtractor.extractSource(metadata, configClass.getResource()));
@@ -212,12 +213,12 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 		//如果加了@Bean方法不是静态的
 		else {
-			//则转化为FactoryBean处理
+			//当初FactoryBean处理
 			// instance @Bean method
-			
 			beanDef.setFactoryBeanName(configClass.getBeanName());
 			beanDef.setUniqueFactoryMethodName(methodName);
 		}
+		//注入模型为AUTOWIRE_CONSTRUCTOR 构造方法注入
 		beanDef.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_CONSTRUCTOR);
 		beanDef.setAttribute(org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor.
 				SKIP_REQUIRED_CHECK_ATTRIBUTE, Boolean.TRUE);

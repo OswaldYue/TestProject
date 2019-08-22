@@ -58,7 +58,7 @@ public interface ImportBeanDefinitionRegistrar {
 	 * BeanDefinitionRegistry:BeanDefinition注册类
 	 *
 	 * 把所有需要添加到容器中的bean 调用BeanDefinitionRegistry.registerBeanDefinition手工注册进来
-	 * 但是如果手工注测近jdk动态代理的bean 那么实际根本拿不出来 因为代理类的类型与原始类的类型已经不同了
+	 * 但是如果手工注测进jdk动态代理的bean 那么实际根本拿不出来 因为代理类的类型与原始类的类型已经不同了
 	 *
 	 *
 	 * Register bean definitions as necessary based on the given annotation metadata of

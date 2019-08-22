@@ -21,6 +21,7 @@ import org.springframework.core.type.AnnotationMetadata;
 /**
  *
  * 自定义逻辑返回需要导入的组件
+ * 返回需要注册的类  spring帮你做注册
  *
  * Interface to be implemented by types that determine which @{@link Configuration}
  * class(es) should be imported based on a given selection criteria, usually one or
