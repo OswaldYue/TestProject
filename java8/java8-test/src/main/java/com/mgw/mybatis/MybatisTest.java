@@ -13,6 +13,7 @@ public class MybatisTest {
 
     public static void test1() {
 
+
         String resourceFile = "mybatis.xml";
         InputStream inputStream = null;
         try {
