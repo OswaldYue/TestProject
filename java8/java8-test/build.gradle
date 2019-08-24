@@ -62,9 +62,9 @@ dependencies {
     //slf4j日志
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
     //slf4j日志log4j绑定器
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.28'
+    //compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.28'
     //slf4j日志jul绑定器
-    //compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.28'
+    compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.28'
 
 
 
