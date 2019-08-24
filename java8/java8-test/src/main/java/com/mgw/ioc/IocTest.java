@@ -35,6 +35,7 @@ public class IocTest  {
 
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(IocConfig.class);
+        context.start();
 
         BYD byd = context.getBean(BYD.class);
 
@@ -47,11 +48,11 @@ public class IocTest  {
 //        System.out.println("=====================================================");
 //        test1();
 
-        System.out.println("=====================================================");
-        test2();
-
 //        System.out.println("=====================================================");
-//        test3();
+//        test2();
+
+        System.out.println("=====================================================");
+        test3();
     }
 
 }

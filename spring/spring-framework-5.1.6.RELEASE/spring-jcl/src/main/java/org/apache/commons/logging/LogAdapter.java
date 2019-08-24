@@ -16,9 +16,6 @@
 
 package org.apache.commons.logging;
 
-import java.io.Serializable;
-import java.util.logging.LogRecord;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.ExtendedLogger;
@@ -26,6 +23,9 @@ import org.apache.logging.log4j.spi.LoggerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
+
+import java.io.Serializable;
+import java.util.logging.LogRecord;
 
 /**
  * Spring's common JCL adapter behind {@link LogFactory} and {@link LogFactoryService}.
@@ -50,12 +50,14 @@ final class LogAdapter {
 	static {
 		if (isPresent(LOG4J_SPI)) {
 			if (isPresent(LOG4J_SLF4J_PROVIDER) && isPresent(SLF4J_SPI)) {
+				//使用log4j与slf4j的桥接器才可以使用log4j框架
 				// log4j-to-slf4j bridge -> we'll rather go with the SLF4J SPI;
 				// however, we still prefer Log4j over the plain SLF4J API since
 				// the latter does not have location awareness support.
 				logApi = LogApi.SLF4J_LAL;
 			}
 			else {
+				//使用log4j2框架
 				// Use Log4j 2.x directly, including location awareness support
 				logApi = LogApi.LOG4J;
 			}
@@ -69,6 +71,7 @@ final class LogAdapter {
 			logApi = LogApi.SLF4J;
 		}
 		else {
+			//默认使用jul 如果想用其他类型的log框架 那么只需引入slf4j包  再引入相关绑定器就行了
 			// java.util.logging as default
 			logApi = LogApi.JUL;
 		}
@@ -92,6 +95,7 @@ final class LogAdapter {
 			case SLF4J:
 				return Slf4jAdapter.createLog(name);
 			default:
+				//默认情况使用  java.util.logging.Logger.getLogger(name) 就是使用jul框架拿到一个日志类
 				// Defensively use lazy-initializing adapter class here as well since the
 				// java.logging module is not present by default on JDK 9. We are requiring
 				// its presence if neither Log4j nor SLF4J is available; however, in the
@@ -482,6 +486,7 @@ final class LogAdapter {
 		private transient java.util.logging.Logger logger;
 
 		public JavaUtilLog(String name) {
+			//默认使用jul框架
 			this.name = name;
 			this.logger = java.util.logging.Logger.getLogger(name);
 		}

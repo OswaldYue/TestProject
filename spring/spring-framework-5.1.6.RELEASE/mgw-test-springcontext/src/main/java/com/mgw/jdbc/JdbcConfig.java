@@ -1,6 +1,8 @@
 package com.mgw.jdbc;
 
+import org.apache.ibatis.logging.log4j.Log4jImpl;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,8 +16,8 @@ import javax.sql.DataSource;
 @Configuration
 @ComponentScan("com.mgw.jdbc")
 @PropertySource(value = "classpath:/jdbc.properties")
-//@MapperScan("com.mgw.jdbc")
-@MyMapperScan
+@MapperScan("com.mgw.jdbc")
+//@MyMapperScan
 public class JdbcConfig {
 
 	@Autowired
@@ -39,11 +41,20 @@ public class JdbcConfig {
 		return driverManagerDataSource;
 	}
 
+	/**
+	 * mybatis的一级缓存与spring整合时 会失效
+	 *
+	 *
+	 * */
 	@Bean
 	public SqlSessionFactoryBean sqlSessionFactoryBean() {
 
 		//SqlSessionFactoryBean是mybatis-spring提供的
 		SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+		//添加日志系统
+		org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
+		configuration.setLogImpl(Log4jImpl.class);
+		sqlSessionFactoryBean.setConfiguration(configuration);
 
 		sqlSessionFactoryBean.setDataSource(dataSource());
 

@@ -64,6 +64,7 @@ public abstract class LogFactory {
 	 * @param name logical name of the <code>Log</code> instance to be returned
 	 */
 	public static Log getLog(String name) {
+		//使用日志适配器创建一个日志类
 		return LogAdapter.createLog(name);
 	}
 

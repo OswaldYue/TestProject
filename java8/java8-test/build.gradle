@@ -59,6 +59,14 @@ dependencies {
     // https://mvnrepository.com/artifact/dom4j/dom4j
     compile group: 'dom4j', name: 'dom4j', version: '1.6.1'
 
+    //slf4j日志
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
+    //slf4j日志log4j绑定器
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.28'
+    //slf4j日志jul绑定器
+    //compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.28'
+
+
 
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 }
