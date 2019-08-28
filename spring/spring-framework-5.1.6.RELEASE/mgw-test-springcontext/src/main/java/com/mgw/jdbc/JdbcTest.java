@@ -7,10 +7,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.lang.reflect.Proxy;
 
 /**
- * mybatis的一级缓存整合spring时会失效  原因是spring每次调用完毕后会将session关闭
+ * mybatis的一级缓存整合spring时会失效  原因是spring每次调用完毕后会将session关闭 可不可以自己手动关  答:不行
  *
  * mybatis的二级缓存 Mapper上添加@CacheNamespace注解
  * 基于命名空间的二级缓存  坑很大
+ * 例如:对user表的操作  使用两个Mapper去操作同一个user表  当第一个Mapper执行select操作  此时二级缓存会存下来 但是第二个Mapper如果做更新操作  那么此时对第一个Mapper缓存不可见
+ * 再次使用第一个Mapper进行select操作时 可能会产生数据错误
  *
  * 一般mybatis缓存会使用redis等框架去做
  * */

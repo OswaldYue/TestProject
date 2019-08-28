@@ -43,6 +43,15 @@ public class IocTest  {
 
     }
 
+    public static void test4() {
+
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(IocConfig.class);
+        CarService carService = context.getBean(CarService.class);
+        carService.getList();
+
+    }
+
     public static void main(String[] args) {
 
 //        System.out.println("=====================================================");
@@ -51,8 +60,11 @@ public class IocTest  {
 //        System.out.println("=====================================================");
 //        test2();
 
+//        System.out.println("=====================================================");
+//        test3();
+
         System.out.println("=====================================================");
-        test3();
+        test4();
     }
 
 }

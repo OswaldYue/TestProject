@@ -1238,6 +1238,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		/*
 		* 使用后置处理器进行构造方法的推断,与AutowireMode有关,当AUTOWIRE_NO时,spring去推断构造方法时,就算有多个构造方法,也是返回都为null,用默认的构造方法,
 		* 当不是使用AUTOWIRE_CONSTRUCTOR时,spring不关心你的构造方法
+		* 但是如果设置了definition.getConstructorArgumentValues().addGenericArgumentValue("xxx")时 也会使用构造方法去进行创造实例
 		 */
 		// Candidate constructors for autowiring?
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
@@ -1455,6 +1456,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
+		//以不同的注入模型来进行依赖注入
 		if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_NAME || mbd.getResolvedAutowireMode() == AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
@@ -1545,6 +1547,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 通过类型进行依赖注入  AUTOWIRE_BY_TYPE
+	 *
 	 * Abstract method defining "autowire by type" (bean properties by type) behavior.
 	 * <p>This is like PicoContainer default, in which there must be exactly one bean
 	 * of the property type in the bean factory. This makes bean factories simple to
@@ -1564,6 +1568,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
+		//拿出需要自动装配的属性 readMethod 和 writeMethod
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		for (String propertyName : propertyNames) {
 			try {
@@ -1597,6 +1602,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
+	 * 过滤不需要自动注入的属性
+	 * 1.不是writeMethod类型的
+	 * 2.spring设置需要过滤掉的那些不注入的接口
+	 * 3.自己加入的自己给值得
+	 * 4.简单的属性:
+	 *  			Enum.class.isAssignableFrom(clazz) ||
+	 * 				CharSequence.class.isAssignableFrom(clazz) ||
+	 * 				Number.class.isAssignableFrom(clazz) ||
+	 * 				Date.class.isAssignableFrom(clazz) ||
+	 * 				URI.class == clazz || URL.class == clazz ||
+	 * 				Locale.class == clazz || Class.class == clazz
+	 *
 	 * Return an array of non-simple bean properties that are unsatisfied.
 	 * These are probably unsatisfied references to other beans in the
 	 * factory. Does not include simple properties like primitives or Strings.
@@ -1656,6 +1673,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * spring过滤掉的那些不注入的接口
+	 *
+	 *
 	 * Determine whether the given bean property is excluded from dependency checks.
 	 * <p>This implementation excludes properties defined by CGLIB and
 	 * properties whose type matches an ignored dependency type or which

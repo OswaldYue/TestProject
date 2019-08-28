@@ -14,6 +14,7 @@
             </dataSource>
         </environment>
     </environments>
+    <!-- 可以解析的mapper的四种类型  package  resource url class -->
 <!--    <mappers>-->
 <!--        <mapper resource=""/>-->
 <!--    </mappers>-->
