@@ -16,13 +16,12 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
 import org.springframework.aop.AfterAdvice;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * Spring AOP advice wrapping an AspectJ after-throwing advice method.
@@ -56,6 +55,9 @@ public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 		setThrowingNameNoCheck(name);
 	}
 
+	/**
+	 * 如果出现方法异常则去执行加了@AfterThrowing注解的增强方法 如果没有异常则不会去执行
+	 * */
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {

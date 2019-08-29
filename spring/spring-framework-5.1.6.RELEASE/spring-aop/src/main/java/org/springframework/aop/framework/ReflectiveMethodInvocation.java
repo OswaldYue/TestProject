@@ -16,19 +16,18 @@
 
 package org.springframework.aop.framework;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.ProxyMethodInvocation;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.core.BridgeMethodResolver;
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-
-import org.springframework.aop.ProxyMethodInvocation;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.core.BridgeMethodResolver;
-import org.springframework.lang.Nullable;
 
 /**
  * Spring's implementation of the AOP Alliance
@@ -158,11 +157,15 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	@Override
 	@Nullable
 	public Object proceed() throws Throwable {
+
+		//如果没有拦截器执行执行目标方法，或者拦截器的索引和拦截器数组大小一样（执行到了最后一个拦截器）执行目标对象原始方法
 		//	We start with an index of -1 and increment early.
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+			//反射调用目标对象的原始标方法 不是增强方法
 			return invokeJoinpoint();
 		}
 
+		//每次得到一个拦截器前先前让索引currentInterceptorIndex加加一次 逐渐就与拦截器数组大小一样了
 		Object interceptorOrInterceptionAdvice =
 				this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
 		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
@@ -181,6 +184,14 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			}
 		}
 		else {
+			/*
+			拦截器执行 即增强逻辑的执行 执行逻辑较复杂
+			ExposeInvocationInterceptor.invoke()(这是一个引子) -> AspectJAfterThrowingAdvice.invoke() ->
+			AfterReturningAdviceInterceptor.invoke() -> AspectJAfterAdvice.invoke() ->
+			AspectJAroundAdvice.invoke() -> MethodBeforeAdviceInterceptor.invoke()
+			这些所有的增强逻辑的方法的调用顺序是典型的堆栈式调用 即从ExposeInvocationInterceptor开始 依次调用到MethodBeforeAdviceInterceptor 再返回到ExposeInvocationInterceptor结束
+			 */
+			//切面类中的加了  @Before() @After()  @AfterReturning()  @AfterThrowing()  @Around()  注解的这五种方法
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.
 			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);

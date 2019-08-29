@@ -1,28 +1,20 @@
 package com.mgw.aop;
 
 
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 
 
 
 @Component
-@Aspect
+//@Aspect
 public class LogAspect {
 
+	/*
     @Pointcut("execution(* com.mgw.aop.MyCaculator.*(..))")
     public void point() {}
 
-    /**
-     * JoinPoint封装了详细信息
-     *
-     * */
+
     @Before("point()")
     public void logBefore(JoinPoint joinPoint) {
 
@@ -44,9 +36,7 @@ public class LogAspect {
 
     }
 
-    /**
-     * 需要告诉spring那个参数来接受返回值
-     * */
+
     @AfterReturning(value = "point()",returning = "result")
     public void logReturn(JoinPoint joinPoint,Object result) {
 
@@ -65,7 +55,7 @@ public class LogAspect {
     }
 
 
-//    @Around(value = "point()")
+    @Around(value = "point()")
     public Object myAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 
         Object[] args = proceedingJoinPoint.getArgs();
@@ -89,5 +79,5 @@ public class LogAspect {
         }
         return result;
     }
-
+*/
 }

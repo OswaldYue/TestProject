@@ -109,7 +109,7 @@ public class LogAspect {
      *
      * 注意:普通前置与环绕前置的执行顺序可能不确定
      * */
-    @Around(value = "point()")
+//    @Around(value = "point()")
     public Object myAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 
         Object[] args = proceedingJoinPoint.getArgs();

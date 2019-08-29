@@ -1,5 +1,6 @@
 package com.mgw.aop;
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.Arrays;
@@ -157,13 +158,20 @@ public class Test {
 
     }
 
+    public static void test8() {
+
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
+        Caculator caculator = context.getBean(Caculator.class);
+        caculator.muti(4,2);
+    }
+
     public static void main(String[] args) {
 
 //        test1();
 //        System.out.println("=============================");
 //        test2();
-        System.out.println("=============================");
-        test3();
+//        System.out.println("=============================");
+//        test3();
 //        System.out.println("=============================");
 //        test5();
 //        System.out.println("=============================");
@@ -171,5 +179,7 @@ public class Test {
 
 //        System.out.println("=============================");
 //        test7();
+        System.out.println("=============================");
+        test8();
     }
 }

@@ -4,11 +4,10 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
-@Component
+//@Component
 @Aspect
 //@Order(1) //使用此注解改变顺序
 public class ValidateAspect {

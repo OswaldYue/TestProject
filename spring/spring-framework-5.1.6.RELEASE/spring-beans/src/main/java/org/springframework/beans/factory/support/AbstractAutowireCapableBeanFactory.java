@@ -532,7 +532,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			* */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
-		//从BeanWrapper对象中获取bean对象,这里的bean指向的是一个原始的对象
+		//从BeanWrapper对象中获取bean对象,这里的bean指向的是一个原生的对象,并非代理对象
 		final Object bean = instanceWrapper.getWrappedInstance();
 		Class<?> beanType = instanceWrapper.getWrappedClass();
 		if (beanType != NullBean.class) {

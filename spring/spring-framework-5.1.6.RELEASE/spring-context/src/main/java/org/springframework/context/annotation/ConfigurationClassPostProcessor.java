@@ -243,6 +243,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		//对config配置类可能进行增强(cglib代理)
 		enhanceConfigurationClasses(beanFactory);
+		//为整个工厂增加一个后置处理器(ImportAwareBeanPostProcessor)
 		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
 	}
 
@@ -462,7 +463,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 	}
 
-
+	/**
+	 * 整个内部类专门来处理ImportAware接口的实现类
+	 * ImportAware这个接口主要
+	 * */
 	private static class ImportAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {
 
 		private final BeanFactory beanFactory;
