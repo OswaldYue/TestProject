@@ -16,17 +16,19 @@
 
 package org.springframework.transaction.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 
+import java.lang.annotation.*;
+
 /**
+ * 这个注解是整个spring tx的配置注解
+ * 主要为容器注入了AutoProxyRegistrar 和 ProxyTransactionManagementConfiguration 这两个类
+ *
+ *
+ * ProxyTransactionManagementConfiguration 这是一个配置类
+ *
  * Enables Spring's annotation-driven transaction management capability, similar to
  * the support found in Spring's {@code <tx:*>} XML namespace. To be used on
  * {@link org.springframework.context.annotation.Configuration @Configuration}

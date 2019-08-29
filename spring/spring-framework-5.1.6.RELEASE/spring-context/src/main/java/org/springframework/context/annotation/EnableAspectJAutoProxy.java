@@ -23,6 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 这个注解是spring aop 启动时的配置注解
+ * 主要为容器注入AnnotationAwareAspectJAutoProxyCreator这个类 这个类及其父类就是整个aop的实现的最重要的类
+ *
  * Enables support for handling components marked with AspectJ's {@code @Aspect} annotation,
  * similar to functionality found in Spring's {@code <aop:aspectj-autoproxy>} XML element.
  * To be used on @{@link Configuration} classes as follows:

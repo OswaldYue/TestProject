@@ -23,6 +23,15 @@ import org.springframework.transaction.config.TransactionManagementConfigUtils;
 import org.springframework.util.ClassUtils;
 
 /**
+ *
+ *  主要注入的几个类及其作用:
+ *  1.AutoProxyRegistrar这个类主要是为容器注入org.springframework.aop.config.internalAutoProxyCreator = InfrastructureAdvisorAutoProxyCreator这个类
+ *
+ *  2.ProxyTransactionManagementConfiguration这是一个配置类主要是为容器处理tx相关引入的配置类
+ *  	1.BeanFactoryTransactionAttributeSourceAdvisor
+ *  	2.TransactionAttributeSource
+ *  	3.TransactionInterceptor
+ *
  * Selects which implementation of {@link AbstractTransactionManagementConfiguration}
  * should be used based on the value of {@link EnableTransactionManagement#mode} on the
  * importing {@code @Configuration} class.

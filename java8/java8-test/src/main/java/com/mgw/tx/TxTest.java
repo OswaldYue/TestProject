@@ -1,5 +1,6 @@
 package com.mgw.tx;
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -93,6 +94,15 @@ public class TxTest {
         bookServiceXml.checkout("Tom","ISBN-01");
     }
 
+    public static void test7() {
+
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TxConfig.class);
+
+        BookServiceXml bookServiceXml = context.getBean(BookServiceXml.class);
+
+        bookServiceXml.checkout("Tom","ISBN-01");
+    }
+
 
     public static void main(String[] args)  throws Exception{
 
@@ -106,7 +116,10 @@ public class TxTest {
 //        test4();
 //        System.out.println("=================================================");
 //        test5();
+//        System.out.println("=================================================");
+//        test6();
+
         System.out.println("=================================================");
-        test6();
+        test7();
     }
 }
