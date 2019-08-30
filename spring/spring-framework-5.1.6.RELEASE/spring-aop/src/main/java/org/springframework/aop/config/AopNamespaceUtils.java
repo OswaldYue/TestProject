@@ -56,6 +56,7 @@ public abstract class AopNamespaceUtils {
 	public static void registerAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 
+		//注册一个org.springframework.aop.config.internalAutoProxyCreator = InfrastructureAdvisorAutoProxyCreator的bean
 		BeanDefinition beanDefinition = AopConfigUtils.registerAutoProxyCreatorIfNecessary(
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);

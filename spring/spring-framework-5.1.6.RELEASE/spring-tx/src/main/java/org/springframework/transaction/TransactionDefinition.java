@@ -16,11 +16,13 @@
 
 package org.springframework.transaction;
 
-import java.sql.Connection;
-
 import org.springframework.lang.Nullable;
 
+import java.sql.Connection;
+
 /**
+ * 事务定义信息(事务隔离级别、传播行为、超时、只读、回滚规则)
+ *
  * Interface that defines Spring-compliant transaction properties.
  * Based on the propagation behavior definitions analogous to EJB CMT attributes.
  *
@@ -46,6 +48,8 @@ import org.springframework.lang.Nullable;
 public interface TransactionDefinition {
 
 	/**
+	 * 如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。
+	 *
 	 * Support a current transaction; create a new one if none exists.
 	 * Analogous to the EJB transaction attribute of the same name.
 	 * <p>This is typically the default setting of a transaction definition,
@@ -54,6 +58,8 @@ public interface TransactionDefinition {
 	int PROPAGATION_REQUIRED = 0;
 
 	/**
+	 * 如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行。
+	 *
 	 * Support a current transaction; execute non-transactionally if none exists.
 	 * Analogous to the EJB transaction attribute of the same name.
 	 * <p><b>NOTE:</b> For transaction managers with transaction synchronization,
@@ -75,6 +81,8 @@ public interface TransactionDefinition {
 	int PROPAGATION_SUPPORTS = 1;
 
 	/**
+	 * 如果当前存在事务，则加入该事务；如果当前没有事务，则抛出异常。（mandatory：强制性）
+	 *
 	 * Support a current transaction; throw an exception if no current transaction
 	 * exists. Analogous to the EJB transaction attribute of the same name.
 	 * <p>Note that transaction synchronization within a {@code PROPAGATION_MANDATORY}
@@ -83,6 +91,8 @@ public interface TransactionDefinition {
 	int PROPAGATION_MANDATORY = 2;
 
 	/**
+	 * 创建一个新的事务，如果当前存在事务，则把当前事务挂起。
+	 *
 	 * Create a new transaction, suspending the current transaction if one exists.
 	 * Analogous to the EJB transaction attribute of the same name.
 	 * <p><b>NOTE:</b> Actual transaction suspension will not work out-of-the-box
@@ -98,6 +108,8 @@ public interface TransactionDefinition {
 	int PROPAGATION_REQUIRES_NEW = 3;
 
 	/**
+	 * 以非事务方式运行，如果当前存在事务，则把当前事务挂起。
+	 *
 	 * Do not support a current transaction; rather always execute non-transactionally.
 	 * Analogous to the EJB transaction attribute of the same name.
 	 * <p><b>NOTE:</b> Actual transaction suspension will not work out-of-the-box
@@ -113,6 +125,8 @@ public interface TransactionDefinition {
 	int PROPAGATION_NOT_SUPPORTED = 4;
 
 	/**
+	 * 以非事务方式运行，如果当前存在事务，则抛出异常。
+	 *
 	 * Do not support a current transaction; throw an exception if a current transaction
 	 * exists. Analogous to the EJB transaction attribute of the same name.
 	 * <p>Note that transaction synchronization is <i>not</i> available within a
@@ -121,6 +135,8 @@ public interface TransactionDefinition {
 	int PROPAGATION_NEVER = 5;
 
 	/**
+	 * 如果当前存在事务，则创建一个事务作为当前事务的嵌套事务来运行；如果当前没有事务，则该取值等价于TransactionDefinition.PROPAGATION_REQUIRED
+	 *
 	 * Execute within a nested transaction if a current transaction exists,
 	 * behave like {@link #PROPAGATION_REQUIRED} otherwise. There is no
 	 * analogous feature in EJB.
@@ -135,6 +151,8 @@ public interface TransactionDefinition {
 
 
 	/**
+	 * 使用后端数据库默认的隔离级别，Mysql 默认采用的 REPEATABLE_READ隔离级别 Oracle 默认采用的 READ_COMMITTED隔离级别.
+	 *
 	 * Use the default isolation level of the underlying datastore.
 	 * All other levels correspond to the JDBC isolation levels.
 	 * @see java.sql.Connection
@@ -142,6 +160,8 @@ public interface TransactionDefinition {
 	int ISOLATION_DEFAULT = -1;
 
 	/**
+	 * 最低的隔离级别，允许读取尚未提交的数据变更，可能会导致脏读、幻读或不可重复读
+	 *
 	 * Indicates that dirty reads, non-repeatable reads and phantom reads
 	 * can occur.
 	 * <p>This level allows a row changed by one transaction to be read by another
@@ -153,6 +173,8 @@ public interface TransactionDefinition {
 	int ISOLATION_READ_UNCOMMITTED = Connection.TRANSACTION_READ_UNCOMMITTED;
 
 	/**
+	 * 允许读取并发事务已经提交的数据，可以阻止脏读，但是幻读或不可重复读仍有可能发生
+	 *
 	 * Indicates that dirty reads are prevented; non-repeatable reads and
 	 * phantom reads can occur.
 	 * <p>This level only prohibits a transaction from reading a row
@@ -162,6 +184,8 @@ public interface TransactionDefinition {
 	int ISOLATION_READ_COMMITTED = Connection.TRANSACTION_READ_COMMITTED;
 
 	/**
+	 * 对同一字段的多次读取结果都是一致的，除非数据是被本身事务自己所修改，可以阻止脏读和不可重复读，但幻读仍有可能发生。
+	 *
 	 * Indicates that dirty reads and non-repeatable reads are prevented;
 	 * phantom reads can occur.
 	 * <p>This level prohibits a transaction from reading a row with uncommitted changes
@@ -173,6 +197,8 @@ public interface TransactionDefinition {
 	int ISOLATION_REPEATABLE_READ = Connection.TRANSACTION_REPEATABLE_READ;
 
 	/**
+	 * 最高的隔离级别，完全服从ACID的隔离级别。所有的事务依次逐个执行，这样事务之间就完全不可能产生干扰，也就是说，该级别可以防止脏读、不可重复读以及幻读。但是这将严重影响程序的性能。通常情况下也不会用到该级别。
+	 *
 	 * Indicates that dirty reads, non-repeatable reads and phantom reads
 	 * are prevented.
 	 * <p>This level includes the prohibitions in {@link #ISOLATION_REPEATABLE_READ}
@@ -194,6 +220,8 @@ public interface TransactionDefinition {
 
 
 	/**
+	 * 返回事务的传播行为
+	 *
 	 * Return the propagation behavior.
 	 * <p>Must return one of the {@code PROPAGATION_XXX} constants
 	 * defined on {@link TransactionDefinition this interface}.
@@ -204,6 +232,20 @@ public interface TransactionDefinition {
 	int getPropagationBehavior();
 
 	/**
+	 * 返回事务的隔离级别  事务管理器根据它来控制另外一个事务可以看到本事务内的哪些数据
+	 *
+	 * 事务的隔离级别 定义了一个事务可能受其他并发事务影响的程度 并发事务带来的问题
+	 * 1.脏读（Dirty read）: 当一个事务正在访问数据并且对数据进行了修改，而这种修改还没有提交到数据库中，这时另外一个事务也访问了这个数据，然后使用了这个数据。因为这个数据是还没有提交的数据，那么另外一个事务读到的这个数据是“脏数据”，依据“脏数据”所做的操作可能是不正确的。
+	 * 2.丢失修改（Lost to modify）: 指在一个事务读取一个数据时，另外一个事务也访问了该数据，那么在第一个事务中修改了这个数据后，第二个事务也修改了这个数据。这样第一个事务内的修改结果就被丢失，因此称为丢失修改。
+	 * 例如：事务1读取某表中的数据A=20，事务2也读取A=20，事务1修改A=A-1，事务2也修改A=A-1，最终结果A=19，事务1的修改被丢失。
+	 * 3.不可重复读（Unrepeatableread）: 指在一个事务内多次读同一数据。在这个事务还没有结束时，另一个事务也访问该数据。那么，在第一个事务中的两次读数据之间，由于第二个事务的修改导致第一个事务两次读取的数据可能不太一样。这就发生了在一个事务内两次读到的数据是不一样的情况，因此称为不可重复读。
+	 * 4.幻读（Phantom read）: 幻读与不可重复读类似。它发生在一个事务（T1）读取了几行数据，接着另一个并发事务（T2）插入了一些数据时。在随后的查询中，第一个事务（T1）就会发现多了一些原本不存在的记录，就好像发生了幻觉一样，所以称为幻读。
+	 * 不可重复度和幻读区别：
+	 * 不可重复读的重点是修改，幻读的重点在于新增或者删除。
+	 * 例1（同样的条件, 你读取过的数据, 再次读取出来发现值不一样了 ）：事务1中的A先生读取自己的工资为     1000的操作还没完成，事务2中的B先生就修改了A的工资为2000，导        致A再读自己的工资时工资变为  2000；这就是不可重复读。
+	 * 例2（同样的条件, 第1次和第2次读出来的记录数不一样 ）：假某工资单表中工资大于3000的有4人，事务1读取了所有工资大于3000的人，共查到4条记录，这时事务2 又插入了一条工资大于3000的记录，事务1再次读取时查到的记录就变为了5条，这样就导致了幻读。
+	 *
+	 *
 	 * Return the isolation level.
 	 * <p>Must return one of the {@code ISOLATION_XXX} constants defined on
 	 * {@link TransactionDefinition this interface}. Those constants are designed
@@ -223,6 +265,8 @@ public interface TransactionDefinition {
 	int getIsolationLevel();
 
 	/**
+	 * 返回事务必须在多少秒内完成
+	 *
 	 * Return the transaction timeout.
 	 * <p>Must return a number of seconds, or {@link #TIMEOUT_DEFAULT}.
 	 * <p>Exclusively designed for use with {@link #PROPAGATION_REQUIRED} or
@@ -235,6 +279,8 @@ public interface TransactionDefinition {
 	int getTimeout();
 
 	/**
+	 * 返回是否优化为只读事务
+	 *
 	 * Return whether to optimize as a read-only transaction.
 	 * <p>The read-only flag applies to any transaction context, whether backed
 	 * by an actual resource transaction ({@link #PROPAGATION_REQUIRED}/
@@ -253,6 +299,8 @@ public interface TransactionDefinition {
 	boolean isReadOnly();
 
 	/**
+	 * 返回事务的名字
+	 *
 	 * Return the name of this transaction. Can be {@code null}.
 	 * <p>This will be used as the transaction name to be shown in a
 	 * transaction monitor, if applicable (for example, WebLogic's).

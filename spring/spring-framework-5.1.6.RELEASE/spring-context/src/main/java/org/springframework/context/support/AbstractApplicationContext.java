@@ -540,7 +540,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * */
 
 				/*
-				* 注册BeanPostProcessor(Bean的后置处理器),就是从工厂中实例化
+				* 注册BeanPostProcessor(Bean的后置处理器),就是从工厂中实例化 并保存到工厂中的beanPostProcessors这个list中
 				* 但是还未执行处理器方法
 				* */
 				// Register bean processors that intercept bean creation.
@@ -548,7 +548,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				/**
 				 * ======================================================分界线========================================================
-				 * 			                          * 以上是Bean的后置处理器的注册但是未执行 *
+				 * 			        * 以上是Bean的后置处理器的注册(实例化并保存到工厂的beanPostProcessors这个List中)但是未执行 *
 				 * */
 
 				/*

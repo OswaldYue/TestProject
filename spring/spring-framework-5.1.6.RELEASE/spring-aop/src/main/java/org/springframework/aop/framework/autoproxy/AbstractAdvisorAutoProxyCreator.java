@@ -69,7 +69,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
 
 	/**
-	 * 找到增强器(其实就是我们配置的通知方法)
+	 * 找到增强器(其实就是我们配置的通知方法) aop与tx共用
 	 * */
 	@Override
 	@Nullable
@@ -96,7 +96,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 
-		//找到候选的所有的增强器（找哪些通知方法是需要切入当前bean方法的）
+		//找到候选的所有的增强器（找哪些通知方法是需要切入当前bean方法的） aop与tx共用
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		//获取到能在bean使用的增强器(原理就是根据切入点去匹配)
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
@@ -113,6 +113,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	}
 
 	/**
+	 * aop与tx共用此方法  就是找到所有的增强器
+	 *
 	 * Find all candidate Advisors to use in auto-proxying.
 	 * @return the List of candidate Advisors
 	 */

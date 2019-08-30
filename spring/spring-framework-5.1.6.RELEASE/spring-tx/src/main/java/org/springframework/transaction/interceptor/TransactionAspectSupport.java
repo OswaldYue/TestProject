@@ -277,9 +277,10 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	protected Object invokeWithinTransaction(Method method, @Nullable Class<?> targetClass,
 			final InvocationCallback invocation) throws Throwable {
 
-		//先获取到事务的属性
+		//先获取到事务的属性源  实际拿到的是AbstractFallbackTransactionAttributeSource 但真正的事务属性在其子类中
 		// If the transaction attribute is null, the method is non-transactional.
 		TransactionAttributeSource tas = getTransactionAttributeSource();
+		//拿到事务属性  封装在RuleBasedTransactionAttribute 其父类是DefaultTransactionAttribute
 		final TransactionAttribute txAttr = (tas != null ? tas.getTransactionAttribute(method, targetClass) : null);
 		//获取到事务管理器
 		final PlatformTransactionManager tm = determineTransactionManager(txAttr);
@@ -563,7 +564,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			}
 			if (txInfo.transactionAttribute != null && txInfo.transactionAttribute.rollbackOn(ex)) {
 				try {
-					//拿到事务管理器然后回滚
+					//拿到事务管理器然后回滚  使用DataSourceTransactionManager父类AbstractPlatformTransactionManager的rollback()
 					txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());
 				}
 				catch (TransactionSystemException ex2) {

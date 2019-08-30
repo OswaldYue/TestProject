@@ -19,6 +19,17 @@ package org.springframework.transaction;
 import org.springframework.lang.Nullable;
 
 /**
+ *  spring提交接口标准 各个平台实现
+ *  主要有4类:
+ *  1.DataSourceTransactionManager  使用spring JDBC或者iBatis进行数据持久化操作时
+ *  2.HibernateTransactionManager   使用Hibernate框架进行数据持久化操作时
+ *  3.JpaTransactionManager         使用JPA进行数据持久化操作时
+ *  4.JtaTransactionManager         使用JTA来管理事务 在一个事务跨越多个资源时使用
+ *  5.JmsTransactionManager         这个不太理解
+ *  上面这些都是AbstractPlatformTransactionManager的子类
+ *
+ *  三个主要方法 涵盖整个事务过程的所有周期
+ *
  * This is the central interface in Spring's transaction infrastructure.
  * Applications can use this directly, but it is not primarily meant as API:
  * Typically, applications will work with either TransactionTemplate or
@@ -46,6 +57,10 @@ import org.springframework.lang.Nullable;
 public interface PlatformTransactionManager {
 
 	/**
+	 * 通过这个方法来得到一个事务
+	 * 根据指定的传播行为,返回当前活动的事务或创建一个新事务
+	 * TransactionDefinition这个类就定义了一些基本的事务属性
+	 *
 	 * Return a currently active transaction or create a new one, according to
 	 * the specified propagation behavior.
 	 * <p>Note that parameters like isolation level or timeout will only be applied
@@ -71,6 +86,8 @@ public interface PlatformTransactionManager {
 	TransactionStatus getTransaction(@Nullable TransactionDefinition definition) throws TransactionException;
 
 	/**
+	 * 使用事务目前的状态提交事务
+	 *
 	 * Commit the given transaction, with regard to its status. If the transaction
 	 * has been marked rollback-only programmatically, perform a rollback.
 	 * <p>If the transaction wasn't a new one, omit the commit for proper
@@ -100,6 +117,8 @@ public interface PlatformTransactionManager {
 	void commit(TransactionStatus status) throws TransactionException;
 
 	/**
+	 * 对执行的事务进行回滚
+	 *
 	 * Perform a rollback of the given transaction.
 	 * <p>If the transaction wasn't a new one, just set it rollback-only for proper
 	 * participation in the surrounding transaction. If a previous transaction

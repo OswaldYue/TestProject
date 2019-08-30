@@ -3,6 +3,7 @@ package com.mgw.tx;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -16,6 +17,7 @@ import javax.sql.DataSource;
 @PropertySource(value = "classpath:/jdbc.properties")
 //相当于<tx:annotation-driven></tx:annotation-driven>这个注解
 @EnableTransactionManagement
+@ComponentScan("com.mgw.tx")
 public class TxConfig {
 
     @Autowired

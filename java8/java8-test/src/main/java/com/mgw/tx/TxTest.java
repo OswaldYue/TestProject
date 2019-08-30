@@ -98,7 +98,7 @@ public class TxTest {
 
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TxConfig.class);
 
-        BookServiceXml bookServiceXml = context.getBean(BookServiceXml.class);
+        BookService bookServiceXml = context.getBean(BookService.class);
 
         bookServiceXml.checkout("Tom","ISBN-01");
     }

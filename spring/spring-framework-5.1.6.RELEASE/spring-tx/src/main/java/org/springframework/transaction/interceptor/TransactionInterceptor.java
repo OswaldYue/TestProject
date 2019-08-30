@@ -87,7 +87,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 	}
 
 
-	//执行代理方法的地方
+	//tx执行代理方法的地方
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation invocation) throws Throwable {

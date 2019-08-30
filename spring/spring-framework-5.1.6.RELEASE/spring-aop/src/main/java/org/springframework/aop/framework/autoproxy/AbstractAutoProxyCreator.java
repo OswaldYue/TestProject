@@ -344,7 +344,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * 如果可以代理 则就去做代理
+	 * 如果可以代理 则就去做代理 aop与tx共用此处
 	 *
 	 * Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
 	 * @param bean the raw bean instance
@@ -365,7 +365,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			return bean;
 		}
 
-		//找到增强器(其实就是我们配置的通知方法)
+		//找到增强器(其实就是我们配置的通知方法) 或者事务增强器
 		// Create proxy if we have advice.
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {

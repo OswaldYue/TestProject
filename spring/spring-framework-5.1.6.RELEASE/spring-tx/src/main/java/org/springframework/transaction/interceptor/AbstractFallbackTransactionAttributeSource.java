@@ -16,18 +16,17 @@
 
 package org.springframework.transaction.interceptor;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.MethodClassKey;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Abstract implementation of {@link TransactionAttributeSource} that caches
@@ -158,6 +157,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		// If the target class is null, the method will be unchanged.
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
+		//调用子类的findTransactionAttribute方法
 		// First try is the method in the target class.
 		TransactionAttribute txAttr = findTransactionAttribute(specificMethod);
 		if (txAttr != null) {
