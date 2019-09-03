@@ -176,6 +176,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		//尝试从缓存池中直接拿到已经创建好的bean
 		Object singletonObject = this.singletonObjects.get(beanName);
+		//实际上再第二次调用getSingleton()的重载方法时,spring才会添加beanName到singletonsCurrentlyInCreation中
+		//个人理解是因为spring还需要做各种各样的判断,认证
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				//尝试从earlySingletonObjects中拿到不完全的bean,主要解决循环依赖
@@ -220,10 +222,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
 				/*
-				 * 把beanName加到singletonsCurrentlyInCreation这个set集合中,表示对应的beanName的bean正在创建
+				 * 把beanName加到singletonsCurrentlyInCreation这个set集合中,此时才正真的表示对应的beanName的bean正在创建
 				 * this.singletonsCurrentlyInCreation.add(beanName)
 				 *
-				 * spring支持循环依赖的条件:其中至少一个对象是单例的,如果都是多实例的,则不支持
 				 *
 				 * */
 				beforeSingletonCreation(beanName);

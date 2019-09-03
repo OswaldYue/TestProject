@@ -460,7 +460,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 第一次调用BeanPostProcessor后置处理器(InstantiationAwareBeanPostProcessor)
 			 * InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation()
 			 * InstantiationAwareBeanPostProcessor.postProcessAfterInitialization()(条件调用)
-			 * 主要完成aop代理与tx相关  生成相关的代理类
+			 *
+			 * aop代理与tx此处使用可一些 但是主要还是在后面产生出代理对象
+			 *
+			 * 这个地方的意义其实在于 如果产生了一个bean  那么久直接返回了 那么后续的关于这个bean的所有再加工都不会去做了,
+			 * 例如:以什么样的方式去实例化对象,属性装配等
 			 * */
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);

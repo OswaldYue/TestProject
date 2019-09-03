@@ -197,7 +197,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 			@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
 
-		//处理&的地方
+		//处理&的地方  统一做是否加&前缀的处理
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
@@ -221,6 +221,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 
 		else {
+			//如果是原型bean 此处抛异常
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
 			if (isPrototypeCurrentlyInCreation(beanName)) {
@@ -251,6 +252,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 			//标记这个bean已经被创建,防止单例重复创建
 			if (!typeCheckOnly) {
+				//往alreadyCreated这个set中添加  表示此bean已经被创建过了 防止重复创建
 				markBeanAsCreated(beanName);
 			}
 
