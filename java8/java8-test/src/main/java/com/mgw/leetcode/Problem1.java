@@ -41,6 +41,9 @@ public class Problem1 {
         return ret;
     }
 
+    /**
+     * 其他答案
+     * */
     public int[] twoSum2(int[] nums, int target) throws Exception{
 
         HashMap<Integer, Integer> map = new HashMap<>();

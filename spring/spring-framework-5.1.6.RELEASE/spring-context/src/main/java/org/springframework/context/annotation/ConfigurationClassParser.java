@@ -250,12 +250,13 @@ class ConfigurationClassParser {
 			processMemberClasses(configClass, sourceClass);
 		}
 
-		//处理标注了@PropertySources的情况
+		//处理标注了@PropertySources的情况  处理引入的Property文件
 		// Process any @PropertySource annotations
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
 			if (this.environment instanceof ConfigurableEnvironment) {
+				//处理Property文件
 				processPropertySource(propertySource);
 			}
 			else {
@@ -311,10 +312,13 @@ class ConfigurationClassParser {
 		AnnotationAttributes importResource =
 				AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);
 		if (importResource != null) {
+			//拿到需要导入的配置文件的位置
 			String[] resources = importResource.getStringArray("locations");
+			//拿到reader
 			Class<? extends BeanDefinitionReader> readerClass = importResource.getClass("reader");
 			for (String resource : resources) {
 				String resolvedResource = this.environment.resolveRequiredPlaceholders(resource);
+				//将@ImportResource注解的信息加到importedResources这个Map中  后续做load时再去解析配置文件相关信息并注入到工厂中
 				configClass.addImportedResource(resolvedResource, readerClass);
 			}
 		}
@@ -444,11 +448,13 @@ class ConfigurationClassParser {
 		if (!StringUtils.hasLength(encoding)) {
 			encoding = null;
 		}
+		//拿到Property文件的路径
 		String[] locations = propertySource.getStringArray("value");
 		Assert.isTrue(locations.length > 0, "At least one @PropertySource(value) location is required");
 		boolean ignoreResourceNotFound = propertySource.getBoolean("ignoreResourceNotFound");
 
 		Class<? extends PropertySourceFactory> factoryClass = propertySource.getClass("factory");
+		//拿到Property的一个工厂 默认是DefaultPropertySourceFactory
 		PropertySourceFactory factory = (factoryClass == PropertySourceFactory.class ?
 				DEFAULT_PROPERTY_SOURCE_FACTORY : BeanUtils.instantiateClass(factoryClass));
 
@@ -456,6 +462,7 @@ class ConfigurationClassParser {
 			try {
 				String resolvedLocation = this.environment.resolveRequiredPlaceholders(location);
 				Resource resource = this.resourceLoader.getResource(resolvedLocation);
+				//创建一个包装类PropertySource  为ResourcePropertySource
 				addPropertySource(factory.createPropertySource(name, new EncodedResource(resource, encoding)));
 			}
 			catch (IllegalArgumentException | FileNotFoundException | UnknownHostException ex) {
@@ -474,6 +481,7 @@ class ConfigurationClassParser {
 
 	private void addPropertySource(PropertySource<?> propertySource) {
 		String name = propertySource.getName();
+
 		MutablePropertySources propertySources = ((ConfigurableEnvironment) this.environment).getPropertySources();
 
 		if (this.propertySourceNames.contains(name)) {

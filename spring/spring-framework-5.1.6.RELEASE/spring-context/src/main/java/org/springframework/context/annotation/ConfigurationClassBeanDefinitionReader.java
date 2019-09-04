@@ -327,6 +327,7 @@ class ConfigurationClassBeanDefinitionReader {
 					readerClass = GroovyBeanDefinitionReader.class;
 				}
 				else {
+					//使用XmlReader去读取xml文件
 					// Primarily ".xml" files but for any other extension as well
 					readerClass = XmlBeanDefinitionReader.class;
 				}
@@ -335,6 +336,7 @@ class ConfigurationClassBeanDefinitionReader {
 			BeanDefinitionReader reader = readerInstanceCache.get(readerClass);
 			if (reader == null) {
 				try {
+
 					// Instantiate the specified BeanDefinitionReader
 					reader = readerClass.getConstructor(BeanDefinitionRegistry.class).newInstance(this.registry);
 					// Delegate the current ResourceLoader to it if possible
@@ -350,7 +352,7 @@ class ConfigurationClassBeanDefinitionReader {
 							"Could not instantiate BeanDefinitionReader class [" + readerClass.getName() + "]");
 				}
 			}
-
+			//解析xml 并将相关信息注册到工厂中
 			// TODO SPR-6310: qualify relative path locations as done in AbstractContextLoader.modifyLocations
 			reader.loadBeanDefinitions(resource);
 		});

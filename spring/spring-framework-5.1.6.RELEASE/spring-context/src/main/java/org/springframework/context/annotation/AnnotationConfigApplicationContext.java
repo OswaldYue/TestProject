@@ -91,7 +91,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		*/
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		/*
-		*  拿到一个扫描器 Scanner  但是这个扫描器只是给使用者使用者  其spring内部自己去扫描类时自己又重新new ClassPathBeanDefinitionScanner()
+		*  拿到一个扫描器 Scanner  但是这个扫描器只是给使用者使用  其spring内部自己去扫描类时自己又重新new ClassPathBeanDefinitionScanner()
 		*  扫描器其实就是可以扫描一个路径并将相关可以注册的类注册
 		*  Mybatis的@MapperScan注解就使用了ClassPathBeanDefinitionScanner这个这个扫描器
 		* */

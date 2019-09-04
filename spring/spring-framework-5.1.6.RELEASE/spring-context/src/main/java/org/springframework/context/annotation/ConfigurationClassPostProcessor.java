@@ -53,6 +53,8 @@ import java.util.*;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR;
 
 /**
+ * 此类是一个BeanFactoryPostProcessor 主要用来解析配置类注解 并将解析后的相关beanDefinition注册到工厂中
+ *
  * {@link BeanFactoryPostProcessor} used for bootstrapping processing of
  * {@link Configuration @Configuration} classes.
  *
@@ -201,6 +203,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 
 	/**
+	 * BeanDefinitionRegistryPostProcessor接口的方法
+	 *
 	 * config配置类中配置@ComponentScan(value = "com.mgw.ioc")扫描操作 就会在这里进行扫描bean的注册
 	 *
 	 * Derive further bean definitions from the configuration classes in the registry.
