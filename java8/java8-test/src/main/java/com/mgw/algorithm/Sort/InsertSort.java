@@ -1,5 +1,9 @@
-package com.mgw.algorithm;
+package com.mgw.algorithm.Sort;
 
+/**
+ * 插入排序的效率极高  因为它特定条件下可以终结第二个循环
+ * 并且在接近差不多有序的情况下  效率甚至高于nlog(n)的排序算法
+ * */
 public class InsertSort implements ISort {
 
 

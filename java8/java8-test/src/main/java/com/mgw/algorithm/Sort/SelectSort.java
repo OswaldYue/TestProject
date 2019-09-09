@@ -1,6 +1,6 @@
-package com.mgw.algorithm;
+package com.mgw.algorithm.Sort;
 
-import com.mgw.algorithm.helper.SortHelper;
+import com.mgw.algorithm.Sort.helper.SortHelper;
 
 import java.util.Arrays;
 

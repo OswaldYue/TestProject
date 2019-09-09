@@ -1,6 +1,6 @@
-package com.mgw.algorithm;
+package com.mgw.algorithm.Sort;
 
-import com.mgw.algorithm.helper.SortHelper;
+import com.mgw.algorithm.Sort.helper.SortHelper;
 
 import java.util.Arrays;
 
@@ -28,14 +28,16 @@ public class TestSort {
 
     public static void main(String[] args) throws Exception {
 
-        int n = 100000;
+        int n = 10000;
 
-        Integer[] ints = SortHelper.generateArray(n, 0, n);
-
+//        Integer[] ints = SortHelper.generateArray(n, 0, n);
+        Integer[] ints = SortHelper.generateNealyOrderArray(n,100);
         Integer[] ints2 = Arrays.copyOf(ints, n);
+        Integer[] ints3 = Arrays.copyOf(ints, n);
 
         TestSort testSort = new TestSort();
         testSort.testSort("selectSort",ints,new SelectSort());
+        testSort.testSort("bubbleSort",ints2,new BubbleSort());
         testSort.testSort("insertSort",ints2,new InsertSort());
 
 

@@ -1,4 +1,4 @@
-package com.mgw.algorithm;
+package com.mgw.algorithm.Sort;
 
 import java.util.Arrays;
 
