@@ -30,16 +30,17 @@ public class TestSort {
 
         int n = 10000;
 
-//        Integer[] ints = SortHelper.generateArray(n, 0, n);
-        Integer[] ints = SortHelper.generateNealyOrderArray(n,100);
+        Integer[] ints = SortHelper.generateArray(n, 0, n);
+//        Integer[] ints = SortHelper.generateNealyOrderArray(n,100);
         Integer[] ints2 = Arrays.copyOf(ints, n);
         Integer[] ints3 = Arrays.copyOf(ints, n);
+        Integer[] ints4 = Arrays.copyOf(ints, n);
 
         TestSort testSort = new TestSort();
         testSort.testSort("selectSort",ints,new SelectSort());
         testSort.testSort("bubbleSort",ints2,new BubbleSort());
-        testSort.testSort("insertSort",ints2,new InsertSort());
-
+        testSort.testSort("insertSort",ints3,new InsertSort());
+        testSort.testSort("mergeSort",ints4,new MergeSort());
 
     }
 
