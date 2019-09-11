@@ -9,7 +9,7 @@ import keyword
 print(keyword.kwlist)
 
 
-# python中使用缩进来表示表达式之间的关系 其他语言一般使用()
+# python中使用缩进来表示表达式之间的关系 其他语言一般使用{}
 if True:
     print("True")
 else:
