@@ -1,0 +1,61 @@
+
+git init 使用当前目录作为Git仓库  该命令执行完后会在当前目录生成一个 .git 目录
+git init newrepo 初始化后，会在 newrepo 目录下会出现一个名为 .git 的目录，所有 Git 需要的数据和资源都存放在这个目录中
+
+git clone <repo>  克隆仓库
+git clone <repo> <directory>  克隆仓库到指定的目录
+
+ls -a 查看一个目录下所有文件，包括隐藏文件
+
+git add <file> 命令可将该文件添加到缓存 
+
+git status 命令用于查看项目的当前状态
+git status -s  命令用于查看项目的当前状态，但是是显示的简化信息      "AM" 状态的意思是，这个文件在我们将它添加到缓存之后又有改动
+
+git diff  命令显示已写入缓存与已修改但尚未写入缓存的改动的区别。git diff 有两个主要的应用场景
+	尚未缓存的改动：git diff
+	查看已缓存的改动： git diff --cached
+	查看已缓存的与未缓存的所有改动：git diff HEAD
+	显示摘要而非整个 diff：git diff --stat
+	
+git commit 使用 git add 命令将想要快照的内容写入缓存区， 而执行 git commit 将缓存区内容添加到仓库中、
+git commit -a 如果你觉得 git add 提交缓存的流程太过繁琐，Git 也允许你用 -a 选项跳过这一步
+git commit -m 写入缓冲区带上注释说明
+如果需改了某个已经在远程分支的文件，则 git commit -am '注释内容' 可以跳过git add <filename>  这一步，直接添加进缓冲区
+
+git reset HEAD <file> 命令用于取消已缓存的内容。必须是在文件执行了git add之后,没有执行git commit之前.
+
+git rm <file> 删除某个文件
+git rm -f <file>  如果删除之前修改过并且已经放到暂存区域的话，则必须要用强制删除选项 -f
+git rm --cached <file>   如果把文件从暂存区域移除，但仍然希望保留在当前工作目录中，换句话说，仅是从跟踪清单中删除，使用 --cached 选项即可。不从工作区中删除文件
+
+本地删除远程分支的某个文件后，需要将其提交到远程分支，则需这么处理：例如
+git rm text.txt 
+git reset HEAD text.txt
+git add text.txt
+git commit
+也可以这么做: git commit -am '注释内容' 直接一条命令即可
+
+
+git branch (branchname)  创建分支  以当前分支快照为基准，为你创建一个新的分支。
+git branch -d (branchname)  删除分支
+git branch -r  查看远程分支
+
+git checkout (branchname)  切换分支命令
+git checkout -b (branchname) 命令来创建新分支并立即切换到该分支下，从而在该分支中操作。 
+
+git branch 所有查看分支
+
+git merge 一旦某分支有了独立内容，你终究会希望将它合并回到你的主分支。 使用此命令
+
+git push  提交将缓冲区提交到远程分支
+
+git ls-files   会显示缓冲区内的文件信息，即就是哪些文件处于git的版本控制中
+
+git回退到历史某个版本:
+1.查看所有的历史版本，获取你git的某个历史版本的id    git log
+2.恢复到历史版本                                     git reset --hard fae6966548e3ae76cfa7f38a461c438cf75ba965
+3.把修改推到远程服务器                               git push -f -u origin master
+
+
+
