@@ -1,5 +1,5 @@
 #! user/bin/pythion
-# -*- coding=utf-8 -*-
+# -*- coding:utf-8 -*-
 
 
 #Python3 基本数据类型

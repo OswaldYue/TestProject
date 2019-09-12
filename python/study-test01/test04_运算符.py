@@ -1,5 +1,5 @@
 #! user/bin/python3
-# -*- coding=utf-8 -*-
+# -*- coding:utf-8 -*-
 
 # Python3 运算符
 # Python语言支持以下类型的运算符:
