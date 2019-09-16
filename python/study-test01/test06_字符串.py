@@ -154,17 +154,17 @@ print(errHTML)
 # 10	             isalnum()       如果字符串至少有一个字符并且所有字符都是字母或数字则返 回 True,否则返回 False
 # 11	             isalpha()       如果字符串至少有一个字符并且所有字符都是字母则返回 True, 否则返回 False
 # 12	             isdigit()       如果字符串只包含数字则返回 True 否则返回 False..
-# 13	             islower()       如果字符串中包含至少一个区分大小写的字符，并且所有这些(区分大小写的)字符都是小写，则返回 True，否则返回 False
+# 13	             islower()       如果字符串中包含至少一个区分大小写的字符，并且所有这些(区分大小写的)字符都是小写，则返回 True，否则返回 False(是否全是小写)
 # 14	             isnumeric()     如果字符串中只包含数字字符，则返回 True，否则返回 False
 # 15	             isspace()       如果字符串中只包含空白，则返回 True，否则返回 False
-# 16	             istitle()       如果字符串是标题化的(见 title())则返回 True，否则返回 False
+# 16	             istitle()       如果字符串是标题化的(见 title())则返回 True，否则返回 False(所有单词首字母大写 其他部分都是小写)
 # 17	             isupper()       如果字符串中包含至少一个区分大小写的字符，并且所有这些(区分大小写的)字符都是大写，则返回 True，否则返回 False
 # 18	             join(seq)       以指定字符串作为分隔符，将 seq 中所有的元素(的字符串表示)合并为一个新的字符串
 # 19	             len(string)     返回字符串长度
 # 20	             ljust(width[, fillchar])       返回一个原字符串左对齐,并使用 fillchar 填充至长度 width 的新字符串，fillchar 默认为空格
 # 21	             lower()         转换字符串中所有大写字符为小写
 # 22	             lstrip()        截掉字符串左边的空格或指定字符
-# 23	             maketrans()     创建字符映射的转换表，对于接受两个参数的最简单的调用方式，第一个参数是字符串，表示需要转换的字符，第二个参数也是字符串表示转换的目标
+# 23	             maketrans()     创建字符映射的转换表，对于接受两个参数的最简单的调用方式，第一个参数是字符串，表示需要转换的字符，第二个参数也是字符串表示转换的目标 Python3.4 已经没有 string.maketrans() 了，取而代之的是内建函数: bytearray.maketrans()、bytes.maketrans()、str.maketrans()
 # 24	             max(str)        返回字符串 str 中最大的字母
 # 25	             min(str)        返回字符串 str 中最小的字母
 # 26	             replace(old, new [, max])              把 将字符串中的 str1 替换成 str2,如果 max 指定，则替换不超过 max 次
@@ -183,10 +183,33 @@ print(errHTML)
 # 39	             zfill (width)               返回长度为 width 的字符串，原字符串右对齐，前面填充0
 # 40	             isdecimal()                 检查字符串是否只包含十进制字符，如果是返回 true，否则返回 false
 
+# bytes.decode(encoding="utf-8", errors="strict")
+# 参数
+# encoding -- 要使用的编码，如"UTF-8"
+# errors -- 设置不同错误的处理方案。默认为 'strict',意为编码错误引起一个UnicodeError。 其他可能得值有 'ignore', 'replace', 'xmlcharrefreplace', 'backslashreplace' 以及通过 codecs.register_error() 注册的任何值
+# 返回值
+# 该方法返回解码后的字符串
+str = "我爱中国";
+str_utf8 = str.encode("UTF-8")   # 返回bytes
+str_gbk = str.encode("GBK")
+print(str)
+print("UTF-8 编码：", str_utf8)
+print("GBK 编码：", str_gbk)
+print("UTF-8 解码：", str_utf8.decode('UTF-8', 'strict'))
+print("GBK 解码：", str_gbk.decode('GBK', 'strict'))
 
 
-
-
+def dn():
+    dgt=[]
+    num=[]
+    c=0
+    for c in range(2**16):
+            ch=chr(c)
+            if ch.isdigit():dgt.append(ch)
+            if ch.isnumeric():num.append(ch)
+    print('digits:',dgt)
+    print('numeric:',num)
+dn()
 
 
 
