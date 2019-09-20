@@ -102,27 +102,182 @@ except MyError as e:
     print('My exception occurred, value:', e.value)
 raise MyError('oops!')
 
+# 在这个例子中，类 Exception 默认的 __init__() 被覆盖
+# 当创建一个模块有可能抛出多种不同的异常时，一种通常的做法是为这个包建立一个基础异常类，然后基于这个基础类为不同的错误情况创建不同的子类:
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+class InputError(Error):
+    """
+    Exception raised for errors in the input.
+    Attributes:
+        expression -- input expression in which the error occurred
+        message -- explanation of the error
+    """
+ 
+    def __init__(self, expression, message):
+        self.expression = expression
+        self.message = message
+
+class TransitionError(Error):
+    """
+    Raised when an operation attempts a state transition that's not allowed.
+ 
+    Attributes:
+        previous -- state at beginning of transition
+        next -- attempted new state
+        message -- explanation of why the specific transition is not allowed
+    """
+    def __init__(self, previous, next, message):
+        self.previous = previous
+        self.next = next
+        self.message = message
+# 大多数的异常的名字都以"Error"结尾，就跟标准的异常命名一样
+# 定义清理行为
+# try 语句还有另外一个可选的子句，它定义了无论在任何情况下都会执行的清理行为。 例如:
+try:
+    raise KeyboardInterrupt
+finally:
+    print('Goodbye, world!')
+# 以上例子不管 try 子句里面有没有发生异常，finally 子句都会执行
+# 如果一个异常在 try 子句里（或者在 except 和 else 子句里）被抛出，而又没有任何的 except 把它截住，那么这个异常会在 finally 子句执行后被抛出
+# 下面是一个更加复杂的例子（在同一个 try 语句里包含 except 和 finally 子句）:
+def divide(x, y):
+    try:
+        result = x / y
+    except ZeroDivisionError:
+        print("division by zero!")
+    else:
+        print("result is", result)
+    finally:
+        print("executing finally clause")
+# 预定义的清理行为
+# 一些对象定义了标准的清理行为，无论系统是否成功的使用了它，一旦不需要它了，那么这个标准的清理行为就会执行
+# 这面这个例子展示了尝试打开一个文件，然后把内容打印到屏幕上:
+for line in open("myfile.txt"):
+    print(line, end="")
+# 以上这段代码的问题是，当执行完毕后，文件会保持打开状态，并没有被关闭
+# 关键词 with 语句就可以保证诸如文件之类的对象在使用完之后一定会正确的执行他的清理方法:
+# 以上这段代码执行完毕后，就算在处理过程中出问题了，文件 f 总是会关闭
 
 
+# 在 python3 中，处理带有参数的异常的方法如下：
+# 定义函数
+def temp_convert(var):
+    try:
+        return int(var)
+    except (ValueError) as Argument:
+        print ("参数没有包含数字\n", Argument)
+# 调用函数
+temp_convert("xyz")
+# 异常是可以向后推移的，所以我们一般看到的报错的位置是相对靠后的，下例：
+num = 100
+def test1():
+    print('test1-1')
+    print(num)
+    print('test2-2')
 
+def test2():
+    print('test2-1')
+    test1()
+    print('test2-2')
 
+def test3():
+    try:
+        print('test3-1')
+        test1()
+        print('test3-2')
+    except Exception as result:
+        print('检测出异常{}'.format(result))
+    print('test3-2')
+test3()
+print('---------------------------------------------')
+test2()
 
+import os
+# with 是个好东西，打开文件的时候多使用它，可以避免很多问题。例如：
+temp = os.open('test_text.txt', os.O_RDWR | os.O_CREAT)
+temp_file = os.fdopen(temp, 'r')
+print(str(temp_file.read()))
+os.close(temp)
+# 就可以简化成：
+with open('test_text.txt', 'r') as f:
+    print(f.read())
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Python3 内置异常类型的结构:
+# BaseException
+#  +-- SystemExit
+#  +-- KeyboardInterrupt
+#  +-- GeneratorExit
+#  +-- Exception
+#       +-- StopIteration
+#       +-- StopAsyncIteration
+#       +-- ArithmeticError
+#       |    +-- FloatingPointError
+#       |    +-- OverflowError
+#       |    +-- ZeroDivisionError
+#       +-- AssertionError
+#       +-- AttributeError
+#       +-- BufferError
+#       +-- EOFError
+#       +-- ImportError
+#       |    +-- ModuleNotFoundError
+#       +-- LookupError
+#       |    +-- IndexError
+#       |    +-- KeyError
+#       +-- MemoryError
+#       +-- NameError
+#       |    +-- UnboundLocalError
+#       +-- OSError
+#       |    +-- BlockingIOError
+#       |    +-- ChildProcessError
+#       |    +-- ConnectionError
+#       |    |    +-- BrokenPipeError
+#       |    |    +-- ConnectionAbortedError
+#       |    |    +-- ConnectionRefusedError
+#       |    |    +-- ConnectionResetError
+#       |    +-- FileExistsError
+#       |    +-- FileNotFoundError
+#       |    +-- InterruptedError
+#       |    +-- IsADirectoryError
+#       |    +-- NotADirectoryError
+#       |    +-- PermissionError
+#       |    +-- ProcessLookupError
+#       |    +-- TimeoutError
+#       +-- ReferenceError
+#       +-- RuntimeError
+#       |    +-- NotImplementedError
+#       |    +-- RecursionError
+#       +-- SyntaxError
+#       |    +-- IndentationError
+#       |         +-- TabError
+#       +-- SystemError
+#       +-- TypeError
+#       +-- ValueError
+#       |    +-- UnicodeError
+#       |         +-- UnicodeDecodeError
+#       |         +-- UnicodeEncodeError
+#       |         +-- UnicodeTranslateError
+#       +-- Warning
+#            +-- DeprecationWarning
+#            +-- PendingDeprecationWarning
+#            +-- RuntimeWarning
+#            +-- SyntaxWarning
+#            +-- UserWarning
+#            +-- FutureWarning
+#            +-- ImportWarning
+#            +-- UnicodeWarning
+#            +-- BytesWarning
+#            +-- ResourceWarning
+def model_exception(x,y):
+  try:
+    b = name
+    a =x/y
+  except(ZeroDivisionError,NameError,TypeError):
+    print('one of ZeroDivisionError or NameError or TypeError happend')
+#调用函数结果
+model_exception(2,0)
 
 
 
