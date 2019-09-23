@@ -1,0 +1,26 @@
+scope-----依赖作用的范围，指通过POM加载进来的包，作用的范围，范围一共有：编译时，运行时，测试时，
+scope一共有compile，runtime，test，system，provided 5种属性值，compile为其默认值，其中：
+
+compile表示在所有范围此jar都生效，
+
+test表示只在测试范围此jar生效，例如Junit（默认compile，不会报错，扩展了test），
+
+runtime表示在测试和运行时此jar生效，例如JDBC驱动（默认compile，不会报错，扩展了runtime），我们在编译时是没有用到这个包的，只在测试和运行时会使用到，
+
+provided表示在编译和测试时此jar生效，例如servlet-api，jsp-api，这个的provided必须填写，不能使用compile，原因是
+我们在eclispe里创建web项目时，eclipse为我们添加了这两个jar包，离开了eclispe之后，到Tomcat中Tomcat又会为我们提供这两个包，所以一直不会报错，但是在我们创建maven项目时，我们就不是web项目了，所以eclispe不会为我们添加这两个jar包，就需要我们通过maven来添加，但是如果设置了compile，在Tomcat中运行时，就会与Tomcat中提供的这两个包产生冲突，所以要设置为provided，
+
+system表示我们手动添加的包，不属于maven仓库，属于别的类库的jar包，只在编译和测试期生效，运行时无效，一般不用，使用时，需要配合下面的systemPath使用
+systemPath--为并非依赖maven的包指明路径。
+
+在项目中创建一个lib作为手动导入的jar包存储位置，
+然后再pom.xml文件中添加依赖，
+<dependency>
+	<groupId>xxx.xxx.xxx</groupId>
+	<artifactId>xxx</artifactId>
+	<version>xxx</version>
+	<scope>system</scope>
+	<systemPath>${basedir}/lib/xxx.jar</systemPath>
+</dependency>
+basedir表示根目录。
+
