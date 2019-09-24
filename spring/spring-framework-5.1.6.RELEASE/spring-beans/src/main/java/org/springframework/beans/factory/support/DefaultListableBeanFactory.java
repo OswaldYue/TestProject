@@ -791,6 +791,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
+		// 实例化所有非延时加载的bean
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
 			//与父类的bd进行合并  假如xml中配置一个bean的父类  那么此时就会在此处做一个合并
