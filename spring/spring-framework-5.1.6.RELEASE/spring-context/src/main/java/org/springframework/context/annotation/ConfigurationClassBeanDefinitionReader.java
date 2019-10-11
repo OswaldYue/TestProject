@@ -209,6 +209,8 @@ class ConfigurationClassBeanDefinitionReader {
 		if (metadata.isStatic()) {
 			// static @Bean method
 			beanDef.setBeanClassName(configClass.getMetadata().getClassName());
+			//为此@Bean的静态方法设置factory-method属性为此静态方法
+			//会在AbstractAutowireCapableBeanFactory.createBeanInstance()中创建时使用 且每次调用时都会重新创建
 			beanDef.setFactoryMethodName(methodName);
 		}
 		//如果加了@Bean方法不是静态的
@@ -216,6 +218,7 @@ class ConfigurationClassBeanDefinitionReader {
 			//当初FactoryBean处理
 			// instance @Bean method
 			beanDef.setFactoryBeanName(configClass.getBeanName());
+			//设置为唯一的实例化标记
 			beanDef.setUniqueFactoryMethodName(methodName);
 		}
 		//注入模型为AUTOWIRE_CONSTRUCTOR 构造方法注入

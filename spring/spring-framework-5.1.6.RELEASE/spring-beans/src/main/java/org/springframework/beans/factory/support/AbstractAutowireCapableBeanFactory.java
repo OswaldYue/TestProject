@@ -465,6 +465,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 *
 			 * 这个地方的意义其实在于 如果产生了一个bean  那么久直接返回了 那么后续的关于这个bean的所有再加工都不会去做了,
 			 * 例如:以什么样的方式去实例化对象,属性装配等
+			 *
+			 * 此处的后置处理器最重要的作用其实就是如果你的bean不需要spring帮你做那些属性管理(属性填充,属性依赖等)  那么你可以实现此后置处理器
+			 *
 			 * */
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
@@ -581,6 +584,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			* SmartInstantiationAwareBeanPostProcessor.getEarlyBeanReference()
 			*
 			* 拿到初期暴露的原始的bean,用于解决循环依赖
+			* 当使用构造器注入和循环依赖的两个bean都是原型时 循环依赖报错
 			*/
 			/*
 			 * 获取原始对象的早期引用，在 getEarlyBeanReference 方法中，会执行 AOP
@@ -1188,6 +1192,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		/*
 		* 如果工厂方法不为空,则通过工厂方法构建bean对象
+		* @Bean 注解就是使用工厂方法创建的
 		*
 		* */
 		if (mbd.getFactoryMethodName() != null) {
@@ -1195,7 +1200,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		/*
-		* 从spring的原始注释可以知道这是一个Shortcut
+		* 从spring的原始注释可以知道这是一个Shortcut(快捷方式)
 		* 当多次构建同一个bean时,可以使用这个Shortcut,
 		* 也就是说不再需要多次推断应该使用哪种方法构造bean
 		* 比如多次构建一个prototype的类型bean时就可以走此处的Shortcut
@@ -1243,13 +1248,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		* 使用后置处理器进行构造方法的推断,与AutowireMode有关,当AUTOWIRE_NO时,spring去推断构造方法时,就算有多个构造方法,也是返回都为null,用默认的构造方法,
 		* 当不是使用AUTOWIRE_CONSTRUCTOR时,spring不关心你的构造方法
 		* 但是如果设置了definition.getConstructorArgumentValues().addGenericArgumentValue("xxx")时 也会使用构造方法去进行创造实例
+		*
+		*如果提供的是无参的构造方法 则此方法也会拿出一个null spring默认无参构造方法也没用
+		* 此方法想要返回不为null  则必须提供一个有参的构造方法
 		 */
 		// Candidate constructors for autowiring?
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
 
-			//推断有多少构造方法的时候有可能为0,但会进行二次推断
+			//推断有多少构造方法的时候有可能为0(即就是ctors为null 但是没关系进到这里来 spring会再找一次的),但会进行二次推断
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
@@ -1317,6 +1325,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 使用后置处理器推断可以使用那些构造方法
+	 * 推断使用那些构造方法 可以有多个狗仔方法  后续会继续筛选
+	 *
 	 * Determine candidate constructors to use for the given bean, checking all registered
 	 * {@link SmartInstantiationAwareBeanPostProcessor SmartInstantiationAwareBeanPostProcessors}.
 	 * @param beanClass the raw class of the bean
@@ -1333,6 +1344,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
 					SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
+					//此处使用的就是当初spring自己注册进来的AutowiredAnnotationBeanPostProcessor这个后置处理器
 					Constructor<?>[] ctors = ibp.determineCandidateConstructors(beanClass, beanName);
 					if (ctors != null) {
 						return ctors;
@@ -1440,6 +1452,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		* 第五次调用BeanPostProcessor后置处理器(InstantiationAwareBeanPostProcessor)
 		* InstantiationAwareBeanPostProcessor.postProcessAfterInstantiation()
 		*
+		* 若自己实现InstantiationAwareBeanPostProcessor这个接口且postProcessAfterInstantiation()方法返回false 则表示不需要再为此bean设置属性
+		*
 		* */
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
@@ -1453,14 +1467,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 		}
-
+		// 若continueWithPropertyPopulation为false 则不再继续设置属性
 		if (!continueWithPropertyPopulation) {
 			return;
 		}
 
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
-		//以不同的注入模型来进行依赖注入
+		//以不同的注入模型来进行依赖注入 前面进行实例化时也有关于注入模型的判断 判断的是AUTOWIRE_CONSTRUCTOR
 		if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_NAME || mbd.getResolvedAutowireMode() == AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
@@ -1477,6 +1491,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
 
+		// 注入时需要的set方法  其实就是拿到所有的get和set方法
 		PropertyDescriptor[] filteredPds = null;
 		if (hasInstAwareBpps) {
 			if (pvs == null) {
@@ -1491,7 +1506,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
-					//处理属性的值
+					//处理属性的值 调用CommonAnnotationBeanPostProcessor设置属性 以及AutowiredAnnotationBeanPostProcessor 注入属性
 					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						if (filteredPds == null) {

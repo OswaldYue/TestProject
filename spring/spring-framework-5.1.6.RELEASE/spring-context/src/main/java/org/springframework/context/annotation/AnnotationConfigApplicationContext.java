@@ -76,11 +76,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	public AnnotationConfigApplicationContext() {
 		/*
 		* 此方法中会预先在beanFactory中注册它自己需要使用的五个类的BeanDefinition
-		* org.springframework.context.annotation.internalConfigurationAnnotationProcessor = ConfigurationClassPostProcessor.class
-		* org.springframework.context.annotation.internalAutowiredAnnotationProcessor = AutowiredAnnotationBeanPostProcessor.class
+		* org.springframework.context.annotation.internalConfigurationAnnotationProcessor = ConfigurationClassPostProcessor.class  解析config配置类
+		* org.springframework.context.annotation.internalAutowiredAnnotationProcessor = AutowiredAnnotationBeanPostProcessor.class 解析构造方法,spring决定使用哪种构造方法去实例化对象
 		* org.springframework.context.event.internalEventListenerProcessor = EventListenerMethodProcessor.class
 		* org.springframework.context.event.internalEventListenerFactory = DefaultEventListenerFactory.class
-		* org.springframework.context.annotation.internalCommonAnnotationProcessor(可选) = CommonAnnotationBeanPostProcessor.class
+		* org.springframework.context.annotation.internalCommonAnnotationProcessor(可选) = CommonAnnotationBeanPostProcessor.class 进行属性设置注入时使用
 		* 以及设置两个比较重要的类
 		* AnnotationAwareOrderComparator 主要是处理排序
 		* ContextAnnotationAutowireCandidateResolver 解决延时加载

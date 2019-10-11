@@ -86,6 +86,11 @@ class ConstructorResolver {
 	public BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd,
 			@Nullable Constructor<?>[] chosenCtors, @Nullable Object[] explicitArgs) {
 
+		/*
+		* 实例化一个BeanWrapper
+		* 其中有个对象叫wrappedObject 就是用来存储真实对象的 这个BeanWrapper其实只是个包装类
+		*
+		* */
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
 
@@ -119,7 +124,7 @@ class ConstructorResolver {
 				* 获取已解析的构造方法
 				* 一般不会有,因为构造方法一般会提供一个
 				* 除非有多个,那么才会存在已经解析完成的构造方法
-				* 当第二次创建对象时会拿到 一般单例就拿不到
+				* 当第二次创建对象时会拿到   一般单例就拿不到
 				* */
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
@@ -135,6 +140,7 @@ class ConstructorResolver {
 			}
 		}
 
+		// 当没有构造方法可用时 就去解析构造方法
 		if (constructorToUse == null || argsToUse == null) {
 			/*
 			* chosenCtors 第一次推断出来的构造方法,可能一个,可能多个,也可能没有 也就是通过上面的后置处理器推断出来的
@@ -170,15 +176,17 @@ class ConstructorResolver {
 
 			/*
 			* 需要去解析构造方法
-			* 判断构造方法是否为空,判断是否根据构造方法自动注入
+			* 判断传入的构造方法是否为空,判断是否根据构造方法自动注入
 			* */
 			// Need to resolve the constructor.
 			boolean autowiring = (chosenCtors != null ||
 					mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
+
+			//resolvedValues 这个数据结构就是用来存储构造方法的值的
 			ConstructorArgumentValues resolvedValues = null;
 
 			/*
-			* 定义最小参数个数
+			* 定义构造方法需要的最小参数个数
 			* 如果你给构造方法参数列表给定了具体的值
 			* 那么这些值个数就是构造方法参数的个数
 			* */
@@ -257,6 +265,7 @@ class ConstructorResolver {
 				if (resolvedValues != null) {
 					try {
 						/*
+						* paramNames为参数名称 此构造方法的参数名称
 						* 判断是否加了@ConstructorProperties注解,如果加了则把值取出来
 						* */
 						String[] paramNames = ConstructorPropertiesChecker.evaluate(candidate, paramTypes.length);
@@ -297,6 +306,9 @@ class ConstructorResolver {
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
 
+				/*
+				* 差异量
+				* */
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
 				// Choose this constructor if it represents the closest match.
@@ -689,6 +701,8 @@ class ConstructorResolver {
 	}
 
 	/**
+	 * 解析构造方法参数
+	 *
 	 * Resolve the constructor arguments for this bean into the resolvedValues object.
 	 * This may involve looking up other beans.
 	 * <p>This method is also used for handling invocations of static factory methods.

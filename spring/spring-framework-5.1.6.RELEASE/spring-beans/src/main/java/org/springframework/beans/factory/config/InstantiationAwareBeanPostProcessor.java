@@ -23,7 +23,7 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.lang.Nullable;
 
 /**
- * 这个接口一般是spring自己内部使用的  外部基本上不会去用
+ * 这个接口一般是spring自己内部使用的  spring不提倡外部去用
  *
  * Subinterface of {@link BeanPostProcessor} that adds a before-instantiation callback,
  * and a callback after instantiation but before explicit properties are set or

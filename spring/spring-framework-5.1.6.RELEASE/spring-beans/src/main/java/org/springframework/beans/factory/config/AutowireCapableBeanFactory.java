@@ -62,6 +62,9 @@ import org.springframework.lang.Nullable;
 public interface AutowireCapableBeanFactory extends BeanFactory {
 
 	/**
+	 * 默认的自动装配的模型为AUTOWIRE_NO
+	 * 自动装配的技术是使用by_type
+	 *
 	 * Constant that indicates no externally defined autowiring. Note that
 	 * BeanFactoryAware etc and annotation-driven injection will still be applied.
 	 * @see #createBean

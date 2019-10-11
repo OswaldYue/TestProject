@@ -87,6 +87,7 @@ public class InjectionMetadata {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Processing injected element of bean '" + beanName + "': " + element);
 				}
+				//属性注入 字段注入或者方法注入
 				element.inject(target, beanName, pvs);
 			}
 		}
