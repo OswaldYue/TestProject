@@ -97,7 +97,7 @@ class ConstructorResolver {
 		/*
 		* spring决定采用哪个构造方法来实例化bean
 		* 代码执行到这里spring已经决定要采用一个特殊构造方法来实例化bean
-		* 但是到底采用哪一个?可能类提供了很多构造方法
+		* 但是到底采用哪一个?可能类提供了很多构造方法T
 		* 采用哪个,spring有自己的一套规则
 		* 当找到一个后就会把这个构造方法赋值给constructorToUse
 		* */

@@ -70,7 +70,7 @@ public class JdbcTest {
 	}
 
 	/**
-	 * 如果将一个自己已经创建好的对象加入到spring中?
+	 * 如何将一个自己已经创建好的对象加入到spring中?
 	 * 1. @Bean可以
 	 * 2. context.getBeanFactory().registerSingleton()
 	 * 3. 加入到容器中的FactoryBean的实现类   例如:MyFactoryBean
