@@ -187,6 +187,8 @@ public class AnnotatedBeanDefinitionReader {
 	}
 
 	/**
+	 * 将bean注册进工厂中
+	 *
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
 	 * @param annotatedClass the class of the bean
@@ -265,6 +267,8 @@ public class AnnotatedBeanDefinitionReader {
 			}
 		}
 		//自定义的BeanDefinition在此设置  目前没发现那里使用了自定义的BeanDefinition  感觉意义不大
+		// AnnotationConfigApplicationContext.registerBean(java.lang.String, java.lang.Class<T>, java.lang.Object...)这个方法
+		// 可以注册bean,并且传入构造方法的参数值
 		for (BeanDefinitionCustomizer customizer : definitionCustomizers) {
 			customizer.customize(abd);
 		}

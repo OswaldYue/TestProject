@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PluggableSchemaResolver implements EntityResolver {
 
 	/**
-	 * 从所以加载进来的jar包中拿到所有的 META-INF/spring.schemas 加载
+	 * 从所有加载进来的jar包中拿到所有的 META-INF/spring.schemas 加载
 	 *
 	 * The location of the file that defines schema mappings.
 	 * Can be present in multiple JAR files.

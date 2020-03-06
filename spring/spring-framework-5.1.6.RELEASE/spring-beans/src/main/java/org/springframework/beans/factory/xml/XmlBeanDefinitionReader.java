@@ -383,11 +383,27 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 		try {
 			//解决让人头疼的xml名称空间的解析及校验的问题
+			/*
+			具体过程如下:
+			使用DelegatingEntityResolver.resolveEntity()方法，根据名称空间去找对应的xsd校验文件，检验是否合法
+			示例:
+				xmlns:context="http://www.springframework.org/schema/context 对应
+					https://www.springframework.org/schema/context/spring-context.xsd文件
+					以xsd文件去找META-INF\spring.schemas文件中找具体目录下的具体xsd文件org/springframework/context/config/spring-context.xsd文件
+				然后校验合法性
+
+			 */
 			Document doc = doLoadDocument(inputSource, resource);
 			/*
 			* 解析xml
 			* 根据xml上的名称空间的url去每个jar的META-INF/spring.handlers文件找相关的标签处理器
 			* 再根据处理器的解析器去解析标签
+			* 示例说明: 具体的解析是DefaultNamespaceHandlerResolver.resolve()做的
+			* 	<context:component-scan base-package="xxx.xxx"></context:component-scan此配置文件
+			*		以命名空间context去找头文件xmlns:context="http://www.springframework.org/schema/context"
+			* 		再以http://www.springframework.org/schema/context作为key值去META-INF\spring.handles文件中找具体的处理类
+			* 		org.springframework.context.config.ContextNamespaceHandler，处理类会有对应标签的具体解析类
+			* 		component-scan标签对应registerBeanDefinitionParser("component-scan", new ComponentScanBeanDefinitionParser())
 			* */
 			int count = registerBeanDefinitions(doc, resource);
 			if (logger.isDebugEnabled()) {

@@ -89,7 +89,7 @@ public class DelegatingEntityResolver implements EntityResolver {
 				return this.dtdResolver.resolveEntity(publicId, systemId);
 			}
 			/*
-			* 如果是.xsd文件 则使用BeansDtdResolver解析
+			* 如果是.xsd文件 则使用PluggableSchemaResolver解析
 			* */
 			else if (systemId.endsWith(XSD_SUFFIX)) {
 				return this.schemaResolver.resolveEntity(publicId, systemId);
