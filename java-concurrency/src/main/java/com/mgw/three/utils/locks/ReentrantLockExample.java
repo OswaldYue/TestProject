@@ -6,6 +6,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
+/**
+ * ReentrantLock可重入锁 属于悲观锁
+ * */
 public class ReentrantLockExample {
 
     private static final ReentrantLock  lock = new ReentrantLock();
