@@ -70,6 +70,8 @@ class ConstructorResolver {
 
 
 	/**
+	 * 这个方法相当相当的复杂
+	 *
 	 * "autowire constructor" (with constructor arguments by type) behavior.
 	 * Also applied if explicit constructor argument values are specified,
 	 * matching all remaining arguments with beans from the bean factory.
@@ -82,6 +84,32 @@ class ConstructorResolver {
 	 * @param explicitArgs argument values passed in programmatically via the getBean method,
 	 * or {@code null} if none (-> use constructor argument values from bean definition)
 	 * @return a BeanWrapper for the new instance
+	 *
+	 * 在此将具体步骤做一个总结:
+	 * 	1 判断有无显式指定参数,如果有则优先使用,如xmlBeanFactory.getBean(“cat”, “美美”,3);
+	 *  2 优先尝试从缓存中获取,spring对参数的解析过程是比较复杂也耗时的,所以这里先尝试从缓存中获取已经解析过的构造函数参数
+	 *  3 缓存中不存在,则需要解析构造函数参数,以确定使用哪一个构造函数来进行实例化
+	 * 		一个类可能存在多个构造函数，如Dog(String name,int age);Dog(String name);Dog(int age)等等，
+	 * 		所以需要解析对构造函数进行解析，以确定使用哪一个构造函数。
+	 *  4 使用指定的构造函数(如果有的话)。
+	 * 		这里说的指定构造函数,并不是我们在配置文件中指定的构造函数,而是通过解析SmartInstantiationAwareBeanPostProcessor得出的构造函数。
+	 * 		参见AbstractAutowireCapableBeanFactory-->determineConstructorsFromBeanPostProcessors(beanClass, beanName),
+	 * 		就是在本方法被调用之前执行的解析操作,即便解析出来的构造函数不为空,但是大家要注意,candidates是个数组,
+	 * 		下一步依然还是要对candidates进行解析,以确定使用哪一个构造函数进行实例化。
+	 *  5 如果指定的构造函数不存在,则根据方法访问级别,获取该bean所有的构造函数
+	 * 		需要注意，该步骤获取的是类的构造函数，而不是在配置文件中的构造函数。
+	 *  6 对构造函数按照参数个数和参数类型进行排序,参数最多的构造函数会排在第一位
+	 *  7 循环所有bean类中的构造函数,解析确定使用哪一个构造函数
+	 * 		首先因为构造函数已经按照参数的个数排序，参数个数最多的排在最前面，
+	 * 			所以判断如若解析出来的构造函数个数小于BeanDefinition中的构造函数个数，
+	 * 			那么肯定不会使用该构造函数进行实例化，那么循环会继续。
+	 * 		其次将解析到的构造函数封装至ArgumentsHolder对象。
+	 * 		最后通过构造函数参数权重对比,得出最适合使用的构造函数。
+	 *  8 处理异常，缓存解析过的构造函数。
+	 * 	9 获取实例化策略并执行实例化
+	 * 		同样这里也会有反射或CGLIB实例化bean
+	 *  10 返回BeanWrapper包装类
+	 *
 	 */
 	public BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd,
 			@Nullable Constructor<?>[] chosenCtors, @Nullable Object[] explicitArgs) {
@@ -113,12 +141,15 @@ class ConstructorResolver {
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
 
+		// 1、 判断有无显式指定参数,如果有则优先使用,如xmlBeanFactory.getBean("cat", "美美",3);
 		//explicitArgs 99%的情况为空 只有自己调用getBean()方法时才可能会不为空
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
+		// 2、 没有显式指定参数,则解析配置文件中的参数
 		else {
 			Object[] argsToResolve = null;
+			// 3、 优先尝试从缓存中获取,spring对参数的解析过程是比较复杂也耗时的,所以这里先尝试从缓存中获取已经解析过的构造函数参数
 			synchronized (mbd.constructorArgumentLock) {
 				/*
 				* 获取已解析的构造方法
@@ -135,21 +166,31 @@ class ConstructorResolver {
 					}
 				}
 			}
+			// 缓存中存在,则解析构造函数参数类型
 			if (argsToResolve != null) {
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve, true);
 			}
 		}
 
+		// 4、 缓存中不存在,则需要解析构造函数参数,以确定使用哪一个构造函数来进行实例化
 		// 当没有构造方法可用时 就去解析构造方法
 		if (constructorToUse == null || argsToUse == null) {
 			/*
 			* chosenCtors 第一次推断出来的构造方法,可能一个,可能多个,也可能没有 也就是通过上面的后置处理器推断出来的
 			* */
 			// Take specified constructors, if any.
+			// 5、 使用指定的构造函数(如果有的话)。
+			// 注意: 5.1、 这里说的指定构造函数,并不是我们在配置文件中指定的构造函数,而是通过解析SmartInstantiationAwareBeanPostProcessor得出的构造函数
+			// 		     参见AbstractAutowireCapableBeanFactory-->determineConstructorsFromBeanPostProcessors(beanClass, beanName),
+			//           就是在本方法被调用之前执行的解析操作
+			//      5.2、 即便解析出来的构造函数不为空,但是大家要注意,candidates是个数组,下一步依然还是要对candidates进行解析,以确定使用哪一个构造函数进行实例化
 			Constructor<?>[] candidates = chosenCtors;
 			if (candidates == null) {
 				Class<?> beanClass = mbd.getBeanClass();
 				try {
+					// 6、 如果指定的构造函数不存在,则根据方法访问级别,获取该bean所有的构造函数
+					// 对于本例来分析,应该会获取到四个构造函数Cat(),Cat(String name),Cat(int age),Cat(String name, int age)
+					// 注意:该处获取到的构造函数,并不是配置文件中定义的构造函数,而是bean类中的构造函数
 					//如果第一次通过后置处理器没有推断出来  那么这里就拿到所有的构造方法
 					candidates = (mbd.isNonPublicAccessAllowed() ?
 							beanClass.getDeclaredConstructors() : beanClass.getConstructors());
@@ -186,6 +227,7 @@ class ConstructorResolver {
 			ConstructorArgumentValues resolvedValues = null;
 
 			/*
+			* 这里定义了一个变量,来记录最小的构造函数参数个数,其作用可以参见下面解释...
 			* 定义构造方法需要的最小参数个数
 			* 如果你给构造方法参数列表给定了具体的值
 			* 那么这些值个数就是构造方法参数的个数
@@ -213,7 +255,8 @@ class ConstructorResolver {
 				minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);
 			}
 			/*
-			*多个构造方法进行排序  构造方法权限优先(public,protected),继而参数个数(参数多排前面)
+			* 7、 对构造函数按照参数个数和参数类型进行排序,参数最多的构造函数会排在第一位
+			* 多个构造方法进行排序  构造方法权限优先(public,protected),继而参数个数(参数多排前面)
 			*
 			* boolean p1 = Modifier.isPublic(e1.getModifiers());
 			* boolean p2 = Modifier.isPublic(e2.getModifiers());
@@ -235,11 +278,15 @@ class ConstructorResolver {
 			LinkedList<UnsatisfiedDependencyException> causes = null;
 
 			/*
+			* 8、 循环所有bean类中的构造函数,解析确定使用哪一个构造函数
 			* 循环所有的构造方法
 			* */
 			for (Constructor<?> candidate : candidates) {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 
+				// 如果constructorToUse不为空,且参数个数大于当前循环的构造函数参数个数,则直接终止循环,因为解析的bean类构造函数已经经过排序
+				// 问题: 进入该if语句的条件是constructorToUse==null? 该处判断是否多余.. ?
+				// 带着这个问题,可以接着看源码...该处的设计还是值得参考的 下面有解释
 				/*
 				* 这个判断不好理解
 				*
@@ -256,11 +303,15 @@ class ConstructorResolver {
 					// do not look any further, there are only less greedy constructors left.
 					break;
 				}
+				// 如果从bean类中解析到的构造函数个数小于从beanDefinition中解析到的构造函数个数,
+				// 那么肯定不会使用该方法实例化,循环继续
+				// 简单的理解:beanDefinition中的构造函数和bean类中的构造函数参数个数不相等,那么肯定不会使用该构造函数实例化
 				//小于,但是前面没有指定,那么可能需要用到私有的
 				if (paramTypes.length < minNrOfArgs) {
 					continue;
 				}
 
+				// 9、 获取ArgumentsHolder对象,直接理解为一个参数持有者即可
 				ArgumentsHolder argsHolder;
 				if (resolvedValues != null) {
 					try {
@@ -305,14 +356,23 @@ class ConstructorResolver {
 					}
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
-
+				// 10、 通过构造函数参数权重对比,得出最适合使用的构造函数
+				// 先判断是返回是在宽松模式下解析构造函数还是在严格模式下解析构造函数。(默认是宽松模式)
+				// 10.1、对于宽松模式:例如构造函数为(String name,int age),配置文件中定义(value="美美",value="3")
+				// 	 那么对于age来讲,配置文件中的"3",可以被解析为int也可以被解析为String,
+				//   这个时候就需要来判断参数的权重,使用ConstructorResolver的静态内部类ArgumentsHolder分别对字符型和数字型的参数做权重判断
+				//   权重越小,则说明构造函数越匹配
+				// 10.2、对于严格模式:严格返回权重值,不会根据分别比较而返回比对值
+				// 10.3、minTypeDiffWeight = Integer.MAX_VALUE;而权重比较返回结果都是在Integer.MAX_VALUE做减法,起返回最大值为Integer.MAX_VALUE
 				/*
 				* 差异量
 				* */
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
+				// 如果此构造函数表示最接近的匹配，则选择此构造函数
 				// Choose this constructor if it represents the closest match.
 				if (typeDiffWeight < minTypeDiffWeight) {
+					// 将解析到的构造函数赋予constructorToUse,这也是我们上面问题疑问的答案所在处
 					constructorToUse = candidate;
 					argsHolderToUse = argsHolder;
 					argsToUse = argsHolder.arguments;
@@ -328,6 +388,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// 11、 异常处理
 			if (constructorToUse == null) {
 				if (causes != null) {
 					UnsatisfiedDependencyException ex = causes.removeLast();
@@ -347,13 +408,16 @@ class ConstructorResolver {
 						ambiguousConstructors);
 			}
 
+			// 12、 缓存解析的构造函数
 			if (explicitArgs == null && argsHolderToUse != null) {
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
+		// 13、 instantiate() 获取实例化策略并执行实例化
 		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
+		// 14、 返回BeanWrapper包装类
 		return bw;
 	}
 

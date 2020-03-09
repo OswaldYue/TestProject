@@ -156,7 +156,8 @@ public abstract class BeanUtils {
 		Assert.notNull(ctor, "Constructor must not be null");
 		try {
 			ReflectionUtils.makeAccessible(ctor);
-			//反射创建对象
+			//反射创建对象 通过ctor.newInstance(args)方法创建了Bean的实例
+			//KotlinDetector，Spring5.0新增的类，用于检测Kotlin的存在和识别Kotlin类型
 			return (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(ctor.getDeclaringClass()) ?
 					KotlinDelegate.instantiateClass(ctor, args) : ctor.newInstance(args));
 		}

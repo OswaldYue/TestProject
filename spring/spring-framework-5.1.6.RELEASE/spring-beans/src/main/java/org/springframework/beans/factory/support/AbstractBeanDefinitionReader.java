@@ -86,14 +86,23 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		this.registry = registry;
 
 		// Determine ResourceLoader to use.
+		// 1、确定ResourceLoader使用 该方法的核心就是确定当前使用的类加载器
 		if (this.registry instanceof ResourceLoader) {
 			this.resourceLoader = (ResourceLoader) this.registry;
 		}
 		else {
+			// PathMatchingResourcePatternResolver类中实际维护了一个DefaultResourceLoader类
+			// 但是PathMatchingResourcePatternResolver这个类是ResourcePatternResolver接口
+			// ResourcePatternResolver是ResourceLoader接口的子接口
+			// PathMatchingResourcePatternResolver实际可以作为一个资源解析类
+			// 实际上DefaultResourceLoader类是使用 ClassUtils.getDefaultClassLoader()来获取类加载器的
 			this.resourceLoader = new PathMatchingResourcePatternResolver();
 		}
 
 		// Inherit Environment if possible
+		// 2、如果环境可继承则继承registry的环境,否则重新创建环境
+		// 系统环境包括了系统环境属性（主机变量信息）、JVM系统环境属性（JDK版本，JDK目录等）、默认激活节点、属性解析器等
+		// 其中比较重要的两个是以systemEnvironment和systemProperties为key的map
 		if (this.registry instanceof EnvironmentCapable) {
 			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
 		}

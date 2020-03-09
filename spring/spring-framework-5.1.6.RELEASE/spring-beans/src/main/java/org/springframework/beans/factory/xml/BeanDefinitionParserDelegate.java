@@ -379,7 +379,10 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		// 1、解析bean的id和bean的别名
+		// 获取id标签属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		// 获取name（别名）标签属性，缓存至List集合
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
 		List<String> aliases = new ArrayList<>();
@@ -388,6 +391,8 @@ public class BeanDefinitionParserDelegate {
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
+		// 如果bean的id为空，但是别名不为空的话，那么默认采用第一个别名作为beanName
+		// 例如：<bean class="com.mgw.Dog" name="myDog1,myDog2"/>，使用myDog1作为beanName
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
@@ -396,24 +401,32 @@ public class BeanDefinitionParserDelegate {
 						"' as bean name and " + aliases + " as aliases");
 			}
 		}
-
+		// 2、containingBean为空，则检查beanName和别名是否被使用
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		// 3、解析bean标签，将其转换为BeanDefinition对象
+		// 详情见继续向方法里面跟踪
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
+		// 4、如果beanDefinition且未配置bean的id属性，name属性，则为当前bean生成id和别名
+		// 例如：<bean class="com.mgw.Dog"/>，<bean factory-bean="dog4"/>，<bean parent="outer"/>等
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
 				try {
+					// containingBean不为null，则当前bean是内部bean，使用BeanDefinitionReaderUtils生成beanName
+					// 跟踪进方法中查看
 					if (containingBean != null) {
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
 					}
 					else {
+						// 否则，使用XmlReaderContext对象生成beanName
 						beanName = this.readerContext.generateBeanName(beanDefinition);
 						// Register an alias for the plain bean class name, if still possible,
 						// if the generator returned the class name plus a suffix.
 						// This is expected for Spring 1.2/2.0 backwards compatibility.
+						// 如果生成器返回的是类名加上后缀，则为普通bean类名注册一个别名。这在Spring 1.2/2.0的向后兼容性中是可以实现的。
 						String beanClassName = beanDefinition.getBeanClassName();
 						if (beanClassName != null &&
 								beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
@@ -431,6 +444,7 @@ public class BeanDefinitionParserDelegate {
 					return null;
 				}
 			}
+			// 5、创建并返回BeanDefinitionHolder对象
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
@@ -469,29 +483,39 @@ public class BeanDefinitionParserDelegate {
 
 		this.parseState.push(new BeanEntry(beanName));
 
+		// 1、解析class属性
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
+		// 2、解析parent属性
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
 
 		try {
+			// 3、创建AbstractBeanDefinition对象
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-
+			// 4、解析bean标签属性 继续跟踪进方法中
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
+			// 5、解析meta标签
 			parseMetaElements(ele, bd);
+			// 6、解析lookup-method属性
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			// 7、解析replace-method属性
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
+			// 8、解析构造函数参数
 			parseConstructorArgElements(ele, bd);
+			// 9、解析property属性
 			parsePropertyElements(ele, bd);
+			// 10、解析qualifier属性
 			parseQualifierElements(ele, bd);
 
+			// 11、设置bean定义来源和元数据的来源
 			bd.setResource(this.readerContext.getResource());
 			bd.setSource(extractSource(ele));
 
@@ -523,6 +547,7 @@ public class BeanDefinitionParserDelegate {
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName,
 			@Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
 
+		// 1、设置bean作用域
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
 			error("Old 1.x 'singleton' attribute in use - upgrade to 'scope' declaration", ele);
 		}
@@ -531,27 +556,45 @@ public class BeanDefinitionParserDelegate {
 		}
 		else if (containingBean != null) {
 			// Take default from containing bean in case of an inner bean definition.
+			// 未明确指定bean的作用域,且当前被解析bean是内部bean的话，
+			// 则默认使用outer bean的的作用域作为当前bean的作用域
+			// 例如:下面的配置，解析到inner属性时，inner未指定作用域，则使用outer的作用域，也就是prototype
+			/**
+			 <bean id="outer" class="com.mgw.Outer" scope="prototype">
+				 <property name="inner">
+				 	<bean id="inner" class="com.mgw.Inner"/>
+				 </property>
+			 </bean>
+			 **/
+			// Take default from containing bean in case of an inner bean definition.
 			bd.setScope(containingBean.getScope());
 		}
 
+		// 2、设置abstract属性
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
-
+		// 3、设置lazy-init(延迟加载)属性；
+		// 如果该属性为true的话，ApplicationContext容器在初始化时不会加载该bean；
+		// 而是在第一次向容器索取该bean时才会被初始化
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTRIBUTE);
 		if (isDefaultValue(lazyInit)) {
 			lazyInit = this.defaults.getLazyInit();
 		}
 		bd.setLazyInit(TRUE_VALUE.equals(lazyInit));
 
+		// 4、设置autowire属性，此属性默认不开启
 		String autowire = ele.getAttribute(AUTOWIRE_ATTRIBUTE);
 		bd.setAutowireMode(getAutowireMode(autowire));
 
+		// 5、设置depends-on属性，如果BeanA依赖于BeanB，可通过depends-on属性使BeanB在BeanA之前完初始化
 		if (ele.hasAttribute(DEPENDS_ON_ATTRIBUTE)) {
 			String dependsOn = ele.getAttribute(DEPENDS_ON_ATTRIBUTE);
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(dependsOn, MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
+		// 6、设置autowire-candidate属性，当一个接口有多个实现类时，
+		// 配置autowire-candidate属性可以明确指定实现类是否参与自动注入
 		String autowireCandidate = ele.getAttribute(AUTOWIRE_CANDIDATE_ATTRIBUTE);
 		if (isDefaultValue(autowireCandidate)) {
 			String candidatePattern = this.defaults.getAutowireCandidates();
@@ -564,31 +607,42 @@ public class BeanDefinitionParserDelegate {
 			bd.setAutowireCandidate(TRUE_VALUE.equals(autowireCandidate));
 		}
 
+		// 7、设置primary属性，当byType注入有多个类型时，
+		// 可以指定primary="true"，提高注入的优先级，避免抛出异常
 		if (ele.hasAttribute(PRIMARY_ATTRIBUTE)) {
 			bd.setPrimary(TRUE_VALUE.equals(ele.getAttribute(PRIMARY_ATTRIBUTE)));
 		}
 
+		// 8、设置init-method，bean初始化完成后回调该方法
 		if (ele.hasAttribute(INIT_METHOD_ATTRIBUTE)) {
 			String initMethodName = ele.getAttribute(INIT_METHOD_ATTRIBUTE);
 			bd.setInitMethodName(initMethodName);
 		}
 		else if (this.defaults.getInitMethod() != null) {
+			// 尝试从DocumentDefaultsDefinition对象中获取init-method属性
+			// DocumentDefaultsDefinition对象保存了Spring bean的一些简单设置，
+			// 我们可以通过该类设定通用的bean属性模板
 			bd.setInitMethodName(this.defaults.getInitMethod());
 			bd.setEnforceInitMethod(false);
 		}
 
+		// 9、设置destroy-method属性，bean销毁后回调该方法
 		if (ele.hasAttribute(DESTROY_METHOD_ATTRIBUTE)) {
 			String destroyMethodName = ele.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 			bd.setDestroyMethodName(destroyMethodName);
 		}
 		else if (this.defaults.getDestroyMethod() != null) {
+			// 尝试从DocumentDefaultsDefinition对象中获取destroy-method属性
 			bd.setDestroyMethodName(this.defaults.getDestroyMethod());
 			bd.setEnforceDestroyMethod(false);
 		}
 
+		// 10、设置factory-method属性，该属性可指定静态工厂或实例工厂方法实例化bean
 		if (ele.hasAttribute(FACTORY_METHOD_ATTRIBUTE)) {
 			bd.setFactoryMethodName(ele.getAttribute(FACTORY_METHOD_ATTRIBUTE));
 		}
+		// 11、设置factory-bean属性，一般和factory-method属性一起使用，
+		// 指定工厂bean和工厂bean的工厂方法
 		if (ele.hasAttribute(FACTORY_BEAN_ATTRIBUTE)) {
 			bd.setFactoryBeanName(ele.getAttribute(FACTORY_BEAN_ATTRIBUTE));
 		}

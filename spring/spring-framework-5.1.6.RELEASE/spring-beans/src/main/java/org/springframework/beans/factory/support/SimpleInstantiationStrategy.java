@@ -61,12 +61,17 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
 		/*
+		* 1、如果没有使用方法覆盖(replace-method或lookup-method注入),则直接使用反射创建bean的实例
 		* 检测bean配置中是否配置了lookup-method或replace-method
 		* 如果配置了就需要使用CGLIB构建bean对象
+		*
+		* 判断的方式很简单，通过BeanDefinition判断有没有replace-method或lookup-method注入即可；
+		* 如果没有则默认使用反射机制实例化bean，否则必须使用CGLIB实例bean
 		* */
 		if (!bd.hasMethodOverrides()) {
 			Constructor<?> constructorToUse;
 			synchronized (bd.constructorArgumentLock) {
+				// 尝试获取已经解析的构造方法
 				//已经解析过的构造方法或者工厂方法
 				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse == null) {
@@ -82,6 +87,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
 						}
 						else {
+							// 未能获取到已经解析过的构造方法，则通过getDeclaredConstructor方法获取构造方法
 							//得到默认的构造方法
 							constructorToUse = clazz.getDeclaredConstructor();
 						}
@@ -92,11 +98,13 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				}
 			}
+			// 通过BeanUtils类实例化bean
 			//使用反射实例化对象
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
+		// 2、否则必须使用CGLIB实例化策略
 		else {
-			//使用cglib代理生成一个代理对象
+			//使用cglib代理生成一个代理对象 CglibSubclassingInstantiationStrategy.instantiateWithMethodInjection(RootBeanDefinition, BeanFactory)
 			// Must generate CGLIB subclass.
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
