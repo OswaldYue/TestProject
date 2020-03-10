@@ -134,8 +134,12 @@ public abstract class AopConfigUtils {
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 
+		// cls --> org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
+		// AUTO_PROXY_CREATOR_BEAN_NAME --> org.springframework.aop.config.internalAutoProxyCreator
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
+			// 如果registry已经包含了internalAutoProxyCreator
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
+			// 如果已经注册的internalAutoProxyCreator不是AnnotationAwareAspectJAutoProxyCreator，则需要判断优先级并决定使用哪个
 			if (!cls.getName().equals(apcDefinition.getBeanClassName())) {
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
 				int requiredPriority = findPriorityForClass(cls);
@@ -143,12 +147,14 @@ public abstract class AopConfigUtils {
 					apcDefinition.setBeanClassName(cls.getName());
 				}
 			}
+			// 如果已经注册的internalAutoProxyCreator是AnnotationAwareAspectJAutoProxyCreator，则无需特殊处理
 			return null;
 		}
 
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
-				beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		// ROLE_INFRASTRUCTURE --> 表示Spring的内部bean
+		beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		registry.registerBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME, beanDefinition);
 		return beanDefinition;
 	}

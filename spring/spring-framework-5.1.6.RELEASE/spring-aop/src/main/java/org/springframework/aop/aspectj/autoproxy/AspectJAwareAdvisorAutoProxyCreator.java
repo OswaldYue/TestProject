@@ -95,10 +95,17 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 		AspectJProxyUtils.makeAdvisorChainAspectJCapableIfNecessary(candidateAdvisors);
 	}
 
+	/**
+	 * 如果给定的bean不应该被认为是后处理器自动代理的，子类应该重写这个方法以返回true
+	 * 该方法主逻辑很简单，查找所有的候选增强并循环判断当前beanName是否需要被代理，关键是findCandidateAdvisors()方法中获取增强的过程
+	 * */
 	@Override
 	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
+		// 1、查找所有候选增强
 		// TODO: Consider optimization by caching the list of the aspect names
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		// 2、循环判断所有的增强,如果增强是AspectJPointcutAdvisor的实例
+		//    并且其名称与当前bean的名称相同,则返回true,即该bean无需代理
 		for (Advisor advisor : candidateAdvisors) {
 			if (advisor instanceof AspectJPointcutAdvisor &&
 					((AspectJPointcutAdvisor) advisor).getAspectName().equals(beanName)) {

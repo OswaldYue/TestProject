@@ -308,7 +308,10 @@ final class PostProcessorRegistrationDelegate {
 
 
 		/*
-		* 注册一个ApplicationListenerDetector 来在Bean创建完成后检查是否是ApplicationListener,如果是 applicationContext.addApplicationListener((ApplicationListener<?>) bean)
+		* 注册一个ApplicationListenerDetector 来在Bean创建完成后检查是否是ApplicationListener,
+		* 如果是 applicationContext.addApplicationListener((ApplicationListener<?>) bean)
+		* 用来侦测ApplicationListener类型的bean
+    	* 并将它们加入到容器的applicationEventMulticaster或applicationListeners集合中
 		* */
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
 		// moving it to the end of the processor chain (for picking up proxies etc).

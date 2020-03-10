@@ -244,15 +244,28 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return wrapIfNecessary(bean, beanName, cacheKey);
 	}
 
+	/**
+	 * 这个后置处理器方法做了两件事
+	 * 1.缓存切面类的信息
+	 * 先判断对应的beanClass是否为Aop的基础类，如果是的话，直接缓存。
+	 * 然后通过shouldSkip方法判断beanClass是否需要被自动代理，如果不需要被自动代理的话，返回true，否则返回false。
+	 * 2.判断有无自定义TargetSource，如果有的话，则在此方法里创建代理
+	 * 关于自定义TargetSource已经给出了一个简单的实例
+	 * */
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
+		// 1、预处理判断
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
+			// 判断该类是否应被处理过
 			//判断当前bean是否在advisedBeans中（保存了所有需要增强的bean）
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
+			// 判断beanClass是否需要被代理
+			// isInfrastructureClass-->判断beanClass是否为AOP基础类例如Advice(增强)，Advisors(切面),Pointcut(切点)
+			// shouldSkip-->判断beanClass是否指定了不需要代理
 			//整体来说:对于实现了Advice、Advisor、AopInfrastructureBean接口的bean,都认为是spring aop的基础框架类,不能对他们创建代理对象,
 			//同时子类也可以覆盖shouldSkip方法来指定不对哪些bean进行代理
 
@@ -263,14 +276,26 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 				判断每一个增强器是否是 AspectJPointcutAdvisor 类型的; 返回true
 			2.永远返回false
 			*/
+			// shouldSkip()方法  增强的提取  调用AspectJAwareAdvisorAutoProxyCreator.shouldSkip()方法
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
+				// 缓存找到的切面类信息
 				//将bean放入advisedBeans并设置不做代理
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
 			}
 		}
 
-		//getCustomTargetSource()这句暂时没看懂
+		// 2、如果有自定义TargetSource的话，则在此创建代理
+		/**
+		 *  自定义TargetSource示例:
+		 * 	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		 * 		<property name="customTargetSourceCreators">
+		 * 			<list>
+		 * 				<bean class="org.springframework.aop.framework.autoproxy.target.LazyInitTargetSourceCreator"/>
+		 * 			</list>
+		 * 		</property>
+		 * 	</bean>
+		 */
 		// Create proxy here if we have a custom TargetSource.
 		// Suppresses unnecessary default instantiation of the target bean:
 		// The TargetSource will handle target instances in a custom fashion.

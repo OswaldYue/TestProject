@@ -19,6 +19,24 @@ package org.springframework.aop;
 import org.aopalliance.aop.Advice;
 
 /**
+ * 切面可以分为3类：一般切面、切点切面、引介切面
+ * 1.一般切面Advisor
+ * org.springframework.aop.Advisor代表一般切面，仅包含一个Advice ,因为Advice包含了横切代码和连接点信息，
+ * 所以Advice本身一个简单的切面，只不过它代表的横切的连接点是所有目标类的所有方法，因为这个横切面太宽泛，所以一般不会直接使用
+ * 2.切点切面PointcutAdvisor
+ * org.springframework.aop.PointcutAdvisor ,代表具有切点的切面，包括Advice和Pointcut两个类，
+ * 这样就可以通过类、方法名以及方位等信息灵活的定义切面的连接点，提供更具实用性的切面。PointcutAdvisor主要有5个具体的实现类：
+ *		1.DefaultPointcutAdvisor：最常用的切面类型，它可以通过任意Pointcut和Advice定义一个切面，
+ *		唯一不支持的就是引介的切面类型，一般可以通过扩展该类实现自定义的切面
+ *		2.NameMatchMethodPointcutAdvisor：通过该类可以定义按方法名定义切点的切面
+ *		3.AspectJExpressionPointcutAdvisor：用于AspectJ切点表达式定义切点的切面
+ *		4.StaticMethodMatcherPointcutAdvisor：静态方法匹配器切点定义的切面，默认情况下匹配所有的的目标类
+ *		5.AspectJPointcutAdvisor：用于AspectJ语法定义切点的切面
+ *	3.引介切面IntroductionAdvisor
+ *	org.springframework.aop.IntroductionAdvisor代表引介切面， 引介切面是对应引介增强的特殊的切面，
+ *  它应用于类层上面，所以引介切点使用ClassFilter进行定义
+ *
+ *
  * Base interface holding AOP <b>advice</b> (action to take at a joinpoint)
  * and a filter determining the applicability of the advice (such as
  * a pointcut). <i>This interface is not for use by Spring users, but to

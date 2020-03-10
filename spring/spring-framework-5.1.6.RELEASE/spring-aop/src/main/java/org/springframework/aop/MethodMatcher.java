@@ -48,6 +48,8 @@ import java.lang.reflect.Method;
 public interface MethodMatcher {
 
 	/**
+	 * 静态方法匹配判断
+	 *
 	 * Perform static checking whether the given method matches.
 	 * <p>If this returns {@code false} or if the {@link #isRuntime()}
 	 * method returns {@code false}, no runtime check (i.e. no
@@ -60,6 +62,15 @@ public interface MethodMatcher {
 	boolean matches(Method method, Class<?> targetClass);
 
 	/**
+	 * 判断静态方法匹配或动态方法匹配
+	 * true：动态方法匹配
+	 * false：静态方法匹配
+	 *
+	 * 方法匹配模式，Spring支持两种方法匹配器:
+	 * 	-静态方法匹模式：所谓静态方法匹配器，仅对方法名签名（包括方法名和入参类型及顺序）进行匹配
+	 * 	-动态方法匹配器：动态方法匹配器会在运行期方法检查入参的值。 静态匹配仅会判断一次，而动态匹配因为每次调用方法的入参可能不一样，
+	 * 		所以每次调用方法都必须判断
+	 *
 	 * Is this MethodMatcher dynamic, that is, must a final call be made on the
 	 * {@link #matches(java.lang.reflect.Method, Class, Object[])} method at
 	 * runtime even if the 2-arg matches method returns {@code true}?
@@ -72,6 +83,8 @@ public interface MethodMatcher {
 	boolean isRuntime();
 
 	/**
+	 * 动态方法匹配判断
+	 *
 	 * Check whether there a runtime (dynamic) match for this method,
 	 * which must have matched statically.
 	 * <p>This method is invoked only if the 2-arg matches method returns

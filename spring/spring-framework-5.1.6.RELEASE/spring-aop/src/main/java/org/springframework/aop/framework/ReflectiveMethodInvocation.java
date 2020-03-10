@@ -154,6 +154,12 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	}
 
 
+	/**
+	 * 调用拦截器链
+	 *
+	 * currentInterceptorIndex维护了一个计数器，该计数器从-1开始，当计数器值等于拦截方法长度减一时，
+	 * 表名所有的增强方法已经被调用（但是不一定被真正执行），那么此时调用连接点的方法，针对本例：即sayHello方法
+	 */
 	@Override
 	@Nullable
 	public Object proceed() throws Throwable {
@@ -168,21 +174,25 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		//每次得到一个拦截器前先前让索引currentInterceptorIndex加加一次 逐渐就与拦截器数组大小一样了
 		Object interceptorOrInterceptionAdvice =
 				this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
+		// 动态匹配增强
 		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
 			// Evaluate dynamic method matcher here: static part will already have
 			// been evaluated and found to match.
 			InterceptorAndDynamicMethodMatcher dm =
 					(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
 			Class<?> targetClass = (this.targetClass != null ? this.targetClass : this.method.getDeclaringClass());
+			// 匹配成功则执行
 			if (dm.methodMatcher.matches(this.method, targetClass, this.arguments)) {
 				return dm.interceptor.invoke(this);
 			}
+			// 匹配失败则跳过并执行下一个拦截器
 			else {
 				// Dynamic matching failed.
 				// Skip this interceptor and invoke the next in the chain.
 				return proceed();
 			}
 		}
+		// 静态增强
 		else {
 			/*
 			拦截器执行 即增强逻辑的执行 执行逻辑较复杂

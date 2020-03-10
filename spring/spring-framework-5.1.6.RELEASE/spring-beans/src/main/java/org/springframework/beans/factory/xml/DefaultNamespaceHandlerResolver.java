@@ -117,6 +117,8 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	@Nullable
 	public NamespaceHandler resolve(String namespaceUri) {
 
+		// 1.获取所有的namespaceUri，NamespaceHandler键值对map集合并得到
+		// 当前namespaceUri对应的NamespaceHandler类
 		/*
 		* 使用文件META-INF/spring.handlers去解析相关标签处理器
 		* */
@@ -129,6 +131,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 			return (NamespaceHandler) handlerOrClassName;
 		}
 		else {
+			// 2、通过BeanUtils实例化NamespaceHandler并调用其init方法进行初始化操作
 			String className = (String) handlerOrClassName;
 			try {
 				Class<?> handlerClass = ClassUtils.forName(className, this.classLoader);

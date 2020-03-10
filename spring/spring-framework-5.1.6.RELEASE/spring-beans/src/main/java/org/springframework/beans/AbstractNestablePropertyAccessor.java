@@ -263,6 +263,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			if (nestedPa == this) {
 				pv.getOriginalPropertyValue().resolvedTokens = tokens;
 			}
+			// 调用nestedPa.setPropertyValue(tokens, pv);执行转换前的判断
 			nestedPa.setPropertyValue(tokens, pv);
 		}
 		else {
@@ -271,9 +272,11 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
+		// 设置配置文件中的key:value对,例如.propertis中的属性
 		if (tokens.keys != null) {
 			processKeyedProperty(tokens, pv);
 		}
+		// 设置本地属性 跟踪进代码查看
 		else {
 			processLocalProperty(tokens, pv);
 		}
@@ -414,7 +417,9 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 	private void processLocalProperty(PropertyTokenHolder tokens, PropertyValue pv) {
 		PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
+		// PropertyHandler为null,或者方法不可写的时候
 		if (ph == null || !ph.isWritable()) {
+			//返回是否为可选值，即在目标类上不存在相应的属性时将被忽略
 			if (pv.isOptional()) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Ignoring optional value for property '" + tokens.actualName +
@@ -455,6 +460,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				}
 				pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);
 			}
+			// 设置属性值，即调用bean中的set方法 跟踪进代码查看
 			ph.setValue(valueToApply);
 		}
 		catch (TypeMismatchException ex) {
@@ -582,6 +588,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 		Assert.state(this.typeConverterDelegate != null, "No TypeConverterDelegate");
 		try {
+			// 真正的转换操作委托给了TypeConverterDelegate执行  跟踪进代码查看
 			return this.typeConverterDelegate.convertIfNecessary(propertyName, oldValue, newValue, requiredType, td);
 		}
 		catch (ConverterNotFoundException | IllegalStateException ex) {

@@ -115,11 +115,13 @@ class TypeConverterDelegate {
 	public <T> T convertIfNecessary(@Nullable String propertyName, @Nullable Object oldValue, @Nullable Object newValue,
 			@Nullable Class<T> requiredType, @Nullable TypeDescriptor typeDescriptor) throws IllegalArgumentException {
 
+		// 1、判断有无自定义属性编辑器
 		// Custom editor for this type?
 		PropertyEditor editor = this.propertyEditorRegistry.findCustomEditor(requiredType, propertyName);
 
 		ConversionFailedException conversionAttemptEx = null;
 
+		// 2、判断有无自定义ConversionService
 		// No custom editor but custom ConversionService specified?
 		ConversionService conversionService = this.propertyEditorRegistry.getConversionService();
 		if (editor == null && conversionService != null && newValue != null && typeDescriptor != null) {
@@ -137,6 +139,10 @@ class TypeConverterDelegate {
 
 		Object convertedValue = newValue;
 
+		// ClassUtils.isAssignableValue(requiredType, convertedValue)-->判断requiredType和convertedValue的class,是否相同,
+		// 相同返回->true;否则返回->false
+		// 3、 如果有自定义属性编辑器或者通过解析出来的值类型与真实的值类型的class不同
+		// 例如<property name="age" value="3"/>,我们需要将value转换成int时
 		// Value not of required type?
 		if (editor != null || (requiredType != null && !ClassUtils.isAssignableValue(requiredType, convertedValue))) {
 			if (typeDescriptor != null && requiredType != null && Collection.class.isAssignableFrom(requiredType) &&
@@ -157,13 +163,16 @@ class TypeConverterDelegate {
 
 		boolean standardConversion = false;
 
+		// 4、执行转换
 		if (requiredType != null) {
 			// Try to apply some standard type conversion rules if appropriate.
 
 			if (convertedValue != null) {
+				// Object类型
 				if (Object.class == requiredType) {
 					return (T) convertedValue;
 				}
+				// 数组类型
 				else if (requiredType.isArray()) {
 					// Array required -> apply appropriate conversion of elements.
 					if (convertedValue instanceof String && Enum.class.isAssignableFrom(requiredType.getComponentType())) {
@@ -171,26 +180,36 @@ class TypeConverterDelegate {
 					}
 					return (T) convertToTypedArray(convertedValue, propertyName, requiredType.getComponentType());
 				}
+				// 集合类型
 				else if (convertedValue instanceof Collection) {
 					// Convert elements to target type, if determined.
 					convertedValue = convertToTypedCollection(
 							(Collection<?>) convertedValue, propertyName, requiredType, typeDescriptor);
 					standardConversion = true;
 				}
+				// map类型
 				else if (convertedValue instanceof Map) {
 					// Convert keys and values to respective target type, if determined.
 					convertedValue = convertToTypedMap(
 							(Map<?, ?>) convertedValue, propertyName, requiredType, typeDescriptor);
 					standardConversion = true;
 				}
+				// 注意:这里是新开启的if,不接上面的else if
+				// 如果经过转换过的值是数组类型,且其长度只有1,那么只取其第0个作为最终转换值
 				if (convertedValue.getClass().isArray() && Array.getLength(convertedValue) == 1) {
 					convertedValue = Array.get(convertedValue, 0);
 					standardConversion = true;
 				}
+				// 如果类型是String,并且是java的基本数据类型或者包装类型
+				// 包括 boolean, byte, char, short, int, long, float, double
+				// 和 Boolean, Byte, Character, Short, Integer, Long, Float, Double
+				// 那么直接调用toString()方法返回即可,注意convertedValue是Object类型,不是基本或包装类型,所以是可以调用toString()方法的
 				if (String.class == requiredType && ClassUtils.isPrimitiveOrWrapper(convertedValue.getClass())) {
 					// We can stringify any primitive value...
 					return (T) convertedValue.toString();
 				}
+				// 如果转换值是String类的实例,但是我们又不能转换为解析出来的requiredType的实例
+				// 例如枚举类型值的注入
 				else if (convertedValue instanceof String && !requiredType.isInstance(convertedValue)) {
 					if (conversionAttemptEx == null && !requiredType.isInterface() && !requiredType.isEnum()) {
 						try {
@@ -217,6 +236,7 @@ class TypeConverterDelegate {
 					convertedValue = attemptToConvertStringToEnum(requiredType, trimmedValue, convertedValue);
 					standardConversion = true;
 				}
+				// 数值类型
 				else if (convertedValue instanceof Number && Number.class.isAssignableFrom(requiredType)) {
 					convertedValue = NumberUtils.convertNumberToTargetClass(
 							(Number) convertedValue, (Class<Number>) requiredType);
@@ -230,6 +250,7 @@ class TypeConverterDelegate {
 				}
 			}
 
+			// 5、 判定requiredType是否可从convertedValue转换而来,并尝试使用conversionService转换,及处理转换异常
 			if (!ClassUtils.isAssignableValue(requiredType, convertedValue)) {
 				if (conversionAttemptEx != null) {
 					// Original exception from former ConversionService call above...
@@ -244,6 +265,7 @@ class TypeConverterDelegate {
 					}
 				}
 
+				// 到此为止,可以确定类型不匹配,无法转换,抛出IllegalArgumentException/IllegalStateException
 				// Definitely doesn't match: throw IllegalArgumentException/IllegalStateException
 				StringBuilder msg = new StringBuilder();
 				msg.append("Cannot convert value of type '").append(ClassUtils.getDescriptiveType(newValue));
@@ -272,6 +294,7 @@ class TypeConverterDelegate {
 					"PropertyEditor based conversion eventually succeeded", conversionAttemptEx);
 		}
 
+		// 6、返回转换值
 		return (T) convertedValue;
 	}
 

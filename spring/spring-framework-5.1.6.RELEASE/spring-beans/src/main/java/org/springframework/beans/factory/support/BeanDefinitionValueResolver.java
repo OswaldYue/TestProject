@@ -84,6 +84,8 @@ class BeanDefinitionValueResolver {
 
 
 	/**
+	 * 解析属性值
+	 *
 	 * Given a PropertyValue, return a value, resolving any references to other
 	 * beans in the factory if necessary. The value could be:
 	 * <li>A BeanDefinition, which leads to the creation of a corresponding
@@ -103,12 +105,19 @@ class BeanDefinitionValueResolver {
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
+
+		// 1、 RuntimeBeanReference->运行时引用
+		//   例如BeanA依赖BeanB,那么在配置文件中有通过配置ref标签进行引用的,
+		//   在解析BeanDefinition的时候,是不会直接实例化BeanB的,那么这个引用就是RuntimeBeanReference
+		// 简单的解析过程:
+		// 	 首先解析refBeanName，然后通过getBean方法获取其实例，此时当前创建的bean是ClassA，引用bean是ClassB
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			return resolveReference(argName, ref);
 		}
+		// 2、 RuntimeBeanNameReference
 		else if (value instanceof RuntimeBeanNameReference) {
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
@@ -118,6 +127,7 @@ class BeanDefinitionValueResolver {
 			}
 			return refName;
 		}
+		// 3、 解析innerBean
 		else if (value instanceof BeanDefinitionHolder) {
 			// Resolve BeanDefinitionHolder: contains BeanDefinition with name and aliases.
 			BeanDefinitionHolder bdHolder = (BeanDefinitionHolder) value;
@@ -130,6 +140,7 @@ class BeanDefinitionValueResolver {
 					ObjectUtils.getIdentityHexString(bd);
 			return resolveInnerBean(argName, innerBeanName, bd);
 		}
+		// 4、 解析数组
 		else if (value instanceof ManagedArray) {
 			// May need to resolve contained runtime references.
 			ManagedArray array = (ManagedArray) value;
@@ -154,18 +165,22 @@ class BeanDefinitionValueResolver {
 			}
 			return resolveManagedArray(argName, (List<?>) value, elementType);
 		}
+		// 5、 解析List集合 跟踪进方法
 		else if (value instanceof ManagedList) {
 			// May need to resolve contained runtime references.
 			return resolveManagedList(argName, (List<?>) value);
 		}
+		// 6、 解析Set集合
 		else if (value instanceof ManagedSet) {
 			// May need to resolve contained runtime references.
 			return resolveManagedSet(argName, (Set<?>) value);
 		}
+		// 7、 解析Map集合
 		else if (value instanceof ManagedMap) {
 			// May need to resolve contained runtime references.
 			return resolveManagedMap(argName, (Map<?, ?>) value);
 		}
+		// 8、 解析Properties集合
 		else if (value instanceof ManagedProperties) {
 			Properties original = (Properties) value;
 			Properties copy = new Properties();
@@ -185,6 +200,7 @@ class BeanDefinitionValueResolver {
 			});
 			return copy;
 		}
+		// 9、 解析字符串
 		else if (value instanceof TypedStringValue) {
 			// Convert value to target type here.
 			TypedStringValue typedStringValue = (TypedStringValue) value;
@@ -205,6 +221,7 @@ class BeanDefinitionValueResolver {
 						"Error converting typed String value for " + argName, ex);
 			}
 		}
+		// 10、 NullBean或者表达式
 		else if (value instanceof NullBean) {
 			return null;
 		}
@@ -346,14 +363,17 @@ class BeanDefinitionValueResolver {
 	}
 
 	/**
+	 * 解析RuntimeBeanReference（运行时引用）
 	 * Resolve a reference to another bean in the factory.
 	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
+			// 1、解析引用beanName
 			Object bean;
 			String refName = ref.getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
+			// 2、判断引用bean是否属于父BeanFactory
 			if (ref.isToParent()) {
 				if (this.beanFactory.getParentBeanFactory() == null) {
 					throw new BeanCreationException(
@@ -363,6 +383,7 @@ class BeanDefinitionValueResolver {
 				}
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
+			// 3、从当前beanFactory获取引用beanName实例
 			else {
 				bean = this.beanFactory.getBean(refName);
 				this.beanFactory.registerDependentBean(refName, this.beanName);
@@ -392,11 +413,15 @@ class BeanDefinitionValueResolver {
 	}
 
 	/**
+	 * 该方法循环调用resolveValueIfNecessary方法进行解析，将解析值加入List集合返回
+	 *
 	 * For each element in the managed list, resolve reference if necessary.
 	 */
 	private List<?> resolveManagedList(Object argName, List<?> ml) {
+		// 创建长度为配置文件中指定的元素个数的List集合
 		List<Object> resolved = new ArrayList<>(ml.size());
 		for (int i = 0; i < ml.size(); i++) {
+			// 循环解析元素,如果配置文件中指定了value-type,resolveValueIfNecessary过程中会对元素进行类型转换
 			resolved.add(
 					resolveValueIfNecessary(new KeyedArgName(argName, i), ml.get(i)));
 		}
