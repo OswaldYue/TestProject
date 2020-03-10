@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--
+        1、proxy-target-class
+            如果被代理的目标对象至少实现了一个接口，则会使用JDK动态代理，所有实现该目标类实现的接口都将被代理
+            如果该目标对象没有实现任何接口，则创建CGLIB动态代理。
+            但是可以通过proxy-target-class属性强制指定使用CGLIB代理，
+        2、expose-proxy
+            解决目标对象内部的自我调用无法实施切面增强的问题
+    -->
+	<aop:aspectj-autoproxy proxy-target-class="true">
+		<!-- 指定@Aspect类，支持正则表达式，符合该表达式的切面类才会被应用-->
+		<aop:include name="dogAspect"></aop:include>
+	</aop:aspectj-autoproxy>
+
+	<!--bean-->
+	<bean id="dog" class="com.mgw.aopprepare.aspectjaop.Dog"/>
+
+	<!--AspectJ-->
+	<bean name="dogAspect" class="com.mgw.aopprepare.aspectjaop.DogAspect"/>
+
+</beans>
