@@ -56,6 +56,10 @@ public class TransactionManagementConfigurationSelector extends AdviceModeImport
 	protected String[] selectImports(AdviceMode adviceMode) {
 		switch (adviceMode) {
 			case PROXY:
+				// 注入InfrastructureAdvisorAutoProxyCreator
+				// 注入BeanFactoryTransactionAttributeSourceAdvisor
+				// 注入AnnotationTransactionAttributeSource
+				// 注入TransactionInterceptor
 				return new String[] {AutoProxyRegistrar.class.getName(),
 						ProxyTransactionManagementConfiguration.class.getName()};
 			case ASPECTJ:

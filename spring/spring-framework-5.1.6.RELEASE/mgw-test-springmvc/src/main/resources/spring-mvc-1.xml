@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!-- 扫描Controller包 -->
+	<context:component-scan base-package="com.mgw">
+		<!--只扫描包下Controller注解的类-->
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+
+	<!--==========mvc:annotation-driven 相关 begin==========-->
+	<!--
+		开启注解模式驱动：
+		默认注册一个RequestMappingHandlerMapping，一个RequestMappingHandlerAdapter，一个ExceptionHandlerExceptionResolver。
+		以支持对使用了 @RequestMapping 、 @ExceptionHandler 及其他注解的控制器方法的请求处理。
+	-->
+
+	<!--conversion-service:数据转换、格式化-->
+	<!--validator:数据校验-->
+	<!--content-negotiation-manager:多视图内容协商-->
+	<!--enable-matrix-variables:是否开启矩阵变量-->
+	<!--ignore-default-model-on-redirect:在重定向时是否忽略默认model的内容，默认为true-->
+	<!--conversion-service="conversionService"-->
+	<mvc:annotation-driven
+			validator="validator"
+			content-negotiation-manager="contentNegotiationManager"
+			enable-matrix-variables="true"
+			ignore-default-model-on-redirect="true"
+			message-codes-resolver="messageCodeResolver">
+		<!--argument-resolvers：参数解析处理-->
+		<mvc:argument-resolvers>
+			<ref bean="myHandlerMethodArgumentResolver"/>
+		</mvc:argument-resolvers>
+		<!--return-value-handlers：返回参数解析处理-->
+		<mvc:return-value-handlers>
+			<ref bean="myHandlerMethodReturnValueHandler"/>
+		</mvc:return-value-handlers>
+		<!--path-matching：路径匹配，参考PathMatchConfigurer-->
+		<mvc:path-matching suffix-pattern="true" trailing-slash="false" registered-suffixes-only="true"/>
+		<!--message-converters：消息转换-->
+		<mvc:message-converters>
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<property name="objectMapper" ref="objectMapper"/>
+			</bean>
+			<bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
+				<property name="objectMapper" ref="xmlMapper"></property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<!--conversionService-->
+	<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<!--Spring的Converter可以将一种类型转换成另一种类型。-->
+		<!--在使用时，必须编写一个实现org.springframework.core.convert.converter.Converter接口的java类。-->
+		<property name="converters">
+			<set>
+				<bean class="com.lyc.cn.my.conversion.MyConverter">
+					<property name="datePattern" value="yyyy-MM-dd"/>
+				</bean>
+			</set>
+		</property>
+		<!--Formatter和Converter一样，也是将一种类型转换成另一种类型。但是，Formatter的源类型必须是一个String。-->
+		<!--在使用时，必须编写一个实现org.springframework.format.Formatter接口的java类。-->
+		<property name="formatters">
+			<set>
+				<bean class="com.lyc.cn.my.conversion.MyFormatter">
+					<property name="datePattern" value="yyyy-MM-dd"/>
+				</bean>
+			</set>
+		</property>
+		<!--注册Formatter的另一种方法是使用Registrar。-->
+		<!--先需要实现org.springframework.format.FormatterRegistrar接口，-->
+		<property name="formatterRegistrars">
+			<set>
+				<bean class="com.lyc.cn.my.conversion.MyFormatterRegistrar">
+					<constructor-arg name="datePattern" value="yyyy-MM-dd"/>
+				</bean>
+			</set>
+		</property>
+		<!--
+			Converter是一般工具，可以将一种类型转换成另一种类型。
+			例如，将String转换成Date，或者将Long转换成Date。Converter既可以用在web层，也可以用在其它层中。
+			Formatter只能将String转成成另一种java类型。
+			例如，将String转换成Date，但它不能将Long转换成Date。所以，Formatter适用于web层。
+			为此，在Spring MVC应用程序中，选择Formatter比选择Converter更合适。
+		-->
+	</bean>
+
+	<!--validator-->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+		<property name="validationMessageSource" ref="validationMessageResource"/>
+	</bean>
+
+	<bean id="validationMessageResource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:validationMessageSource</value>
+			</list>
+		</property>
+	</bean>
+
+	<!--contentNegotiationManager-->
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="mediaTypes">
+			<value>
+				json=application/json
+				xml=application/xml
+			</value>
+		</property>
+	</bean>
+
+	<!--messageCodeResolver-->
+	<bean id="messageCodeResolver" class="org.springframework.validation.DefaultMessageCodesResolver">
+		<property name="prefix" value="validation."></property>
+	</bean>
+
+	<!--Adapter-->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="myHandlerMethodArgumentResolver" class="com.lyc.cn.my.argumentResolvers.MyHandlerMethodArgumentResolver"/>
+	<bean id="myHandlerMethodReturnValueHandler" class="com.lyc.cn.my.returnValueHandlers.MyHandlerMethodReturnValueHandler"/>
+
+	<!--message-converters：消息转换-->
+	<bean id="objectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+		<property name="indentOutput" value="true"/>
+		<property name="simpleDateFormat" value="yyyy-MM-dd"/>
+		<property name="modulesToInstall" value="com.fasterxml.jackson.module.paramnames.ParameterNamesModule"></property>
+	</bean>
+
+	<bean id="xmlMapper" parent="objectMapper" p:createXmlMapper="true"/>
+
+	<!--==========mvc:annotation-driven 相关 End==========-->
+
+
+	<!-- ViewResolver -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 制定页面存放的路径 -->
+		<property name="prefix" value="/WEB-INF/pages/"/>
+		<!-- 文件的后缀 -->
+		<property name="suffix" value=".jsp"/>
+	</bean>
+
+	<!-- MultipartResolver -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 设定默认编码 -->
+		<property name="defaultEncoding" value="UTF-8"/>
+		<!-- 设定文件上传的最大值为5MB，5*1024*1024 -->
+		<property name="maxUploadSize" value="5242880"/>
+		<!-- 设定文件上传时写入内存的最大值，如果小于这个参数不会生成临时文件，默认为10240 -->
+		<property name="maxInMemorySize" value="40960"/>
+		<!-- 上传文件的临时路径 -->
+		<property name="uploadTempDir" value="WEB-INF/fileUpload"></property>
+		<!-- 延迟文件解析 -->
+		<property name="resolveLazily" value="true"/>
+	</bean>
+
+	<!--拦截器-->
+	<mvc:interceptors>
+		<bean id="myHandlerInterceptor" class="com.mgw.config.MyHandlerInterceptor"></bean>
+	</mvc:interceptors>
+
+</beans>

@@ -50,6 +50,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 
 /**
+ * 解析<aop:config>标签
+ *
  * {@link BeanDefinitionParser} for the {@code <aop:config>} tag.
  *
  * @author Rob Harrop
@@ -96,6 +98,9 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	private ParseState parseState = new ParseState();
 
 
+	/**
+	 * 解析<aop:config>标签
+	 * */
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext parserContext) {

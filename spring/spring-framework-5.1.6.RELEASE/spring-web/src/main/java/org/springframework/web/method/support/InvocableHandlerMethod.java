@@ -109,6 +109,11 @@ public class InvocableHandlerMethod extends HandlerMethod {
 
 
 	/**
+	 * 该方法看起来很简单，只有两个函数调用，但是其背后的逻辑还是相当复杂的。
+	 * 另外如果有同学设置了@InitBinder注解，那么这里的调用可能会有一些绕，
+	 * 因为这里不仅仅调用的是@RequestMapping方法，前面介绍过@InitBinder注解的方法会先于@RequestMapping调用，
+	 * 那么其调用的时机就是在解析参数的时候，也就是这里。接下来的处理分为两步，一是参数处理，二是方法调用
+	 *
 	 * Invoke the method after resolving its argument values in the context of the given request.
 	 * <p>Argument values are commonly resolved through
 	 * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}.
@@ -131,10 +136,22 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		// 获取并解析请求参数
+		//确定执行方法时需要的参数值
+		/**
+		 * 注意这里不一定都是解析@RequestMapping方法的参数,
+		 * 也有可能会解析@InitBinder方法的参数
+		 *
+		 * 所以下面的doInvoke方法也并不一定调用具体的@RequestMapping方法,
+		 * 也有可能调用@InitBinder方法进行参数的解析绑定
+		 */
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Arguments: " + Arrays.toString(args));
 		}
+		// 调用方法
+		// 反射调用方法即可
+		// 到这里 @InitBinder创建、初始化、参数的解析、转换、调用以及@RequestMapping方法的调用就完成了
 		return doInvoke(args);
 	}
 
@@ -150,19 +167,37 @@ public class InvocableHandlerMethod extends HandlerMethod {
 		if (ObjectUtils.isEmpty(getMethodParameters())) {
 			return EMPTY_ARGS;
 		}
+		//拿到传入的参数的类型
+		// 1.获取方法参数列表,并创建与参数个数相同的Object数组,用来保存解析的参数值
 		MethodParameter[] parameters = getMethodParameters();
 		Object[] args = new Object[parameters.length];
+		// 2.解析参数
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
+			// 这里当解析@InitBinder参数时会指定providedArgs参数
+			//解析是否是springMvc提供的原生的API  比如Request等
 			args[i] = findProvidedArgument(parameter, providedArgs);
 			if (args[i] != null) {
 				continue;
 			}
+			//参数解析器开始判断哪个参数解析器可以解析这个参数
+			//实际就是调用HandlerMethodArgumentResolverComposite 这个类
+			//这里详细说一下HandlerMethodArgumentResolverComposite这个类 代码跟进查看
+			// 参数解析器是否支持对该参数的解析
+			// 说明当前参数没有合适的参数解析器,抛出 'No suitable resolver' 异常
 			if (!this.resolvers.supportsParameter(parameter)) {
 				throw new IllegalStateException(formatArgumentError(parameter, "No suitable resolver"));
 			}
 			try {
+				// 调用参数解析器的解析方法
+				//解析参数 以自定义参数解析为例
+				/**
+				 * SpringMVC的参数解析器顶级接口为HandlerMethodArgumentResolver
+				 * 该接口只提供了两个方法:supportsParameter和resolveArgument
+				 *
+				 * 我们也可以自定义参数解析器,只需实现这两个方法即可
+				 */
 				args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
 			}
 			catch (Exception ex) {
@@ -176,6 +211,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 				throw ex;
 			}
 		}
+		//将解析好的参数值返回
 		return args;
 	}
 

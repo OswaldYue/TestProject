@@ -33,6 +33,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 public interface HandlerMethodArgumentResolver {
 
 	/**
+	 * 此解析器是否支持给定的方法参数。
+	 *
 	 * Whether the given {@linkplain MethodParameter method parameter} is
 	 * supported by this resolver.
 	 * @param parameter the method parameter to check
@@ -42,6 +44,8 @@ public interface HandlerMethodArgumentResolver {
 	boolean supportsParameter(MethodParameter parameter);
 
 	/**
+	 * 将方法参数解析为给定请求的参数值。
+	 *
 	 * Resolves a method parameter into an argument value from a given request.
 	 * A {@link ModelAndViewContainer} provides access to the model for the
 	 * request. A {@link WebDataBinderFactory} provides a way to create

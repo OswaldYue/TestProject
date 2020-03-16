@@ -72,6 +72,9 @@ public abstract class AopConfigUtils {
 		return registerAutoProxyCreatorIfNecessary(registry, null);
 	}
 
+	/**
+	 * <tx:annotation-driven/>标签解析后注册的类
+	 * */
 	@Nullable
 	public static BeanDefinition registerAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
@@ -89,6 +92,9 @@ public abstract class AopConfigUtils {
 		return registerAspectJAutoProxyCreatorIfNecessary(registry, null);
 	}
 
+	/**
+	 * 通过xml配置文件解析<aop:config/>标签后后注册的一些类 注册AspectJAwareAdvisorAutoProxyCreator这个类
+	 * */
 	@Nullable
 	public static BeanDefinition registerAspectJAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
@@ -106,6 +112,9 @@ public abstract class AopConfigUtils {
 		return registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry, null);
 	}
 
+	/**
+	 * 通过xml配置文件解析<aop:aspectj-autoproxy/>标签后注册的类 注册AnnotationAwareAspectJAutoProxyCreator这个类
+	 * */
 	@Nullable
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
@@ -153,6 +162,8 @@ public abstract class AopConfigUtils {
 
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
+		// HIGHEST_PRECEDENCE --> 指定最高优先级
+		beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);
 		// ROLE_INFRASTRUCTURE --> 表示Spring的内部bean
 		beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		registry.registerBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME, beanDefinition);

@@ -40,11 +40,13 @@ public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+	// Controller本身实例
 	private final Object handler;
 
 	@Nullable
 	private HandlerInterceptor[] interceptors;
 
+	// 拦截器集合
 	@Nullable
 	private List<HandlerInterceptor> interceptorList;
 
@@ -149,6 +151,7 @@ public class HandlerExecutionChain {
 	void applyPostHandle(HttpServletRequest request, HttpServletResponse response, @Nullable ModelAndView mv)
 			throws Exception {
 
+		// 应用已注册拦截器的后置方法
 		HandlerInterceptor[] interceptors = getInterceptors();
 		if (!ObjectUtils.isEmpty(interceptors)) {
 			for (int i = interceptors.length - 1; i >= 0; i--) {

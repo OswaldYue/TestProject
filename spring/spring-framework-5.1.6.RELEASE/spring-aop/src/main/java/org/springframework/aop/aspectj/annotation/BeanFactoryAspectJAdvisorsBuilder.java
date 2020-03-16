@@ -75,6 +75,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 
 	/**
 	 * 在当前BeanFactory中查找AspectJ-annotated的注解信息，并返回增强集合
+	 * 增强的提取工作交给了this.advisorFactory.getAdvisors(factory)
 	 *
 	 * Look for AspectJ-annotated aspect beans in the current bean factory,
 	 * and return to a list of Spring AOP Advisors representing them.
@@ -101,6 +102,8 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						// 如果配置文件指定了<aop:include/>属性，那么只有符合表达式条件的切面类的增强才会被提取
 						// 例如：配置<aop:include name="dogAspect"></aop:include>
 						// 那么只有dogAspect切面类的增强才会被提取
+						// 调用子类的内部类AnnotationAwareAspectJAutoProxyCreator.BeanFactoryAspectJAdvisorsBuilderAdapter.isEligibleBean()来判断
+						// 而内部类还是调用AnnotationAwareAspectJAutoProxyCreator.isEligibleAspectBean()来判断
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}
@@ -121,10 +124,9 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							 * singleton: 即切面只会有一个实例；
 							 * perthis  : 每个切入点表达式匹配的连接点对应的AOP对象都会创建一个新切面实例；
 							 *            使用@Aspect("perthis(切入点表达式)")指定切入点表达式；
-							 *            例如: @Aspect("perthis(this(com.mgw.aspectj.Dog))")
+							 *            例如: @Aspect("perthis(this(com.mgw.aopprepare.aspectjaop.Dog))")
 							 * pertarget: 每个切入点表达式匹配的连接点对应的目标对象都会创建一个新的切面实例；
 							 *            使用@Aspect("pertarget(切入点表达式)")指定切入点表达式；
-							 *            例如:
 							 *
 							 * 默认是singleton实例化模型，Schema风格只支持singleton实例化模型，而@AspectJ风格支持这三种实例化模型。
 							 */
@@ -132,7 +134,8 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
-								// 获取所有的增强方法，并缓存
+								// 获取所有的增强方法，并缓存 增强的提取工作交给了this.advisorFactory.getAdvisors(factory)
+								// 跟进代码查看
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
@@ -146,9 +149,9 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							else {
 								/**
 								 * 注意：当使用perthis或pertarget属性时，切面类不能是单例bean，否则会抛出下面的异常
-								 * 例如：<bean name="dogAspect" class="com.mgw.aspectj.DogAspect" scope="singleton"/>
+								 * 例如：<bean name="dogAspect" class="com.mgw.aopprepare.aspectjaop.DogAspect" scope="singleton"/>
 								 * 则会报错，应该为
-								 *      <bean name="dogAspect" class="com.mgw.aspectj.DogAspect" scope="prototype"/>
+								 *      <bean name="dogAspect" class="com.mgw.aopprepare.aspectjaop.DogAspect" scope="prototype"/>
 								 */
 								// Per target or per this.
 								if (this.beanFactory.isSingleton(beanName)) {

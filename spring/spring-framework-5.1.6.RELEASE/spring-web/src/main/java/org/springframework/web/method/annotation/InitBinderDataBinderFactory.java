@@ -65,6 +65,9 @@ public class InitBinderDataBinderFactory extends DefaultDataBinderFactory {
 	public void initBinder(WebDataBinder dataBinder, NativeWebRequest request) throws Exception {
 		for (InvocableHandlerMethod binderMethod : this.binderMethods) {
 			if (isBinderMethodApplicable(binderMethod, dataBinder)) {
+				// 注意这里有invokeForRequest方法...
+				// 这里我们可以看到在initBinder的过程中会有对invokeForRequest方法的调用，
+				// 从这里我们也可以看到@InitBinder方法是优先于@RequestMapping方法调用的
 				Object returnValue = binderMethod.invokeForRequest(request, null, dataBinder);
 				if (returnValue != null) {
 					throw new IllegalStateException(

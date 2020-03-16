@@ -139,6 +139,11 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	}
 
 	/**
+	 * DispatcherServlet 初始化入口
+	 * 该方法最主要的作用就是初始化init-param，如果我们没有配置任何init-param，那么该方法不会执行任何操作。
+	 * 从这里我们没有拿到有用的信息，但是在该方法结尾有initServletBean()，这是一个模板方法，可以由子类来实现，
+	 * 那么接下来我们就去看其子类FrameworkServlet中的initServletBean吧
+	 *
 	 * Map config parameters onto bean properties of this servlet, and
 	 * invoke subclass initialization.
 	 * @throws ServletException if bean properties are invalid (or required
@@ -147,6 +152,23 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	@Override
 	public final void init() throws ServletException {
 
+		/**
+		 * 1.加载初始化参数，如：
+		 * <servlet>
+		 * 		<servlet-name>spring-mvc</servlet-name>
+		 * 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		 * 		<init-param >
+		 * 			<param-name >contextConfigLocation</param-name>
+		 * 			<param-value >classpath:/spring-mvc.xml</param-value>
+		 * 		</init-param>
+		 * 		<init-param>
+		 * 			<param-name>name</param-name>
+		 * 			<param-value>jack</param-value>
+		 * 		</init-param>
+		 * 		<load-on-startup>1</load-on-startup>
+		 * 	</servlet>
+		 * 	这里会解析init-param列表。
+		 */
 		// Set bean properties from init parameters.
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
@@ -165,6 +187,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			}
 		}
 
+		// 2.留给子类覆盖的模板方法
 		// Let subclasses do whatever initialization they like.
 		initServletBean();
 	}

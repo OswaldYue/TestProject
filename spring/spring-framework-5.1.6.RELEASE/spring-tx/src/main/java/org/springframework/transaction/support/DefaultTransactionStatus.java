@@ -178,6 +178,8 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 	}
 
 	/**
+	 * 获取SavepointManager
+	 *
 	 * This implementation exposes the {@link SavepointManager} interface
 	 * of the underlying transaction object, if any.
 	 * @throws NestedTransactionNotSupportedException if savepoints are not supported
@@ -190,6 +192,7 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 			throw new NestedTransactionNotSupportedException(
 					"Transaction object [" + this.transaction + "] does not support savepoints");
 		}
+		// SavepointManager就是当前事物
 		return (SavepointManager) transaction;
 	}
 

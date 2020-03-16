@@ -130,12 +130,14 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 		Object attribute = null;
 		BindingResult bindingResult = null;
 
+		//先从mavContainer中取自定义参数的信息 如果有就直接在模型中取
 		if (mavContainer.containsAttribute(name)) {
 			attribute = mavContainer.getModel().get(name);
 		}
 		else {
 			// Create attribute instance
 			try {
+				// 如果没有就创建一个
 				attribute = createAttribute(name, parameter, binderFactory, webRequest);
 			}
 			catch (BindException ex) {
@@ -152,13 +154,16 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 		}
 
 		if (bindingResult == null) {
+			//创建一个数据绑定器
 			// Bean property binding and validation;
 			// skipped in case of binding failure on construction.
 			WebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);
 			if (binder.getTarget() != null) {
+				//数据绑定  将传过来的参数与bean进行绑定 里面有关于数据类型转化器的调用等
 				if (!mavContainer.isBindingDisabled(name)) {
 					bindRequestParameters(binder, webRequest);
 				}
+				//数据校验
 				validateIfApplicable(binder, parameter);
 				if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
 					throw new BindException(binder.getBindingResult());
@@ -171,6 +176,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 			bindingResult = binder.getBindingResult();
 		}
 
+		//数据模型放入mavContainer中
 		// Add resolved attribute and BindingResult at the end of the model
 		Map<String, Object> bindingResultModel = bindingResult.getModel();
 		mavContainer.removeAttributes(bindingResultModel);

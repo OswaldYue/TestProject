@@ -22,6 +22,10 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 import org.springframework.lang.Nullable;
 
 /**
+ * 从类图上看到BeanFactoryTransactionAttributeSourceAdvisor是PointcutAdvisor类型的切面，
+ * 创建了该bean的定义之后，又将上面创建的AnnotationTransactionAttributeSource注入到transactionAttributeSource属性中；
+ * 将TransactionInterceptor注入到adviceBeanName属性中
+ *
  * Advisor driven by a {@link TransactionAttributeSource}, used to include
  * a transaction advice bean for methods that are transactional.
  *

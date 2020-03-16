@@ -39,6 +39,13 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
 
+	/**
+	 * 这个文件路径是从配置文件中配置得到的
+	 *	<context-param>
+	 * 		<param-name>contextConfigLocation</param-name>
+	 * 		<param-value>classpath:spring-context.xml</param-value>
+	 * 	</context-param>
+	 * */
 	@Nullable
 	private String[] configLocations;
 
@@ -87,6 +94,14 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
+	 * 优先使用配置文件中配置的xml文件:
+	 *  <context-param>
+	 * 		<param-name>contextConfigLocation</param-name>
+	 * 		<param-value>classpath:spring-context.xml</param-value>
+	 * 	</context-param>
+	 * 	当没有时才使用默认的/WEB-INF/applicationContext.xml文件
+	 * 	getDefaultConfigLocations()方法是XmlWebApplicationContext类中的
+	 *
 	 * Return an array of resource locations, referring to the XML bean definition
 	 * files that this context should be built with. Can also include location
 	 * patterns, which will get resolved via a ResourcePatternResolver.

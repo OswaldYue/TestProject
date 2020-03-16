@@ -59,6 +59,11 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 	/**
 	 * 从当前BeanFactory中寻找所有的增强bean，忽略FactoryBean和正在创建的bean
+	 * 在tx的配置下，有四个类被注入了:
+	 *  InfrastructureAdvisorAutoProxyCreator
+	 *  AnnotationTransactionAttributeSource
+	 *  TransactionInterceptor实现了Advice
+	 * 	BeanFactoryTransactionAttributeSourceAdvisor实现了Advisor
 	 *
 	 * Find all eligible Advisor beans in the current bean factory,
 	 * ignoring FactoryBeans and excluding beans that are currently in creation.
@@ -73,6 +78,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		// 缓存增强为空，则重新查找增强并缓存
 		if (advisorNames == null) {
 			// 从当前BeanFactory中获取所有类型为Advisor的bean
+			// 当在tx时，已经将BeanFactoryTransactionAttributeSourceAdvisor类注入了
 			// Do not initialize FactoryBeans here: We need to leave all regular beans
 			// uninitialized to let the auto-proxy creator apply to them!
 			advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
@@ -98,6 +104,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 					try {
 						// 通过getBean方法获取bean实例
 						//从容器中拿到实物增强器 即为tx配置类为其导入的BeanFactoryTransactionAttributeSourceAdvisor这个类
+						// 所以tx的情况下是可以拿到的
 						advisors.add(this.beanFactory.getBean(name, Advisor.class));
 					}
 					catch (BeanCreationException ex) {

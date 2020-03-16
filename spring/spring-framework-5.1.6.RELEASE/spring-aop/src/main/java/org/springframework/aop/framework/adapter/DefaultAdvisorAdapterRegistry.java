@@ -44,6 +44,10 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 
 
 	/**
+	 * DefaultAdvisorAdapterRegistry通过构造函数对增强适配器进行了初始化，
+	 * 包含了MethodBeforeAdviceAdapter前置增强适配器、AfterReturningAdviceAdapter后置返回增强适配器、ThrowsAdviceAdapter后置异常增强适配器
+	 * 除了这几种增强适配器对应的增强类型之外，其他的都是MethodInterceptor类型
+	 *
 	 * Create a new DefaultAdvisorAdapterRegistry, registering well-known adapters.
 	 */
 	public DefaultAdvisorAdapterRegistry() {
@@ -75,13 +79,20 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		throw new UnknownAdviceTypeException(advice);
 	}
 
+	/**
+	 * 获取方法连接器
+	 */
 	@Override
 	public MethodInterceptor[] getInterceptors(Advisor advisor) throws UnknownAdviceTypeException {
 		List<MethodInterceptor> interceptors = new ArrayList<>(3);
 		Advice advice = advisor.getAdvice();
+		// 1.如果增强是MethodInterceptor类型直接添加
+		// 如果增强是MethodInterceptor的实例，直接加入结果中
 		if (advice instanceof MethodInterceptor) {
 			interceptors.add((MethodInterceptor) advice);
 		}
+		// 2.循环增强适配器,并判断是否支持
+		// MethodBeforeAdviceAdapter AfterReturningAdviceAdapter ThrowsAdviceAdapter 这三种类型
 		for (AdvisorAdapter adapter : this.adapters) {
 			if (adapter.supportsAdvice(advice)) {
 				interceptors.add(adapter.getInterceptor(advisor));
@@ -90,6 +101,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		if (interceptors.isEmpty()) {
 			throw new UnknownAdviceTypeException(advisor.getAdvice());
 		}
+		// 3.返回结果
 		return interceptors.toArray(new MethodInterceptor[0]);
 	}
 

@@ -110,31 +110,46 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	}
 
 
+	/**
+	 * 提取普通增强、处理处理perthis和pertarget、引介增强
+	 * 普通增强是2.1做的
+	 * 处理perthis和pertarget是2.2做的
+	 * 引介增强是2.3做的
+	 * */
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
+		// 1、预处理工作，包括获取切面类，名称，验证等
 		Class<?> aspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
 		String aspectName = aspectInstanceFactory.getAspectMetadata().getAspectName();
 		validate(aspectClass);
 
+		// 我们需要用一个装饰器包装MetadataAwareAspectInstanceFactory，这样它只会实例化一次。
 		// We need to wrap the MetadataAwareAspectInstanceFactory with a decorator
 		// so that it will only instantiate once.
 		MetadataAwareAspectInstanceFactory lazySingletonAspectInstanceFactory =
 				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
+		// 2、提取增强
+		// 2.1、获取切面类的所有方法，循环判断提取合适的切入点，并创建增强
 		List<Advisor> advisors = new ArrayList<>();
 		for (Method method : getAdvisorMethods(aspectClass)) {
+			// 获取增强 普通增强
 			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, advisors.size(), aspectName);
 			if (advisor != null) {
 				advisors.add(advisor);
 			}
 		}
 
+		// 2.2、处理perthis和pertarget切面类
 		// If it's a per target aspect, emit the dummy instantiating aspect.
 		if (!advisors.isEmpty() && lazySingletonAspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
+			// 创建SyntheticInstantiationAdvisor实例
 			Advisor instantiationAdvisor = new SyntheticInstantiationAdvisor(lazySingletonAspectInstanceFactory);
+			// 将SyntheticInstantiationAdvisor实例加入到advisors集合首位，注意：不是替换
 			advisors.add(0, instantiationAdvisor);
 		}
 
+		// 2.3、处理引入，获取所有的引入并循环创建DeclareParentsAdvisor
 		// Find introduction fields.
 		for (Field field : aspectClass.getDeclaredFields()) {
 			Advisor advisor = getDeclareParentsAdvisor(field);
@@ -182,31 +197,40 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	}
 
 
+	/**
+	 * 方法中的核心是切点提取和创建增强
+	 * */
 	@Override
 	@Nullable
 	public Advisor getAdvisor(Method candidateAdviceMethod, MetadataAwareAspectInstanceFactory aspectInstanceFactory,
 			int declarationOrderInAspect, String aspectName) {
 
+		// 1、验证
 		validate(aspectInstanceFactory.getAspectMetadata().getAspectClass());
 
+		// 2、提取切入点
 		AspectJExpressionPointcut expressionPointcut = getPointcut(
 				candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
 		if (expressionPointcut == null) {
 			return null;
 		}
 
+		// 3、创建增强 InstantiationModelAwarePointcutAdvisorImpl类是PointcutAdvisor接口的子实现类 也就是说它的里面有Pointcut和Advice
+		// 至此一个Advisor生成完毕  关于SpringAop中的切面概念，可以理解为 切面=连接点+增强
 		return new InstantiationModelAwarePointcutAdvisorImpl(expressionPointcut, candidateAdviceMethod,
 				this, aspectInstanceFactory, declarationOrderInAspect, aspectName);
 	}
 
 	@Nullable
 	private AspectJExpressionPointcut getPointcut(Method candidateAdviceMethod, Class<?> candidateAspectClass) {
+		// 1、从候选切入点上找出增强表达式 跟进代码查看
 		AspectJAnnotation<?> aspectJAnnotation =
 				AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
 			return null;
 		}
 
+		// 2、创建AspectJExpressionPointcut对象
 		AspectJExpressionPointcut ajexp =
 				new AspectJExpressionPointcut(candidateAspectClass, new String[0], new Class<?>[0]);
 		ajexp.setExpression(aspectJAnnotation.getPointcutExpression());
@@ -222,6 +246,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	public Advice getAdvice(Method candidateAdviceMethod, AspectJExpressionPointcut expressionPointcut,
 			MetadataAwareAspectInstanceFactory aspectInstanceFactory, int declarationOrder, String aspectName) {
 
+		// 1、获取增强之前的处理
 		Class<?> candidateAspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
 		validate(candidateAspectClass);
 
@@ -243,26 +268,32 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			logger.debug("Found AspectJ method: " + candidateAdviceMethod);
 		}
 
+		// 2、针对各种不同的增强，做不同的处理
 		AbstractAspectJAdvice springAdvice;
 
 		switch (aspectJAnnotation.getAnnotationType()) {
+			// 6、如果是Pointcut，则不做处理
 			case AtPointcut:
 				if (logger.isDebugEnabled()) {
 					logger.debug("Processing pointcut '" + candidateAdviceMethod.getName() + "'");
 				}
 				return null;
+			// 5、环绕增强
 			case AtAround:
 				springAdvice = new AspectJAroundAdvice(
 						candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
 				break;
+			// 1、前置增强
 			case AtBefore:
 				springAdvice = new AspectJMethodBeforeAdvice(
 						candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
 				break;
+			// 2、后置增强
 			case AtAfter:
 				springAdvice = new AspectJAfterAdvice(
 						candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
 				break;
+			// 3、后置返回增强
 			case AtAfterReturning:
 				springAdvice = new AspectJAfterReturningAdvice(
 						candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
@@ -271,6 +302,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 					springAdvice.setReturningName(afterReturningAnnotation.returning());
 				}
 				break;
+			// 4、后置异常增强
 			case AtAfterThrowing:
 				springAdvice = new AspectJAfterThrowingAdvice(
 						candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
@@ -279,11 +311,13 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 					springAdvice.setThrowingName(afterThrowingAnnotation.throwing());
 				}
 				break;
+			// 7、未能满足case条件，抛出异常
 			default:
 				throw new UnsupportedOperationException(
 						"Unsupported advice type on method: " + candidateAdviceMethod);
 		}
 
+		// 3、获取增强方法之后，对增强方法进行配置
 		// Now to configure the advice...
 		springAdvice.setAspectName(aspectName);
 		springAdvice.setDeclarationOrder(declarationOrder);

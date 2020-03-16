@@ -50,6 +50,8 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 
 
 	/**
+	 * 增加参数解析器
+	 *
 	 * Add the given {@link HandlerMethodArgumentResolver}.
 	 */
 	public HandlerMethodArgumentResolverComposite addResolver(HandlerMethodArgumentResolver resolver) {
@@ -58,6 +60,8 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	}
 
 	/**
+	 * 增加参数解析器
+	 *
 	 * Add the given {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}.
 	 * @since 4.3
 	 */
@@ -69,6 +73,8 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	}
 
 	/**
+	 * 增加参数解析器
+	 *
 	 * Add the given {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}.
 	 */
 	public HandlerMethodArgumentResolverComposite addResolvers(
@@ -81,6 +87,8 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	}
 
 	/**
+	 * 拿到所有的已经注册了的参数解析器
+	 *
 	 * Return a read-only list with the contained resolvers, or an empty list.
 	 */
 	public List<HandlerMethodArgumentResolver> getResolvers() {
@@ -97,6 +105,8 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 
 
 	/**
+	 * 判断是否支持某个参数类型的解析
+	 *
 	 * Whether the given {@linkplain MethodParameter method parameter} is
 	 * supported by any registered {@link HandlerMethodArgumentResolver}.
 	 */
@@ -106,6 +116,8 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	}
 
 	/**
+	 * 根据参数类型解析参数
+	 *
 	 * Iterate over registered
 	 * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers} and
 	 * invoke the one that supports it.
@@ -117,16 +129,23 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
+		// 获取参数解析器
 		HandlerMethodArgumentResolver resolver = getArgumentResolver(parameter);
 		if (resolver == null) {
 			throw new IllegalArgumentException(
 					"Unsupported parameter type [" + parameter.getParameterType().getName() + "]." +
 							" supportsParameter should be called first.");
 		}
+		// 解析参数,不同的参数解析器实例,有不同的解析方式
+		// 以AbstractNamedValueMethodArgumentResolver作为示例分析
+		//  AbstractNamedValueMethodArgumentResolver的子类很重要，查看就可明白
+		// 以ServletModelAttributeMethodProcessor这个参数处理器作为分析
 		return resolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
 	}
 
 	/**
+	 * 根据参数类型从已经注册了的参数解析器中去循环拿参数解析器 只要匹配上就ok
+	 *
 	 * Find a registered {@link HandlerMethodArgumentResolver} that supports
 	 * the given method parameter.
 	 */

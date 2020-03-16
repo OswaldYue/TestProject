@@ -162,6 +162,8 @@ public abstract class DataSourceUtils {
 	}
 
 	/**
+	 * 预设置数据库只读属性和数据库事物隔离级别
+	 *
 	 * Prepare the given Connection with the given transaction semantics.
 	 * @param con the Connection to prepare
 	 * @param definition the transaction definition to apply
@@ -175,6 +177,12 @@ public abstract class DataSourceUtils {
 
 		Assert.notNull(con, "No Connection specified");
 
+		// 设置只读标记
+		/**
+		 * 假如：@Transactional(propagation = Propagation.REQUIRED,readOnly = true)
+		 * 定义了开启事物，又将readOnly属性设置为true，则这里要将数据库连接的readOnly设置为true
+		 * 这样做可以减少数据库开销，只读数据库连接将占用更少的数据库开销
+		 */
 		// Set read-only flag.
 		if (definition != null && definition.isReadOnly()) {
 			try {
@@ -184,6 +192,8 @@ public abstract class DataSourceUtils {
 				con.setReadOnly(true);
 			}
 			catch (SQLException | RuntimeException ex) {
+				// 异常处理,这里可能会引发连接超时,直接抛出异常
+				// 也有可能数据库不支持read-only属性,但是此种情况无需特殊处理,这里也只打印了一行日志而已
 				Throwable exToCheck = ex;
 				while (exToCheck != null) {
 					if (exToCheck.getClass().getSimpleName().contains("Timeout")) {
@@ -197,6 +207,8 @@ public abstract class DataSourceUtils {
 			}
 		}
 
+		// 如果指定了事物隔离级别,且该隔离级别不等于Spring事物数据库默认隔离级别,则在此设置
+		// Spring事物数据库默认隔离级别为-1,即使用底层数据库的事物隔离级别
 		// Apply specific isolation level, if any.
 		Integer previousIsolationLevel = null;
 		if (definition != null && definition.getIsolationLevel() != TransactionDefinition.ISOLATION_DEFAULT) {
@@ -204,7 +216,11 @@ public abstract class DataSourceUtils {
 				logger.debug("Changing isolation level of JDBC Connection [" + con + "] to " +
 						definition.getIsolationLevel());
 			}
+			// 从当前数据库连接获取数据库事物隔离级别
 			int currentIsolation = con.getTransactionIsolation();
+			// 如果我们自己配置的数据库事物隔离级别与数据库连接获取的数据库事物隔离级别不相同,
+			// 则更改连接的数据库事物隔离级别
+			// 从这里也可以看出数据库连接资源的宝贵性啊...
 			if (currentIsolation != definition.getIsolationLevel()) {
 				previousIsolationLevel = currentIsolation;
 				con.setTransactionIsolation(definition.getIsolationLevel());

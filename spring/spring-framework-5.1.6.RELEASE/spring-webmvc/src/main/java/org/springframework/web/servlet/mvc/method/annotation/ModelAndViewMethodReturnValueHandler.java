@@ -78,11 +78,13 @@ public class ModelAndViewMethodReturnValueHandler implements HandlerMethodReturn
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
+		// 当前请求返回值为null，无需处理，并且要将当前请求标记已处理
 		if (returnValue == null) {
 			mavContainer.setRequestHandled(true);
 			return;
 		}
 
+		// 处理引用视图
 		ModelAndView mav = (ModelAndView) returnValue;
 		if (mav.isReference()) {
 			String viewName = mav.getViewName();
@@ -91,6 +93,7 @@ public class ModelAndViewMethodReturnValueHandler implements HandlerMethodReturn
 				mavContainer.setRedirectModelScenario(true);
 			}
 		}
+		// 处理普通视图(即我们已经制定了具体的View视图，而无需通过视图解析器再次解析)
 		else {
 			View view = mav.getView();
 			mavContainer.setView(view);
@@ -98,6 +101,10 @@ public class ModelAndViewMethodReturnValueHandler implements HandlerMethodReturn
 				mavContainer.setRedirectModelScenario(true);
 			}
 		}
+		//这里又涉及到两个概念，即引用视图以及普通视图（姑且命名为普通视图）。
+		// 引用视图如没有指定具体的View类型，而只是通过ModelAndView对象的setViewName设置了返回视图的名称，
+		// 则该视图还需要再次被解析；普通视图正好相反
+		// 处理属性
 		mavContainer.setStatus(mav.getStatus());
 		mavContainer.addAllAttributes(mav.getModel());
 	}

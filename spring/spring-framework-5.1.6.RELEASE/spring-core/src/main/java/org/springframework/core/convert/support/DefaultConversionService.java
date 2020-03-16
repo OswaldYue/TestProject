@@ -45,10 +45,13 @@ public class DefaultConversionService extends GenericConversionService {
 
 
 	/**
+	 * 构造方法 其大量的为其注册Converter
+	 *
 	 * Create a new {@code DefaultConversionService} with the set of
 	 * {@linkplain DefaultConversionService#addDefaultConverters(ConverterRegistry) default converters}.
 	 */
 	public DefaultConversionService() {
+		//构造方法 其大量的为其注册Converter
 		addDefaultConverters(this);
 	}
 
@@ -85,7 +88,9 @@ public class DefaultConversionService extends GenericConversionService {
 	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
 	 */
 	public static void addDefaultConverters(ConverterRegistry converterRegistry) {
+		//这是添加基础类型的一些转化器
 		addScalarConverters(converterRegistry);
+		//这是添加集合类型的一些转化器
 		addCollectionConverters(converterRegistry);
 
 		converterRegistry.addConverter(new ByteBufferConverter((ConversionService) converterRegistry));

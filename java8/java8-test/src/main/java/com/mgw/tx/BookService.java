@@ -14,11 +14,11 @@ public class BookService {
     @Transactional(rollbackFor = Exception.class)
     public void checkout(String username,String isbn) {
 
-        bookDao.updateStock(isbn);
-        int price = bookDao.getPrice(isbn);
-        bookDao.updateBalance(username,price);
-
-        int i = 10 / 0;
+//        bookDao.updateStock(isbn);
+//        int price = bookDao.getPrice(isbn);
+//        bookDao.updateBalance(username,price);
+//
+//        int i = 10 / 0;
     }
 
 
@@ -59,7 +59,7 @@ public class BookService {
      *  }
      *  问题:若c事务出问题,b是否需要回滚?  答:可控  可回滚也可不回滚
      *
-     * REQUIRED:如果有事务再运行,当前的方法就在这个事务内运行,否则,就启动一个新的事务,并在自己的事务内运行
+     * REQUIRED:如果有事务在运行,当前的方法就在这个事务内运行,否则,就启动一个新的事务,并在自己的事务内运行
      * REQUIRES_NEW:当前的方法必须启动新事务,并在自己的事务内运行,如果有事务正在运行,则将其挂起
      * SUPPORTS:如果有事务在运行,当前的方法就在这个事务内运行,否则它可以不运行在事务中
      * NOT_SUPPORTED:当前方法不应该运行在事务中,如果有运行的事务,将其挂起

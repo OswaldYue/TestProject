@@ -137,15 +137,19 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	protected void renderMergedOutputModel(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		// 曝光模型
 		// Expose the model object as request attributes.
 		exposeModelAsRequestAttributes(model, request);
 
+		// 空的模板方法
 		// Expose helpers as request attributes, if any.
 		exposeHelpers(request);
 
+		// 获取转发路径
 		// Determine the path for the request dispatcher.
 		String dispatcherPath = prepareForRendering(request, response);
 
+		// 获取可应用于 forward/include 的RequestDispatcher
 		// Obtain a RequestDispatcher for the target resource (typically a JSP).
 		RequestDispatcher rd = getRequestDispatcher(request, dispatcherPath);
 		if (rd == null) {
@@ -153,6 +157,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 					"]: Check that the corresponding file exists within your web application archive!");
 		}
 
+		// 处理include
 		// If already included or response already committed, perform include, else forward.
 		if (useInclude(request, response)) {
 			response.setContentType(getContentType());
@@ -162,6 +167,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 			rd.include(request, response);
 		}
 
+		// 处理转发
 		else {
 			// Note: The forwarded resource is supposed to determine the content type itself.
 			if (logger.isDebugEnabled()) {

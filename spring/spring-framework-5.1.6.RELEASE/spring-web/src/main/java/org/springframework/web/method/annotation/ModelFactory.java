@@ -106,13 +106,23 @@ public final class ModelFactory {
 	public void initModel(NativeWebRequest request, ModelAndViewContainer container, HandlerMethod handlerMethod)
 			throws Exception {
 
+		// 1.解析并合并@SessionAttributes注解
+		//取出SessionAttributes的session信息
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
+		//session信息放入container
 		container.mergeAttributes(sessionAttributes);
+
+		// 2.调用被@ModelAttribute注解的方法
+		//重要方法 提前执行标准了@ModelAttribute注解的方法
 		invokeModelAttributeMethods(request, container);
 
+		// 3.查找标注了@ModelAttribute、@SessionAttributes的方法参数，确保其解析过程中不会发生异常
+		//循环执行查找SessionAttribute里的信息 因为session里也是可以放数据的
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!container.containsAttribute(name)) {
 				Object value = this.sessionAttributesHandler.retrieveAttribute(request, name);
+				// 注意这里会有一个Expected session attribute xxx的异常，如果类上标注了@SessionAttributes注解，
+				// 且在方法中标注了@ModelAttribute注解，如果@ModelAttribute为空，则会抛出此异常
 				if (value == null) {
 					throw new HttpSessionRequiredException("Expected session attribute '" + name + "'", name);
 				}
@@ -122,6 +132,8 @@ public final class ModelFactory {
 	}
 
 	/**
+	 * 提前执行标注了@ModelAttribute注解的方法
+	 *
 	 * Invoke model attribute methods to populate the model.
 	 * Attributes are added only if not already present in the model.
 	 */
@@ -130,6 +142,7 @@ public final class ModelFactory {
 
 		while (!this.modelMethods.isEmpty()) {
 			InvocableHandlerMethod modelMethod = getNextModelMethod(container).getHandlerMethod();
+			//拿到@ModelAttribute注解的信息
 			ModelAttribute ann = modelMethod.getMethodAnnotation(ModelAttribute.class);
 			Assert.state(ann != null, "No ModelAttribute annotation");
 			if (container.containsAttribute(ann.name())) {
@@ -139,13 +152,18 @@ public final class ModelFactory {
 				continue;
 			}
 
+			//执行标注了@ModelAttribute注解的方法
 			Object returnValue = modelMethod.invokeForRequest(request, container);
+			//标注了@ModelAttribute注解的方法如果返回值时void 也是要将其放入container中
+			// 类似于以前的处理@ModelAttribute注解方法时要将其返回值放入隐藏域中是一致的
 			if (!modelMethod.isVoid()){
+				//返回值类型当@ModelAttribute注解有value值时取value值,没有时取返回值类型首字母小写
 				String returnValueName = getNameForReturnValue(returnValue, modelMethod.getReturnType());
 				if (!ann.binding()) {
 					container.setBindingDisabled(returnValueName);
 				}
 				if (!container.containsAttribute(returnValueName)) {
+					//执行结果放入container
 					container.addAttribute(returnValueName, returnValue);
 				}
 			}

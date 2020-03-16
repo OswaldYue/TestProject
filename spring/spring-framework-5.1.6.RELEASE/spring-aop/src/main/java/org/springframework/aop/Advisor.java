@@ -36,6 +36,18 @@ import org.aopalliance.aop.Advice;
  *	org.springframework.aop.IntroductionAdvisor代表引介切面， 引介切面是对应引介增强的特殊的切面，
  *  它应用于类层上面，所以引介切点使用ClassFilter进行定义
  *
+ * 举例说明一下：
+ * 如果我们定义了一个DogAspect类，并用@AspectJ对其进行注解,那么该类仅仅代表一个切面类，会被Spring扫描并解析，
+ * 仅此而已，该类不代表SpringAop概念中的切面。那么Spring如果通过解析该类得到具体的切面呢?
+ *
+ * 首先,关于SpringAop中的切面概念，可以理解为 切面=连接点+增强
+ *
+ * 其次，而标记了@AspectJ注解的类在被Spring解析的时候,
+ *		1.提取该类的方法上的切点表达式注解：例如–>@Pointcut(“execution(* com.mgw.aopprepare.aspectjaop..*.*(…))”)，解析之后,就可以的到具体的切点.
+ * 		2.提取该类的方法上的增强注解:例如：@Before(“test()”)解析之后,就可以得到具体的增强代码
+ * 最后,通过第一步和第二步的操作,就可以得到切点+增强,那么自然就构成了一个切面
+ *
+ * 但是Advisor接口里只包含了一个Advice,并且Advisor一般不直接提供给用户使用,所以这里也可以理解为获取增强，当然如果理解为切面也是没有问题的
  *
  * Base interface holding AOP <b>advice</b> (action to take at a joinpoint)
  * and a filter determining the applicability of the advice (such as

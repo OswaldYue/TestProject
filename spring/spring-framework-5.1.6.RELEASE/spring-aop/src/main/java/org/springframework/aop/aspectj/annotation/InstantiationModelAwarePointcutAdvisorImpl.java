@@ -94,6 +94,17 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 		this.declarationOrder = declarationOrder;
 		this.aspectName = aspectName;
 
+		// 1、延迟初始化
+		// 在Spring AOP中，切面类的实例只有一个，比如前面我们一直使用的MyAspect类，
+		// 假设我们使用的切面类需要具有某种状态，以适用某些特殊情况的使用，比如多线程环境，此时单例的切面类就不符合我们的要求了。
+		// 在Spring AOP中，切面类默认都是单例的，但其还支持另外两种多例的切面实例的切面，即perthis和pertarget，
+		// 需要注意的是perthis和pertarget都是使用在切面类的@Aspect注解中的。
+		// 这里perthis和pertarget表达式中都是指定一个切面表达式，其语义与前面讲解的this和target非常的相似，
+		// perthis表示如果某个类的代理类符合其指定的切面表达式，那么就会为每个符合条件的目标类都声明一个切面实例；
+		// pertarget表示如果某个目标类符合其指定的切面表达式，那么就会为每个符合条件的类声明一个切面实例。
+		// 从上面的语义可以看出，perthis和pertarget的含义是非常相似的。如下是perthis和pertarget的使用语法：
+		// perthis(pointcut-expression)
+		// pertarget(pointcut-expression)
 		if (aspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
 			// Static part of the pointcut is a lazy type.
 			Pointcut preInstantiationPointcut = Pointcuts.union(
@@ -106,10 +117,12 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 					this.declaredPointcut, preInstantiationPointcut, aspectInstanceFactory);
 			this.lazy = true;
 		}
+		// 2、立刻初始化
 		else {
 			// A singleton aspect.
 			this.pointcut = this.declaredPointcut;
 			this.lazy = false;
+			// 初始化增强
 			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);
 		}
 	}
@@ -145,7 +158,11 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 		return this.instantiatedAdvice;
 	}
 
+	/**
+	 * 根据pointcut初始化增强
+	 * */
 	private Advice instantiateAdvice(AspectJExpressionPointcut pointcut) {
+		// 获取增强
 		Advice advice = this.aspectJAdvisorFactory.getAdvice(this.aspectJAdviceMethod, pointcut,
 				this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
 		return (advice != null ? advice : EMPTY_ADVICE);

@@ -93,6 +93,7 @@ public class DefaultFormattingConversionService extends FormattingConversionServ
 		if (embeddedValueResolver != null) {
 			setEmbeddedValueResolver(embeddedValueResolver);
 		}
+		// 同样调用DefaultConversionService.addDefaultConverters(this)方法大量的注入转化器
 		DefaultConversionService.addDefaultConverters(this);
 		if (registerDefaultFormatters) {
 			addDefaultFormatters(this);

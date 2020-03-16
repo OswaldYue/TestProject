@@ -46,12 +46,36 @@ import java.lang.reflect.Proxy;
 @SuppressWarnings("serial")
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
+
 	/**
-	 * 创建一个aop代理
-	 * */
+	 * 创建代理
+	 * 1、config.isOptimize()：判断通过CGLIB创建的代理是否使用了优化策略
+	 * 2、config.isProxyTargetClass()：是否配置了proxy-target-class为true
+	 * 3、hasNoUserSuppliedProxyInterfaces(config)：是否存在代理接口
+	 * 4、targetClass.isInterface()-->目标类是否为接口
+	 * 5、Proxy.isProxyClass-->如果targetClass类是代理类，则返回true，否则返回false
+	*/
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		// 1、判断是否需要创建CGLIB动态代理
 		//先判断是否使用cglib代理 若@EnableAspectJAutoProxy的proxyTargetClass值设置为true 则可能使用cglib代理
+		/*
+		* 说明几个问题:
+		* 1.config.isOptimize()：判断通过CGLIB创建的代理是否使用了优化策略
+		* 该条件取值于ProxyConfig类的optimize属性。此属性标记是否对代理进行优化。
+		* 启动优化通常意味着在代理对象被创建后，增强的修改将不会生效，因此默认值为false。
+		* 如果exposeProxy设置为true，即使optimize为true也会被忽略
+		*
+		* 2.config.isProxyTargetClass()：是否配置了proxy-target-class为true
+		* 该条件取值于ProxyConfig类的proxyTargetClass属性。此属性标记是否直接对目标类进行代理，而不是通过接口产生代理
+		*
+		* 3.hasNoUserSuppliedProxyInterfaces(config)：是否存在代理接口
+		*
+		* 满足以上三者条件的任何一个，则会考虑开启CGLIB动态代理，
+		* 但是在该if条件里还有另外一层判断 targetClass.isInterface() || Proxy.isProxyClass(targetClass),
+		* 即如果目标类本身就是一个接口，或者目标类是由Proxy.newProxyInstance()或Proxy.getProxyClass()生成时，
+		* 则依然采用jdk动态代理
+		 * */
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {
@@ -62,6 +86,7 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 			if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
 				return new JdkDynamicAopProxy(config);
 			}
+			// 创建CGLIB动态代理
 			return new ObjenesisCglibAopProxy(config);
 		}
 		else {

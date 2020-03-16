@@ -69,7 +69,10 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
 
 	/**
-	 * 找到增强器(其实就是我们配置的通知方法) aop与tx共用
+	 * 获取指定bean的增强
+	 * 找到增强器(其实就是我们配置的通知方法)
+	 *
+	 * aop与tx共用
 	 * */
 	@Override
 	@Nullable
@@ -78,13 +81,20 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
 		//找到可用的增强器
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
+		// 如果获取到的增强是个空的集合,则返回DO_NOT_PROXY-->空数组
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
 		}
+		// 将获取到的增强转换为数组并返回
 		return advisors.toArray();
 	}
 
 	/**
+	 * 为当前bean获取所有需要自动代理的增强
+	 *
+	 * 先的到所有的增强
+	 * 再从所有增强中找到适合当前bean的增强
+	 *
 	 * Find all eligible Advisors for auto-proxying this class.
 	 * @param beanClass the clazz to find advisors for
 	 * @param beanName the name of the currently proxied bean
@@ -96,12 +106,18 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 
+		// 1、查找所有候选增强
 		//找到候选的所有的增强器（找哪些通知方法是需要切入当前bean方法的） aop与tx共用
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		// 2、从所有增强集合中查找适合当前bean的增强
 		//获取到能在bean使用的增强器(原理就是根据切入点去匹配)
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+		// 3、在eligibleAdvisors集合首位加入ExposeInvocationInterceptor增强
+		// ExposeInvocationInterceptor的作用是可以将当前的MethodInvocation暴露为一个thread-local对象,该拦截器很少使用
+		// 使用场景:一个切点(例如AspectJ表达式切点)需要知道它的全部调用上线文环境
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
+			// 4.对增强进行排序
 			//给增强器排序 此处很重要因为会直接导致后面的增强器链的执行顺序
 			/*
 			因为目标方法和aop增强的方法是有顺序的
@@ -125,6 +141,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	}
 
 	/**
+	 * 从给定的增强中找出可以应用到当前指定bean的增强
+	 *
 	 * Search the given candidate Advisors to find all Advisors that
 	 * can apply to the specified bean.
 	 * @param candidateAdvisors the candidate Advisors
@@ -138,6 +156,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
 		ProxyCreationContext.setCurrentProxiedBeanName(beanName);
 		try {
+			// 跟进代码中查看
 			return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);
 		}
 		finally {

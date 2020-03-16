@@ -75,6 +75,12 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		this.aspectJAdvisorFactory = aspectJAdvisorFactory;
 	}
 
+	/**
+	 * AbstractAutoProxyCreator类实现了BeanFactoryAware接口
+	 * 并不断的向下调用，调用到此处，特地初始化两个类
+	 * 	ReflectiveAspectJAdvisorFactory
+	 * 	BeanFactoryAspectJAdvisorsBuilderAdapter
+	 * */
 	@Override
 	protected void initBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		super.initBeanFactory(beanFactory);
@@ -126,6 +132,8 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	 * then one of the patterns must match.
 	 */
 	protected boolean isEligibleAspectBean(String beanName) {
+		// includePatterns如果配置了<aop:include name="dogAspect"></aop:include>那么是会被Spring自动注入进来的
+		// 在AspectJAutoProxyBeanDefinitionParser.addIncludePatterns()方法中解析并报存到了beanDefintion中
 		if (this.includePatterns == null) {
 			return true;
 		}

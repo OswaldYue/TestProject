@@ -75,10 +75,13 @@ public class HandlerMethodReturnValueHandlerComposite implements HandlerMethodRe
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
+		// 选取合适的HandlerMethodReturnValueHandler，如果没有找到则抛出异常
+		// 以ModelAndViewMethodReturnValueHandler为例
 		HandlerMethodReturnValueHandler handler = selectHandler(returnValue, returnType);
 		if (handler == null) {
 			throw new IllegalArgumentException("Unknown return value type: " + returnType.getParameterType().getName());
 		}
+		// 处理返回值
 		handler.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
 	}
 

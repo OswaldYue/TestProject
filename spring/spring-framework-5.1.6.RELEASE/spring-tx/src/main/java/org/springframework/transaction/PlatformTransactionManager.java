@@ -19,12 +19,15 @@ package org.springframework.transaction;
 import org.springframework.lang.Nullable;
 
 /**
- *  spring提交接口标准 各个平台实现
+ *  Spring事务基础结构中的中心接口
+ *
+ *  Spring提供接口标准 各个平台实现
+ *  Spring将事物管理委托给底层的持久化框架来完成
  *  主要有4类:
- *  1.DataSourceTransactionManager  使用spring JDBC或者iBatis进行数据持久化操作时
+ *  1.DataSourceTransactionManager  提供对单个javax.sql.DataSource事务管理，用于Spring JDBC抽象框架、iBATIS或MyBatis框架的事务管理
  *  2.HibernateTransactionManager   使用Hibernate框架进行数据持久化操作时
- *  3.JpaTransactionManager         使用JPA进行数据持久化操作时
- *  4.JtaTransactionManager         使用JTA来管理事务 在一个事务跨越多个资源时使用
+ *  3.JpaTransactionManager         使用JPA进行数据持久化操作时，提供对单个javax.persistence.EntityManagerFactory事务支持，用于集成JPA实现框架时的事务管理
+ *  4.JtaTransactionManager         使用JTA来管理事务，在一个事务跨越多个资源时使用，提供对分布式事务管理的支持，并将事务管理委托给Java EE应用服务器事务管理器
  *  5.JmsTransactionManager         这个不太理解
  *  上面这些都是AbstractPlatformTransactionManager的子类
  *
@@ -57,6 +60,8 @@ import org.springframework.lang.Nullable;
 public interface PlatformTransactionManager {
 
 	/**
+	 * 根据指定的传播行为，返回当前活动的事务或创建新事务
+	 *
 	 * 通过这个方法来得到一个事务
 	 * 根据指定的传播行为,返回当前活动的事务或创建一个新事务
 	 * TransactionDefinition这个类就定义了一些基本的事务属性

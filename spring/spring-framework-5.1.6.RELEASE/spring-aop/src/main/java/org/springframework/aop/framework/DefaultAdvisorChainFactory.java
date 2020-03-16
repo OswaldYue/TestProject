@@ -51,21 +51,33 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
 			Advised config, Method method, @Nullable Class<?> targetClass) {
 
+		// 获取AdvisorAdapterRegistry对象,Spring默认初始化了MethodBeforeAdviceAdapter,AfterReturningAdviceAdapter和ThrowsAdviceAdapter
 		// This is somewhat tricky... We have to process introductions first,
 		// but we need to preserve order in the ultimate list.
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
+		// 获取所有增强
 		Advisor[] advisors = config.getAdvisors();
+		// 创建interceptorList保存返回结果,这里可以看到new ArrayList指定了集合长度,也是编码中节约内存开销的一个小技巧
 		List<Object> interceptorList = new ArrayList<>(advisors.length);
+		// 获取代理类的Class对象
 		Class<?> actualClass = (targetClass != null ? targetClass : method.getDeclaringClass());
 		Boolean hasIntroductions = null;
 
+		// 循环所有的增强
 		for (Advisor advisor : advisors) {
+			// 如果增强是PointcutAdvisor的实例
 			if (advisor instanceof PointcutAdvisor) {
 				// Add it conditionally.
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
+				// config.isPreFiltered() -> 返回是否对该代理配置进行了预筛选，以便仅对其进行筛选包含适用的增强(匹配此代理的目标类)。
+				// pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass) -> 当前切点匹配的类是否匹配actualClass
+				// 以上两个条件是在类一级别上做出判断,如果符合,则接下来对方法级别的再做匹配判断
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
+					// 获取当前切点匹配的方法
 					MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
 					boolean match;
+					// 区分普通的MethodMatcher和IntroductionAwareMethodMatcher,分别调用不同的匹配方法做出判断
+					// IntroductionAwareMethodMatcher可以作用域引入类型的增强,且当匹配方法不包含引用增强时,可以提升匹配效率
 					if (mm instanceof IntroductionAwareMethodMatcher) {
 						if (hasIntroductions == null) {
 							hasIntroductions = hasMatchingIntroductions(advisors, actualClass);
@@ -75,6 +87,8 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					else {
 						match = mm.matches(method, actualClass);
 					}
+					// 如果匹配，获取方法拦截器
+					// Spring最终还是要把增强（切面）转换为方法拦截器
 					if (match) {
 						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
 						if (mm.isRuntime()) {
@@ -90,6 +104,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					}
 				}
 			}
+			// 如果增强是IntroductionAdvisor实例
 			else if (advisor instanceof IntroductionAdvisor) {
 				IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
 				if (config.isPreFiltered() || ia.getClassFilter().matches(actualClass)) {
@@ -97,6 +112,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					interceptorList.addAll(Arrays.asList(interceptors));
 				}
 			}
+			// 其他类型
 			else {
 				Interceptor[] interceptors = registry.getInterceptors(advisor);
 				interceptorList.addAll(Arrays.asList(interceptors));

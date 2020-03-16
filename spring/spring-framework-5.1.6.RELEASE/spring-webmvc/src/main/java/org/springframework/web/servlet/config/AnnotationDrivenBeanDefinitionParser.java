@@ -190,6 +190,19 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 
+	/**
+	 * 解析 mvc:annotation-driven 标签
+	 * 如果<mvc:annotation-driven>没有配置任何子标签的话，Spring会如何处理呢？
+	 * 1.RootBeanDefinition handlerMappingDef = new RootBeanDefinition(RequestMappingHandlerMapping.class);
+	 * 2.RootBeanDefinition bindingDef = new RootBeanDefinition(ConfigurableWebBindingInitializer.class);
+	 * 3.RootBeanDefinition handlerAdapterDef = new RootBeanDefinition(RequestMappingHandlerAdapter.class);
+	 * 4.RootBeanDefinition uriContributorDef = new RootBeanDefinition(CompositeUriComponentsContributorFactoryBean.class);
+	 * 5.RootBeanDefinition csInterceptorDef = new RootBeanDefinition(ConversionServiceExposingInterceptor.class);
+	 * 6.RootBeanDefinition mappedInterceptorDef = new RootBeanDefinition(MappedInterceptor.class);
+	 * 7.RootBeanDefinition methodExceptionResolver = new RootBeanDefinition(ExceptionHandlerExceptionResolver.class);
+	 * 8.RootBeanDefinition statusExceptionResolver = new RootBeanDefinition(ResponseStatusExceptionResolver.class);
+	 * 9.RootBeanDefinition defaultExceptionResolver = new RootBeanDefinition(DefaultHandlerExceptionResolver.class);
+	 */
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext context) {
@@ -199,29 +212,48 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		CompositeComponentDefinition compDefinition = new CompositeComponentDefinition(element.getTagName(), source);
 		context.pushContainingComponent(compDefinition);
 
+		/**
+		 * 获取协商内容视图配置
+		 */
 		RuntimeBeanReference contentNegotiationManager = getContentNegotiationManager(element, source, context);
 
+		/**
+		 * 创建RequestMappingHandlerMapping的RootBeanDefinition
+		 * 从这里也可以看出，开启mvc:annotation-driven标签后，
+		 * 将会默认注册RequestMappingHandlerMapping作为默认的HandlerMapping
+		 */
 		RootBeanDefinition handlerMappingDef = new RootBeanDefinition(RequestMappingHandlerMapping.class);
 		handlerMappingDef.setSource(source);
 		handlerMappingDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		handlerMappingDef.getPropertyValues().add("order", 0);
 		handlerMappingDef.getPropertyValues().add("contentNegotiationManager", contentNegotiationManager);
 
+		// 是否开启矩阵变量
 		if (element.hasAttribute("enable-matrix-variables")) {
 			Boolean enableMatrixVariables = Boolean.valueOf(element.getAttribute("enable-matrix-variables"));
 			handlerMappingDef.getPropertyValues().add("removeSemicolonContent", !enableMatrixVariables);
 		}
 
+		// 解析path-matching路径匹配标签
 		configurePathMatchingProperties(handlerMappingDef, element, context);
 		readerContext.getRegistry().registerBeanDefinition(HANDLER_MAPPING_BEAN_NAME, handlerMappingDef);
 
+		// 解析cors跨域标签
 		RuntimeBeanReference corsRef = MvcNamespaceUtils.registerCorsConfigurations(null, context, source);
 		handlerMappingDef.getPropertyValues().add("corsConfigurations", corsRef);
 
+		// 解析conversion-service数据转换、格式化标签
 		RuntimeBeanReference conversionService = getConversionService(element, source, context);
+		// 解析validator标签
 		RuntimeBeanReference validator = getValidator(element, source, context);
+		// 解析message-codes-resolver标签
 		RuntimeBeanReference messageCodesResolver = getMessageCodesResolver(element);
 
+		/**
+		 * 创建ConfigurableWebBindingInitializer的RootBeanDefinition对象
+		 * 并将上一步解析的conversionService、validator、messageCodesResolver
+		 * 作为属性注入到该对象中
+		 */
 		RootBeanDefinition bindingDef = new RootBeanDefinition(ConfigurableWebBindingInitializer.class);
 		bindingDef.setSource(source);
 		bindingDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -229,14 +261,27 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		bindingDef.getPropertyValues().add("validator", validator);
 		bindingDef.getPropertyValues().add("messageCodesResolver", messageCodesResolver);
 
+		// 解析message-converters标签
 		ManagedList<?> messageConverters = getMessageConverters(element, source, context);
+		// 解析argument-resolvers标签
 		ManagedList<?> argumentResolvers = getArgumentResolvers(element, context);
+		// 解析return-value-handlers标签
 		ManagedList<?> returnValueHandlers = getReturnValueHandlers(element, context);
+		// 解析async-support标签
 		String asyncTimeout = getAsyncTimeout(element);
+		// 解析async-support的task-executor子标签
 		RuntimeBeanReference asyncExecutor = getAsyncExecutor(element);
+		// 解析async-support的callable-interceptors子标签
 		ManagedList<?> callableInterceptors = getCallableInterceptors(element, source, context);
+		// 解析async-support的deferred-result-interceptors子标签
 		ManagedList<?> deferredResultInterceptors = getDeferredResultInterceptors(element, source, context);
 
+		/**
+		 * 创建RequestMappingHandlerAdapter的RootBeanDefinition
+		 * 从这里也可以看出，开启mvc:annotation-driven标签后，
+		 * 将会默认注册RequestMappingHandlerAdapter作为默认的HandlerAdapter
+		 * 并将上面解析的内容绑定到该HandlerAdapter中
+		 */
 		RootBeanDefinition handlerAdapterDef = new RootBeanDefinition(RequestMappingHandlerAdapter.class);
 		handlerAdapterDef.setSource(source);
 		handlerAdapterDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -267,6 +312,11 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		handlerAdapterDef.getPropertyValues().add("deferredResultInterceptors", deferredResultInterceptors);
 		readerContext.getRegistry().registerBeanDefinition(HANDLER_ADAPTER_BEAN_NAME, handlerAdapterDef);
 
+		/**
+		 * 创建CompositeUriComponentsContributorFactoryBean的RootBeanDefinition
+		 * CompositeUriComponentsContributorFactoryBean是一个工厂bean，
+		 * 可以用来获取RequestMappingHandlerAdapter中的HandlerMethodArgumentResolver配置
+		 */
 		RootBeanDefinition uriContributorDef =
 				new RootBeanDefinition(CompositeUriComponentsContributorFactoryBean.class);
 		uriContributorDef.setSource(source);
@@ -275,6 +325,10 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		String uriContributorName = MvcUriComponentsBuilder.MVC_URI_COMPONENTS_CONTRIBUTOR_BEAN_NAME;
 		readerContext.getRegistry().registerBeanDefinition(uriContributorName, uriContributorDef);
 
+		/**
+		 * 创建ConversionServiceExposingInterceptor的RootBeanDefinition
+		 * 主要用来解析spring:eval标签
+		 */
 		RootBeanDefinition csInterceptorDef = new RootBeanDefinition(ConversionServiceExposingInterceptor.class);
 		csInterceptorDef.setSource(source);
 		csInterceptorDef.getConstructorArgumentValues().addIndexedArgumentValue(0, conversionService);
@@ -285,6 +339,9 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		mappedInterceptorDef.getConstructorArgumentValues().addIndexedArgumentValue(1, csInterceptorDef);
 		String mappedInterceptorName = readerContext.registerWithGeneratedName(mappedInterceptorDef);
 
+		/**
+		 * 创建ExceptionHandlerExceptionResolver的RootBeanDefinition
+		 */
 		RootBeanDefinition methodExceptionResolver = new RootBeanDefinition(ExceptionHandlerExceptionResolver.class);
 		methodExceptionResolver.setSource(source);
 		methodExceptionResolver.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -300,18 +357,30 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		String methodExResolverName = readerContext.registerWithGeneratedName(methodExceptionResolver);
 
+		/**
+		 * 创建ResponseStatusExceptionResolver的RootBeanDefinition
+		 *
+		 */
 		RootBeanDefinition statusExceptionResolver = new RootBeanDefinition(ResponseStatusExceptionResolver.class);
 		statusExceptionResolver.setSource(source);
 		statusExceptionResolver.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		statusExceptionResolver.getPropertyValues().add("order", 1);
 		String statusExResolverName = readerContext.registerWithGeneratedName(statusExceptionResolver);
 
+		/**
+		 * 创建DefaultHandlerExceptionResolver的RootBeanDefinition
+		 * 该类是HandlerExceptionResolver的默认实现，可以解析http异常并将相应的http状态码返回
+		 * 例如：404
+		 */
 		RootBeanDefinition defaultExceptionResolver = new RootBeanDefinition(DefaultHandlerExceptionResolver.class);
 		defaultExceptionResolver.setSource(source);
 		defaultExceptionResolver.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		defaultExceptionResolver.getPropertyValues().add("order", 2);
 		String defaultExResolverName = readerContext.registerWithGeneratedName(defaultExceptionResolver);
 
+		/**
+		 * 将上面创建的RootBeanDefinition以组件形式纳入SpringIOC容器
+		 */
 		context.registerComponent(new BeanComponentDefinition(handlerMappingDef, HANDLER_MAPPING_BEAN_NAME));
 		context.registerComponent(new BeanComponentDefinition(handlerAdapterDef, HANDLER_ADAPTER_BEAN_NAME));
 		context.registerComponent(new BeanComponentDefinition(uriContributorDef, uriContributorName));
@@ -320,6 +389,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		context.registerComponent(new BeanComponentDefinition(statusExceptionResolver, statusExResolverName));
 		context.registerComponent(new BeanComponentDefinition(defaultExceptionResolver, defaultExResolverName));
 
+		// 注册默认组件
 		// Ensure BeanNameUrlHandlerMapping (SPR-8289) and default HandlerAdapters are not "turned off"
 		MvcNamespaceUtils.registerDefaultComponents(context, source);
 
@@ -377,6 +447,9 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 	}
 
+	/**
+	 * 如果我们自定义了content-negotiation-manager标签，那么则使用自定义的视图协商；否则创建一个默认的视图协商
+	 * */
 	private RuntimeBeanReference getContentNegotiationManager(
 			Element element, @Nullable Object source, ParserContext context) {
 

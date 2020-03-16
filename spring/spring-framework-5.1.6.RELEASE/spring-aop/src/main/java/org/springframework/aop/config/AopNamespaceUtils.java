@@ -53,6 +53,9 @@ public abstract class AopNamespaceUtils {
 	private static final String EXPOSE_PROXY_ATTRIBUTE = "expose-proxy";
 
 
+	/**
+	 * <tx:annotation-driven/> 标签解析后来注册的一些类
+	 * */
 	public static void registerAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 
@@ -63,6 +66,9 @@ public abstract class AopNamespaceUtils {
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
+	/**
+	 * 通过xml配置文件解析<aop:config/>标签后后注册的一些类
+	 * */
 	public static void registerAspectJAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 
@@ -73,7 +79,7 @@ public abstract class AopNamespaceUtils {
 	}
 
 	/**
-	 * 通过xml配置文件解析后注册的一些类
+	 * 通过xml配置文件解析解析<aop:aspectj-autoproxy/>标签后注册的类
 	 * */
 	public static void registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {

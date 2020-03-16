@@ -30,4 +30,5 @@ rootProject.children.each {project ->
 	project.buildFileName = "${project.name}.gradle"
 }
 include 'mgw-test-springcontext'
+include 'mgw-test-springmvc'
 

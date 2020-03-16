@@ -71,10 +71,16 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		return TransactionInterceptor.class;
 	}
 
+	/**
+	 *  这个解析类比较曲折
+	 *  TxAdviceBeanDefinitionParser -> AbstractSingleBeanDefinitionParser -> AbstractBeanDefinitionParser
+	 *  从AbstractBeanDefinitionParser.parse() 调用AbstractSingleBeanDefinitionParser.parseInternal()调用本类的doParse()
+	 * */
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.addPropertyReference("transactionManager", TxNamespaceHandler.getTransactionManagerName(element));
 
+		// 寻找<tx:attributes/>标签并封装
 		List<Element> txAttributes = DomUtils.getChildElementsByTagName(element, ATTRIBUTES_ELEMENT);
 		if (txAttributes.size() > 1) {
 			parserContext.getReaderContext().error(

@@ -53,10 +53,25 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
 	@Nullable
 	private Set<?> converters;
 
+
 	@Nullable
 	private GenericConversionService conversionService;
 
 
+	//设置一些converters 这是可以由程序员自己注入加到原来默认的转化器后面的
+	/**
+	 * <!-- 告诉SpringMVC别用默认的ConversionService，
+	 *             而用我自定义的ConversionService、可能有我们自定义的Converter； -->
+	 * <!--ConversionServiceFactoryBean 这个有个确定就是只有转化器 没有格式化器 后续会介绍怎么改 -->
+	 * <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+	 *     <!--converters转换器中添加我们自定义的类型转换器  -->
+	 *     <property name="converters">
+	 *         <set>
+	 *             <bean class="com.mgw.component.MyStringToEmployeeConverter"></bean>
+	 *         </set>
+	 *     </property>
+	 * </bean>
+	 * */
 	/**
 	 * Configure the set of custom converter objects that should be added:
 	 * implementing {@link org.springframework.core.convert.converter.Converter},
@@ -67,9 +82,12 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
 		this.converters = converters;
 	}
 
+	//注意这个方法  这个方法是在整个bean刚创建后 初始化时调用的
 	@Override
 	public void afterPropertiesSet() {
+		//设置conversionService
 		this.conversionService = createConversionService();
+		//并将converters 和 conversionService注册进工厂
 		ConversionServiceFactory.registerConverters(this.converters, this.conversionService);
 	}
 
@@ -85,7 +103,7 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
 
 
 	// implementing FactoryBean
-
+	//拿到一个conversionService对象
 	@Override
 	@Nullable
 	public ConversionService getObject() {

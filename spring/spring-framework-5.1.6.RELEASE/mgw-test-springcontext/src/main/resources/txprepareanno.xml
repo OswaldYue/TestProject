@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--数据源-->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://localhost:3306/my_test?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
+		<property name="username" value="root"/>
+		<property name="password" value="liyanchao1989@"/>
+	</bean>
+
+	<!--jdbcTemplate-->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!--业务bean-->
+	<bean id="accountService" class="com.mgw.txprepare.AccountServiceImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"/>
+	</bean>
+
+	<!--事物管理器-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!--开启tx注解 这个标签就可以直接使用tx的注解进行实物管了-->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>

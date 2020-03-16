@@ -77,6 +77,9 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	protected abstract boolean supportsInternal(HandlerMethod handlerMethod);
 
 	/**
+	 * 核心方法：
+	 * 在此过程中会包含SpringMVC流程处理的的关键部分。例如参数获取及解析、异步处理、调用Controller中的方法、返回视图等等。。。
+	 *
 	 * This implementation expects the handler to be an {@link HandlerMethod}.
 	 */
 	@Override

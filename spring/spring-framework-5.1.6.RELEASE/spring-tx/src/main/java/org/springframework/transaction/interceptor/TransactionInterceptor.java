@@ -31,6 +31,10 @@ import java.util.Properties;
 
 /**
  * 事务拦截器 继承MethodInterceptor
+ * TransactionInterceptor是Spring声明式事物管理器的基础，查看其类图结构，
+ * TransactionInterceptor继承了TransactionAspectSupport并实现了MethodInterceptor接口。
+ * TransactionAspectSupport提供了对事物支持的能力，而MethodInterceptor我们之前已经介绍过，可以用来实现环绕增强。
+ * 从此我们大致可以推断出，Spring的事物管理是基于环绕增强的
  *
  * AOP Alliance MethodInterceptor for declarative transaction
  * management using the common Spring transaction infrastructure

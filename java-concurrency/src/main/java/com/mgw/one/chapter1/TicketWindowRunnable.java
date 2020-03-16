@@ -9,6 +9,7 @@ public class TicketWindowRunnable implements Runnable {
 
     private final static int MAx = 50;
 
+    @Override
     public void run() {
 
         while (index <= 50) {

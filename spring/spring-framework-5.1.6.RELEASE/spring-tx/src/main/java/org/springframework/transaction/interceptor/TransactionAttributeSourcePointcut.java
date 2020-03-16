@@ -42,7 +42,11 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 				PersistenceExceptionTranslator.class.isAssignableFrom(targetClass)) {
 			return false;
 		}
+		// 获取事物属性源
 		TransactionAttributeSource tas = getTransactionAttributeSource();
+		// 如果获取事物属性源为空,或者没有提取到事物标签,那么返回false,表示改目标类不会被事物增强代理
+		// 在getTransactionAttribute完成了事物标签的提取工作
+		// 使用tx之前注册的AnnotationTransactionAttributeSource的父类的AbstractFallbackTransactionAttributeSource.getTransactionAttribute()方法
 		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
 	}
 

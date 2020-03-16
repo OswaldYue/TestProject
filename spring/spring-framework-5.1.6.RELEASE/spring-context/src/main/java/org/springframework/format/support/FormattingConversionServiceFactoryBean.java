@@ -64,9 +64,11 @@ import org.springframework.util.StringValueResolver;
 public class FormattingConversionServiceFactoryBean
 		implements FactoryBean<FormattingConversionService>, EmbeddedValueResolverAware, InitializingBean {
 
+	//转化器集合
 	@Nullable
 	private Set<?> converters;
 
+	//格式化器集合
 	@Nullable
 	private Set<?> formatters;
 
@@ -82,6 +84,24 @@ public class FormattingConversionServiceFactoryBean
 	private FormattingConversionService conversionService;
 
 
+	//设置一些converters 这是可以由程序员自己注入加到原来默认的转化器后面的
+	/**
+	 * <!-- conversion-service="conversionService"：使用我们自己配置的类型转换组件 -->
+	 * <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
+	 *
+	 * <!-- 告诉SpringMVC别用默认的ConversionService，
+	 *    而用我自定义的ConversionService、可能有我们自定义的Converter； -->
+	 * <!-- 以后写自定义类型转换器的时候，就使用FormattingConversionServiceFactoryBean来注册；
+	 *  既具有类型转换还有格式化功能 -->
+	 * <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+	 *     <!--converters转换器中添加我们自定义的类型转换器  -->
+	 *     <property name="converters">
+	 *         <set>
+	 *             <bean class="com.atguigu.component.MyStringToEmployeeConverter"></bean>
+	 *         </set>
+	 *     </property>
+	 * </bean>
+	 * */
 	/**
 	 * Configure the set of custom converter objects that should be added.
 	 * @param converters instances of any of the following:
@@ -136,10 +156,13 @@ public class FormattingConversionServiceFactoryBean
 	}
 
 
+	//注意这个方法  这个方法是在整个bean刚创建后 初始化时调用的
 	@Override
 	public void afterPropertiesSet() {
 		this.conversionService = new DefaultFormattingConversionService(this.embeddedValueResolver, this.registerDefaultFormatters);
+		//注册转化器
 		ConversionServiceFactory.registerConverters(this.converters, this.conversionService);
+		//注册格式化器
 		registerFormatters(this.conversionService);
 	}
 

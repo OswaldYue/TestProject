@@ -31,7 +31,7 @@ public class SynchronizedThis {
         Thread t4 = new Thread("T4") {
             @Override
             public void run() {
-                thisLock.m3();
+                thisLock.m4();
             }
         };
 

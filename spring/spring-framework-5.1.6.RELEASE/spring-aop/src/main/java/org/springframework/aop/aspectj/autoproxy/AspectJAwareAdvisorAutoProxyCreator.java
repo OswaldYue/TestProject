@@ -50,6 +50,13 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 
 
 	/**
+	 * 排序的原则和增强的执行顺序还是要简单介绍一下：
+	 * 1.如果在一个切面中没有相同类型的增强（例如：一个切面类里不同时有两个前置增强），且目标方法里没有异常抛出，
+	 * 那么其执行顺序是：环绕增强 --> 前置增强 --> 目标类方法 --> 前置增强 --> 后置最终增强 --> 后置返回增强
+	 * 2.如果在一个切面中没有相同类型的增强（例如：一个切面类里不同时有两个前置增强），但目标方法里存在异常，
+	 * 那么其执行顺序是 ：环绕增强 --> 前置增强 --> 目标类方法（直至调用到发生异常的代码）–> 后置最终增强–> 后置异常增强
+	 * 3.如果两条相同增强类型增强来自同一切面，它们将具有相同的顺序。然后根据以下规则进一步排序。如果是后置增强，
+	 * 那么最后声明的增强将获得最高的优先级，对于其他类型的增强，首先声明的增强将获得最高的优先级
 	 * Sort the rest by AspectJ precedence. If two pieces of advice have
 	 * come from the same aspect they will have the same order.
 	 * Advice from the same aspect is then further ordered according to the
@@ -67,11 +74,13 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 	@Override
 	@SuppressWarnings("unchecked")
 	protected List<Advisor> sortAdvisors(List<Advisor> advisors) {
+		// 1.创建PartiallyComparableAdvisorHolder集合并将所有的增强加入到该集合中
 		List<PartiallyComparableAdvisorHolder> partiallyComparableAdvisors = new ArrayList<>(advisors.size());
 		for (Advisor element : advisors) {
 			partiallyComparableAdvisors.add(
 					new PartiallyComparableAdvisorHolder(element, DEFAULT_PRECEDENCE_COMPARATOR));
 		}
+		// 2.执行排序并返回结果
 		List<PartiallyComparableAdvisorHolder> sorted = PartialOrder.sort(partiallyComparableAdvisors);
 		if (sorted != null) {
 			List<Advisor> result = new ArrayList<>(advisors.size());
@@ -101,7 +110,7 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 	 * */
 	@Override
 	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
-		// 1、查找所有候选增强
+		// 1、查找所有候选增强  AnnotationAwareAspectJAutoProxyCreator.findCandidateAdvisors()
 		// TODO: Consider optimization by caching the list of the aspect names
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		// 2、循环判断所有的增强,如果增强是AspectJPointcutAdvisor的实例

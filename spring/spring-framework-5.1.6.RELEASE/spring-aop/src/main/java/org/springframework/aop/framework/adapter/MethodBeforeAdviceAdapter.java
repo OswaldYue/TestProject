@@ -39,6 +39,17 @@ class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable {
 		return (advice instanceof MethodBeforeAdvice);
 	}
 
+	/**
+	 * 增强适配器
+	 * 这个方法在获取拦截器链的时候调用,从这里也可以看出,Spring中的advisor(增强/切面)
+	 * 最终还是被转换为MethodInterceptor对象
+	 *
+	 * AdvisorAdapter的实现类有AfterReturningAdviceAdapter,MethodBeforeAdviceAdapter,ThrowsAdviceAdapter三个
+	 *
+	 * AfterReturningAdviceAdapter -> new AfterReturningAdviceInterceptor(advice) -> 后置返回增强
+	 * MethodBeforeAdviceAdapter -> new MethodBeforeAdviceInterceptor(advice) -> 前置增强
+	 * ThrowsAdviceAdapter -> new ThrowsAdviceInterceptor(advisor.getAdvice()) -> 该适配器有些特殊...看源码吧
+	 */
 	@Override
 	public MethodInterceptor getInterceptor(Advisor advisor) {
 		MethodBeforeAdvice advice = (MethodBeforeAdvice) advisor.getAdvice();

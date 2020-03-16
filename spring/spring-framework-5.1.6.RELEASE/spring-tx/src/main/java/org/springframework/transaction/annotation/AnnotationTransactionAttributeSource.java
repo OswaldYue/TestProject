@@ -31,6 +31,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
+ * 该类实现了TransactionAttributeSource接口，
+ * 该接口只提供了一个获取TransactionAttribute的方法TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass);
+ * TransactionAttribute接口继承了TransactionDefinition接口，该接口提供了Spring事物的传播特性以及事物隔离级别等定义。
+ * 综合上述分析，大致可以了解到AnnotationTransactionAttributeSource可以用来获取类、接口、方法上的事物注解属性
+ *
+ *
  * Implementation of the
  * {@link org.springframework.transaction.interceptor.TransactionAttributeSource}
  * interface for working with transaction metadata in JDK 1.5+ annotation format.
@@ -68,6 +74,12 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 
 	private final boolean publicMethodsOnly;
 
+	/**
+	 * 三个事务注解转换器
+	 * 	SpringTransactionAnnotationParser
+	 * 	JtaTransactionAnnotationParser
+	 * 	Ejb3TransactionAnnotationParser
+	 * */
 	private final Set<TransactionAnnotationParser> annotationParsers;
 
 
@@ -138,12 +150,18 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	}
 
 
+	/**
+	 * 从给定的类上提取事物标签
+	 * */
 	@Override
 	@Nullable
 	protected TransactionAttribute findTransactionAttribute(Class<?> clazz) {
 		return determineTransactionAttribute(clazz);
 	}
 
+	/**
+	 * 从给定的方法上提取事物标签
+	 * */
 	@Override
 	@Nullable
 	protected TransactionAttribute findTransactionAttribute(Method method) {
@@ -162,6 +180,7 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	 */
 	@Nullable
 	protected TransactionAttribute determineTransactionAttribute(AnnotatedElement element) {
+		// 使用事务转换器去做解析，以SpringTransactionAnnotationParser做分析
 		for (TransactionAnnotationParser annotationParser : this.annotationParsers) {
 			TransactionAttribute attr = annotationParser.parseTransactionAnnotation(element);
 			if (attr != null) {

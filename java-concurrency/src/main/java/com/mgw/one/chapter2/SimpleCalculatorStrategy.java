@@ -6,6 +6,7 @@ public class SimpleCalculatorStrategy implements CalculatorStrategy {
 
     private static final double BOUNS_RATE = 0.1;
 
+    @Override
     public double calculate(double salary, double bonus) {
 
         return salary * SALARY_RATE + bonus * BOUNS_RATE;

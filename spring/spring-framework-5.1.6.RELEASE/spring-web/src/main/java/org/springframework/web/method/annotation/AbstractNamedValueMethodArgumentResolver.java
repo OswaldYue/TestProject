@@ -95,23 +95,38 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	public final Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
+		// 1.NamedValueInfo对象包含了name,required,defaultValue三个信息
 		NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
+		// 获取MethodParameter对象,该对象封装了方法参数的规范
 		MethodParameter nestedParameter = parameter.nestedIfOptional();
 
+		// 2.解析参数名,包括占位符和表达式等
 		Object resolvedName = resolveStringValue(namedValueInfo.name);
 		if (resolvedName == null) {
 			throw new IllegalArgumentException(
 					"Specified name must not resolve to null: [" + namedValueInfo.name + "]");
 		}
 
+		// 3.将给定的参数类型和值名称解析为参数值。
 		Object arg = resolveName(resolvedName.toString(), nestedParameter, webRequest);
+		// 如果未能正常解析
+		/**
+		 * 如
+		 * 方法参数 : @RequestParam(name = "name") String name
+		 * 请求路径参数后缀 : sayHello?1212
+		 *
+		 * 未指定参数名称,则无法正常解析,接下来要判断NamedValueInfo属性值,并作出后续处理
+		 */
 		if (arg == null) {
+			// 如果默认值不为空,则
 			if (namedValueInfo.defaultValue != null) {
 				arg = resolveStringValue(namedValueInfo.defaultValue);
 			}
+			// 指定了required属性且该参数不是为非不必须,则调动handleMissingValue方法处理缺失值,该方法一般会抛出异常
 			else if (namedValueInfo.required && !nestedParameter.isOptional()) {
 				handleMissingValue(namedValueInfo.name, nestedParameter, webRequest);
 			}
+			// 最后处理将该参数值处理为null即可
 			arg = handleNullValue(namedValueInfo.name, arg, nestedParameter.getNestedParameterType());
 		}
 		else if ("".equals(arg) && namedValueInfo.defaultValue != null) {
@@ -119,8 +134,11 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 		}
 
 		if (binderFactory != null) {
+			// 4.创建WebDataBinder实例
+			// 以DefaultDataBinderFactory.createBinder()作为分析
 			WebDataBinder binder = binderFactory.createBinder(webRequest, null, namedValueInfo.name);
 			try {
+				// 5.尝试转换参数
 				arg = binder.convertIfNecessary(arg, parameter.getParameterType(), parameter);
 			}
 			catch (ConversionNotSupportedException ex) {

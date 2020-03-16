@@ -627,7 +627,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			/*
 			* 第五次,第六次调用后置处理器,调用两次BeanPostProcessor后置处理器
 			* 填充bean实例(设置属性)
-			 * */
+			* 第五次调用:
+			* 	BeanPostProcessor后置处理器(InstantiationAwareBeanPostProcessor)
+			* 	InstantiationAwareBeanPostProcessor.postProcessAfterInstantiation()
+			* 第六次调用(条件调用):
+			* 	BeanPostProcessor后置处理器(InstantiationAwareBeanPostProcessor)
+			* 	InstantiationAwareBeanPostProcessor.postProcessProperties()
+			* 	InstantiationAwareBeanPostProcessor.postProcessPropertyValues()
+			* */
 			populateBean(beanName, mbd, instanceWrapper);
 			/*
 			* 第七次,第八次调用BeanPostProcessor后置处理器(直接实现类)
@@ -1279,7 +1286,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		*
 		* 第二次调用BeanPostProcessor后置处理器(SmartInstantiationAwareBeanPostProcessor是InstantiationAwareBeanPostProcessor的子接口)
 		* SmartInstantiationAwareBeanPostProcessor.determineCandidateConstructors()
-		*
+		* 主要使用AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors()来推断
 		* */
 		/*
 		* 使用后置处理器进行构造方法的推断,与AutowireMode有关,当AUTOWIRE_NO时,spring去推断构造方法时,就算有多个构造方法,也是返回都为null,用默认的构造方法,
@@ -1510,6 +1517,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 2 应用InstantiationAwareBeanPostProcessor处理器
 		// 在设置属性之前,给InstantiationAwareBeanPostProcessor一个修改bean状态的机会
+		// 此时bean刚创建好，很符合这个后置处理器的InstantiationAwareBeanPostProcessor.postProcessAfterInstantiation()方法
 		// Give any InstantiationAwareBeanPostProcessors the opportunity to modify the
 		// state of the bean before properties are set. This can be used, for example,
 		// to support styles of field injection.
@@ -1582,6 +1590,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 					//处理属性的值 调用CommonAnnotationBeanPostProcessor设置属性 以及AutowiredAnnotationBeanPostProcessor 注入属性
+					// 主要由AutowiredAnnotationBeanPostProcessor.postProcessProperties()与AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues()
+					// 与CommonAnnotationBeanPostProcessor.postProcessProperties()和CommonAnnotationBeanPostProcessor.postProcessPropertyValues()共同处理
 					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						if (filteredPds == null) {
@@ -2009,13 +2019,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			* BeanPostProcessor.postProcessBeforeInitialization()
 			*
 			* bean的生命周期中的Lifecycle Callbacks中的@PostConstruct注解就是使用后置处理器去执行的
-			*  */
+			* 由CommonAnnotationBeanPostProcessor的父类InitDestroyAnnotationBeanPostProcessor.postProcessBeforeInitialization()执行
+			* @PostConstruct注解方法的初始化
+			**/
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		// 3、调用bean的init_method初始化方法
 		try {
-			//执行bean的生命周期中的Lifecycle Callbacks的回调方法.实现了InitializingBean接口的类
+			//执行bean的生命周期中的Lifecycle Callbacks的回调方法.实现了InitializingBean接口的类以及标注了init_method的方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {

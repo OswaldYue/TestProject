@@ -11,16 +11,18 @@ public class ThreadCloseForce {
         long start = System.currentTimeMillis();
         threadService.execte(() -> {
 
+            //情况1：加载很重的资源，超时退出
             // 加载一个很重的资源 非常耗时
-//            while (true) {
-//
-//            }
+            while (true) {
 
-            try {
-                Thread.sleep(5_000);
-            }catch (InterruptedException e) {
-                e.printStackTrace();
             }
+
+            //情况2：加载不是很重的资源，正常执行完毕后退出
+//            try {
+//                Thread.sleep(5_000);
+//            }catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
         });
 
