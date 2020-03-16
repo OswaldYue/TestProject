@@ -6,10 +6,15 @@ group 'com.poplar'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
-    mavenCentral()
+//    mavenCentral()
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
 }
+
+//编译使用UTF-8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
