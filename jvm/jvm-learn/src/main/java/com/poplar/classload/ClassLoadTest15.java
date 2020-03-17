@@ -19,6 +19,15 @@ public class ClassLoadTest15 {
         System.out.println(strings.getClass().getClassLoader());
 
         ClassLoadTest14[] classLoadTest14s = new ClassLoadTest14[1];
-        System.out.println();
+        // sun.misc.Launcher$AppClassLoader@18b4aac2
+        System.out.println(classLoadTest14s.getClass().getClassLoader());
+
+        /*
+         * if the element type is a primitive type, then the array class has no
+         * class loader 如果数组元素是基本数据类型，则其classload是null
+         * */
+        int[] ints = new int[1];
+        // null
+        System.out.println(ints.getClass().getClassLoader());
     }
 }
