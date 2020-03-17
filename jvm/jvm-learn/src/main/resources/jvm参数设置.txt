@@ -4,7 +4,7 @@ jvm参数设置:
 -XX:<option>=value，表示将option的值设置为value
 
 1.-XX:+TraceClassLoading，用于追踪类的加载信息并打印出来
-2.-XX:+TraceClassUnLoading，用于追踪类的卸载信息并打印出来
+2.-XX:+TraceClassUnloading，用于追踪类的卸载信息并打印出来
 
 
 
