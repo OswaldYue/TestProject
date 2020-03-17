@@ -12,7 +12,9 @@ package com.poplar.classload;
 public class ClassLoadTest {
 
     public static void main(String[] args) {
-        System.out.println(Parent.str1);
+//        System.out.println(Parent.str1);
+        // 父类会初始化，子类会加载，但是不会初始化
+        System.out.println(Child.str1);
     }
 }
 

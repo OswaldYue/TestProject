@@ -12,7 +12,9 @@ import java.util.UUID;
 public class ClassLoadTest3 {
 
     public static void main(String[] args) {
-        System.out.println(Student2.str); //Student2, 6dbb23...
+        //Student2 static block
+        //70e5e2ff-7637-4edb-bf6c-b72da212e801
+        System.out.println(Student2.str);
     }
 }
 
@@ -20,6 +22,6 @@ class Student2 {
     static final String str = UUID.randomUUID().toString();
 
     static {
-        System.out.println("Student2");
+        System.out.println("Student2 static block");
     }
 }
