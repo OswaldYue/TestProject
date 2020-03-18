@@ -8,6 +8,7 @@ public class ClassLoadTest24 {
     /**
      * 当前类加载器(Current ClassLoader)
      * 每个类都会尝试使用自己的类加载器去加载依赖的类。
+     * 如果ClassX引用了ClassY,那么ClassX的类加载器就会去加载ClassY（前提是ClassY尚未被加载）
      * <p>
      * 线程上下文类加载器(Context ClassLoader)
      * 线程上下文加载器 @ jdk1.2
@@ -17,7 +18,7 @@ public class ClassLoadTest24 {
      * <p>
      * 线程上下文类加载器的作用：
      * SPI：Service Provide Interface
-     * 父ClassLoader可以使用当前线程Thread.currentThread().getContextClassLoader()所制定的ClassLoader加载的类，
+     * 父ClassLoader可以使用当前线程Thread.currentThread().getContextClassLoader()所指定的ClassLoader加载的类，
      * 这就改变了父加载器加载的类无法使用子加载器或是其他没有父子关系的ClassLoader加载的类的情况，即改变了双亲委托模型。
      * <p>
      * 在双亲委托模型下，类加载是由下至上的，即下层的类加载器会委托父加载器进行加载。但是对于SPI来说，
@@ -26,8 +27,11 @@ public class ClassLoadTest24 {
      * 就可以由设置的上下文类加载器来实现对于接口实现类的加载。
      */
     public static void main(String[] args) {
+        // sun.misc.Launcher$AppClassLoader@18b4aac2
         System.out.println(Thread.currentThread().getContextClassLoader());
+        // null
         System.out.println(Thread.class.getClassLoader());
+        // 没有配置此参数 null
         System.out.println(System.getProperty("java.system.class.loader"));
     }
 }

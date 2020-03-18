@@ -21,6 +21,7 @@ public class ClassLoadTest17_2 {
     }
 }
 
+/*
 class MyCat2 {
     public MyCat2() {
         System.out.println("MyCat2 loaded by: " + this.getClass().getClassLoader());
@@ -34,4 +35,4 @@ class Simple2 {
         new MyCat2();
 
     }
-}
+}*/

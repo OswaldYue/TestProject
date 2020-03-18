@@ -21,6 +21,10 @@ public class ClassLoadTest16 extends ClassLoader {
         this.classLoadName = classLoadName;
     }
 
+    public ClassLoadTest16(ClassLoader parent) {
+        super(parent); //显示指定该类的父加载器
+    }
+
     public void setPath(String path) {
         this.path = path;
     }
@@ -192,6 +196,8 @@ public class ClassLoadTest16 extends ClassLoader {
 
     }
 
+
+
     public static void test5() throws Exception {
 
         ClassLoadTest16 myLoader1 = new ClassLoadTest16("myLoader1");
@@ -224,6 +230,31 @@ public class ClassLoadTest16 extends ClassLoader {
 
     }
 
+    /**
+     * 若可以被父加载器系统加载器加载类，则class一致
+     * 否则不一致
+     * */
+    public static void test6() throws Exception {
+
+        ClassLoadTest16 myLoader1 = new ClassLoadTest16("myLoader1");
+        myLoader1.setPath("E:\\code\\AppData\\classloader4\\");
+
+        Class<?> clazz = myLoader1.loadClass("com.poplar.classload.ClassLoadTest15");
+        System.out.println("class:" + clazz.hashCode());
+        Object object = clazz.newInstance();
+        System.out.println(object);
+        System.out.println(object.getClass().getClassLoader());
+
+        System.out.println("================================================");
+
+        final Class<?> clazz1 = ClassLoader.getSystemClassLoader().loadClass("com.poplar.classload.ClassLoadTest15");
+        System.out.println("class:" + clazz1.hashCode());
+        Object object1 = clazz1.newInstance();
+        System.out.println(object1);
+        System.out.println(object1.getClass().getClassLoader());
+
+    }
+
     public static void main(String[] args) throws Exception {
 
 //        test();
@@ -231,7 +262,8 @@ public class ClassLoadTest16 extends ClassLoader {
 //        test2();
 //        test3();
 //        test4();
-        test5();
+//        test5();
+        test6();
     }
 
 }

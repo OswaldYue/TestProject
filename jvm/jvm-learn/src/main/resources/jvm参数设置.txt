@@ -3,6 +3,10 @@ jvm参数设置:
 -XX:-<option>，表示关闭option选项
 -XX:<option>=value，表示将option的值设置为value
 
+修改java系统属性的方式:
+java -Djava.ext.dirs=./ com.poplar.classload.ClassLoadTest19
+
+
 1.-XX:+TraceClassLoading，用于追踪类的加载信息并打印出来
 2.-XX:+TraceClassUnloading，用于追踪类的卸载信息并打印出来
 
