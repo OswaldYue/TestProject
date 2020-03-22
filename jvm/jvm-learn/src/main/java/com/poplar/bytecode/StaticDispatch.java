@@ -1,7 +1,7 @@
 package com.poplar.bytecode;
 
 /**
- * Created BY poplar ON 2019/12/4
+ *
  * 静态分派的演示与证明：
  */
 public class StaticDispatch {
@@ -32,10 +32,11 @@ public class StaticDispatch {
 
     public static void main(String[] args) {
         StaticDispatch dispatch = new StaticDispatch();
-        /*Human man = new Man();
+        Human man = new Man();
         Human woMan = new Woman();
-        dispatch.hello(man);
-        dispatch.hello(woMan);*/
+        //静态分派，重载是在编译器即确定
+        dispatch.hello(man);//Hello Human
+        dispatch.hello(woMan);//Hello Human
 
         Human human = new Woman();
         human = new Man();

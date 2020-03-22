@@ -1,7 +1,7 @@
 package com.poplar.bytecode;
 
 /**
- * Created BY poplar ON 2019/12/5
+ *
  * 测试即使编译
  * VM参数：-XX:+PrintCompilation  要求虚拟机在即时编译时将被编译成本地代码的 方法名称打印出来 其中带有“%”的输出说明是由回边计数器触发的 OSR编译
  */

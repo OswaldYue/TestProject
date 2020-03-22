@@ -1,7 +1,10 @@
 package com.poplar.classload;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 /**
  * Created By poplar on 2019/11/9
@@ -24,8 +27,8 @@ public class ClassLoadTest27 {
             return result;
         }*/
     public static void main(String[] args) throws Exception {
-        //Class<?> clazz = Class.forName("com.mysql.jdbc.Driver");
-        //Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/user", "root", "123456");
+//        Class<?> clazz = Class.forName("com.mysql.jdbc.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/user", "root", "xxxxx");
 
        /* jar hell问题以及解决办法
         当一个类或者一个资源文件存在多个jar中，就会存在jar hell问题。
@@ -37,5 +40,9 @@ public class ClassLoadTest27 {
             URL element = urls.nextElement();
             System.out.println(element);
         }
+
+        final HashMap<String, String> ss = new HashMap<>();
+        ss.put(null,null);
+
     }
 }

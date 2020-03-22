@@ -9,6 +9,7 @@ java -Djava.ext.dirs=./ com.poplar.classload.ClassLoadTest19
 
 1.-XX:+TraceClassLoading，用于追踪类的加载信息并打印出来
 2.-XX:+TraceClassUnloading，用于追踪类的卸载信息并打印出来
+3.-XX:+PrintCompilation，  要求虚拟机在即时编译时将被编译成本地代码的 方法名称打印出来 其中带有“%”的输出说明是由回边计数器触发的 OSR编译
 
 
 

@@ -1,8 +1,5 @@
 package com.poplar.classload;
 
-/**
- * Created By poplar on 2019/11/9
- */
 public class ClassLoadTest25 implements Runnable {
 
     private Thread thread;
@@ -17,7 +14,7 @@ public class ClassLoadTest25 implements Runnable {
         ClassLoader classLoader = thread.getContextClassLoader();
         thread.setContextClassLoader(classLoader);
         System.out.println("Class: " + classLoader.getClass()); //Class: class sun.misc.Launcher$AppClassLoader
-        System.out.println("Parent " + classLoader.getParent()); // Parent sun.misc.Launcher$ExtClassLoader@5b74b597
+        System.out.println("Parent: " + classLoader.getParent()); // Parent sun.misc.Launcher$ExtClassLoader@5b74b597
     }
 
     public static void main(String[] args) {

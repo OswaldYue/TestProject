@@ -197,7 +197,16 @@ public class ClassLoadTest16 extends ClassLoader {
     }
 
 
-
+    /**
+     * 如果是使用父加载器系统类加载器来加载，实际上经测试是不会去卸载ClassLoadTest15这个Class的
+     * 但是如果使用我们自定义类加载器ClassLoadTest16来加载，经测试发现会卸载ClassLoadTest15
+     * [Unloading class com.poplar.classload.ClassLoadTest15 0x0000000100061028]
+     *
+     * 印证一个结论:
+     * 1.由Java虚拟机自带的类加载器所加载的类，在虚拟机的生命周期中，始终不会被卸载。
+     * Java虚拟机本身会始终引用这些加载器，而这些类加载器则会始终引用他们所加载的类的Class对象，因此这些Class对象是可触及的
+     * 2.由用户自定义的类加载器所加载的类是可以被卸载的
+     *  */
     public static void test5() throws Exception {
 
         ClassLoadTest16 myLoader1 = new ClassLoadTest16("myLoader1");
@@ -217,7 +226,7 @@ public class ClassLoadTest16 extends ClassLoader {
         object = null;
         System.gc();
 
-        Thread.sleep(200_000);
+        Thread.sleep(10_000);
 
         myLoader1 = new ClassLoadTest16("myLoader1");
         myLoader1.setPath("E:\\code\\AppData\\classloader4\\");
@@ -262,8 +271,8 @@ public class ClassLoadTest16 extends ClassLoader {
 //        test2();
 //        test3();
 //        test4();
-//        test5();
-        test6();
+        test5();
+//        test6();
     }
 
 }

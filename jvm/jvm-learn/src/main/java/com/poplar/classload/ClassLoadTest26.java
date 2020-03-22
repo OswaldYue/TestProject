@@ -11,17 +11,18 @@ import java.util.ServiceLoader;
  * 伪代码：
  * ClassLoader classLoader=Thread.currentThread().getContextLoader();
  * try{
- * Thread.currentThread().setContextLoader(targetTccl);
- * myMethod();
+ *  Thread.currentThread().setContextLoader(targetTccl);
+ *  myMethod();
  * }finally{
- * Thread.currentThread().setContextLoader(classLoader);
+ *  Thread.currentThread().setContextLoader(classLoader);
  * }
- * 在myMethod中调用Thread.currentThread().getContextLoader()做某些事情
+ * 在myMethod中调用Thread.currentThread().getContextLoader()做某些事情。
+ * 如果一个类由类加载器A加载，那么这个类的依赖类也是由相同的类加载器加载的(如果该依赖类之前没有被加载过的话)
  * ContextClassLoader的目的就是为了破坏类加载委托机制
  * <p>
  * 在SPI接口的代码中，使用线程上下文类加载器就可以成功的加载到SPI的实现类。
  * <p>
- * 当高层提供了统一的接口让底层去实现，同时又要在高层加载（或实例化）底层的类时，
+ * 当高层提供了统一的接口让低层去实现，同时又要在高层加载（或实例化）底层的类时，
  * 就必须通过上下文类加载器来帮助高层的ClassLoader找到并加载该类。
  */
 public class ClassLoadTest26 {
@@ -35,10 +36,10 @@ public class ClassLoadTest26 {
         Iterator<Driver> iterator = loader.iterator();
         while (iterator.hasNext()) {
             Driver driver = iterator.next();
-            System.out.println("driver:" + driver.getClass() + ",loader" + driver.getClass().getClassLoader());
+            System.out.println("driver:" + driver.getClass() + ",loader:" + driver.getClass().getClassLoader());
         }
-        System.out.println("当前上下文加载器" + Thread.currentThread().getContextClassLoader());
-        System.out.println("ServiceLoader的加载器" + ServiceLoader.class.getClassLoader());
+        System.out.println("当前线程上下文加载器:" + Thread.currentThread().getContextClassLoader());
+        System.out.println("ServiceLoader的加载器:" + ServiceLoader.class.getClassLoader());
     }
 }
 

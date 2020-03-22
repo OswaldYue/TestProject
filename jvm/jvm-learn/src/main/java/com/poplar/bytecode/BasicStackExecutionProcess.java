@@ -1,7 +1,7 @@
 package com.poplar.bytecode;
 
 /**
- * Created BY poplar ON 2019/12/4
+ *
  * 基于栈的解释器的执行过程概念模型
  */
 public class BasicStackExecutionProcess {

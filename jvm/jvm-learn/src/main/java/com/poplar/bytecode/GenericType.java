@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created BY poplar ON 2019/12/4
+ *
  * java伪泛型存在的问题
- * 下啊面的代码不能编译
+ * 下面的代码不能编译
  */
 public class GenericType {
 

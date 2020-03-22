@@ -7,13 +7,12 @@
 ### 字节码
 
 - Java跨平台的原因是JVM不跨平台
-- 首先编写一个简单的java代码，一次为例进行讲解
+- 首先编写一个简单的java代码，以此为例进行讲解
 
 ### 测试1:
 
 ```java
 /**
- * Created By poplar on 2019/11/9
  * 源码：
  */
 public class ByteCodeTest1 {
@@ -165,18 +164,20 @@ SourceFile: "ByteCodeTest1.java"
 
 2. 魔数：所有的.class文件的前四个字节都是魔数，魔数值为固定值：0xCAFEBABE（咖啡宝贝）
 
-3. 版本号：魔数后面4个字节是版本信息，前两个字节表示minor version（次版本号），后两个字节表示major version（主版本号），十六进制34=十进制52。所以该文件的版本号为1.8.0。低版本的编译器编译的字节码可以在高版本的JVM下运行，反过来则不行。
+3. 版本号：魔数后面4个字节是版本信息，从第5个字节开始。前两个字节表示minor version（次版本号），后两个字节表示major version（主版本号），十六进制34=十进制52。所以该文件的版本号为1.8.0。低版本的编译器编译的字节码可以在高版本的JVM下运行，反过来则不行。
 
-4. 常量池（constant pool）：版本号之后的就是常量池入口，一个java类定义的很多信息都是由常量池来维护和描述的，可以将常量池看作是class文件的资源仓库，包括java类定义的方法和变量信息，常量池中主要存储两类常量：字面量和符号引用。字面量如文本字符串、java中生命的final常量值等，符号引用如类和接口的全局限定名，字段的名称和描述符，方法的名称和描述符等。
+4. 常量池（constant pool）：版本号之后的就是常量池入口，从第9个字节开始。一个java类定义的很多信息都是由常量池来维护和描述的，可以将常量池看作是class文件的资源仓库，包括java类定义的方法和变量信息，常量池中主要存储两类常量：字面量和符号引用。字面量如文本字符串、java中声明的final常量值等，符号引用如类和接口的全局限定名，字段的名称和描述符，方法的名称和描述符等。
 
-5. 常量池的整体结构：Java类对应的常量池主要由常量池数量和常量池数组两部分共同构成，常量池数量紧跟在主版本号后面，占据两个字节，而常量池数组在常量池数量之后。常量池数组与一般数组不同的是，常量池数组中元素的类型、结构都是不同的，长度当然也就不同，但是每一种元素的第一个数据都是一个u1类型标志位，占据一个字节，JVM在解析常量池时，就会根据这个u1类型的来获取对应的元素的具体类型。 值得注意的是，常量池数组中元素的个数=常量池数-1,（其中0暂时不使用）。目的是满足某些常量池索引值的数据在特定的情况下需要表达不引用任何常量池的含义。根本原因在于索引为0也是一个常量，它是JVM的保留常量，它不位于常量表中。这个常量就对应null，所以常量池的索引从1而非0开始。
+5. 常量池的整体结构：Java类对应的常量池主要由常量池数量和常量池数组(常量表)两部分共同构成，常量池数量紧跟在主版本号后面，就是从第9个字节开始，占据两个字节，而常量池数组在常量池数量之后，从第11个字节开始。常量池数组与一般数组不同的是，常量池数组中元素的类型、结构都是不同的，长度当然也就不同，但是每一种元素的第一个数据都是一个u1类型标志位，占据一个字节，JVM在解析常量池时，就会根据这个u1类型的来获取对应的元素的具体类型。 值得注意的是，常量池数组中元素的个数=常量池数-1,（其中0暂时不使用）。目的是满足某些常量池索引值的数据在特定的情况下需要表达**不引用任何常量池**的含义。根本原因在于索引为0也是一个常量，它是JVM的保留常量，它不位于常量表中。这个常量就对应null，所以常量池的索引从1而非0开始。
    
 
 ![](./images/pool.png)
 
+jdk1.7后又增加了3种，CONSTANT_MethodHandle_info,CONSTANT_MethodType_info,CONSTANT_InvokeDynamic_info，所以共14种
+
 6. 在JVM规范中，每个变量/字段都有描述信息，主要的作用是描述字段的数据类型，方法的参数列表（包括数量、类型和顺序）与返回值。根据描述符规则，基本数据类型和代表无返回值的void类型都用一个大写字符来表示，而对象类型使用字符L+对象的全限定名称来表示。为了压缩字节码文件的体积，对于基本数据类型，JVM都只使用一个大写字母来表示。如下所示:B - byte，C - char，D - double，F - float，I - int，J -l ong，S -short，Z - boolean，V - void，L-对象类型，如Ljava/lang/String;
-   对于数组类型来说，每一个维度使用一个前置的[ 来表示，如int[]表示为[I ，String [][]被记录为[[Ljava/lang/String;
-7. 用描述符描述方法的时候，用先参数列表后返回值的方式来描述。参数列表按照参数的严格顺序放在一组（）之内，如方法String getNameByID(int id ,String name)
+7. 对于数组类型来说，每一个维度使用一个前置的[ 来表示，如int[]表示为[I ，String[][] 【】【】被记录为[[Ljava/lang/String;
+8. 用描述符描述方法的时候，用先参数列表后返回值的方式来描述。参数列表按照参数的严格顺序放在一组（）之内，如方法：String getNameByID(int id ,String name)被描述为
    (I,Ljava/lang/String;)Ljava/lang/String;
    Java字节码整体结构
 
@@ -186,12 +187,16 @@ SourceFile: "ByteCodeTest1.java"
 （1）字节数据直接量：这是基本的数据类型。共细分为u1、u2、u4、u8四种，分别代表连续的1个字节、2个字节、4个字节、8个字节组成的整体数据。
 （2）表/数组：表是由多个基本数据或其他表，按照既定顺序组成的大的数据集合。表是有结构的，它的结构体：组成表的成分所在的位置和顺序都是已经严格定义好的。
 
-Access Falgs：
-访问标志信息包括了该class文件是类还是接口，是否被定义成public，是否是abstract，如果是类，是否被定义成final。
+
 
 ![](./images/re.png)
 
 ![](./images/hff.png)
+
+Access Falgs：
+访问标志信息包括了该class文件是类还是接口，是否被定义成public，是否是abstract，如果是类，是否被定义成final。
+
+![](./images/access_flag.jpg)
 
 - 0x0021是0x0020和0x0001的并集，表示ACC_PUBLIC和ACC_SUPER
   0x0002:private
@@ -199,25 +204,58 @@ Access Falgs：
 - 字段表（Fields）：
   字段表用于描述类和接口中声明的变量。这里的字段包含了类级别变量和实例变量，但是不包括方法内部声明的局部变量。
 
+  field_info {	
+
+  ​	u2 access_flags;
+
+  ​	u2 name_index;
+
+  ​	u2 descributes_index;
+
+  ​	u2 attributes_count;
+
+  ​	attribute_info attributes[attributes_count];
+
+  }
+
   
 
 ![](./images/fieled.png)
 
 - 方法表
+
+  ![](./images/method_biao.jpg)
+
+  
+
+  method_info {	
+
+  ​	u2 access_flags;
+
+  ​	u2 name_index;
+
+  ​	u2 descributes_index;
+
+  ​	u2 attributes_count;
+
+  ​	attribute_info attributes[attributes_count];
+
+  }
+
   方法的属性结构：
   方法中的每个属性都是一个attribute_info结构:
   （1）JVM预定义了部分attribute，但是编译器自己也可以实现自己的attribute写入class文件里，供运行时使用；
   （2）不同的attribute通过attribute_name_index来区分。
 
-- attribute_info格式:
+  attribute_info格式:
   attribute_info{
-  u2 attribute_name_index;
-  u4 attribute_length;
-  u1 info[attribute_length]
+  	u2 attribute_name_index;
+  	u4 attribute_length;
+  	u1 info[attribute_length]
   }
 
-- attribute_name_index值为code，则为Code结构
-  Code的作用是保存该方法的结构，所对应的的字节码
+- attribute_name_index值为code，下图为Code结构
+  Code attribute 的作用是保存该方法的结构，所对应的的字节码
   ![](./images/dss.png)
 
 attribute_length：表示attribute所包含的字节数，不包含attribute_name_index和attribute_length
@@ -239,6 +277,38 @@ catch_type：表示会被处理的异常类型，它指向常量池中的一个�
 - LocalVariableTable ：结构类似于 LineNumbeTable_attribute
   对于Java中的任何一个非静态方法，至少会有一个局部变量，就是this。
 
+  局部变量表的结构:
+
+  LocalVariableTable_attribute {     
+
+  ​	u2 attribute_name_index;     
+
+  ​	u4 attribute_length;     
+
+  ​	u2 local_variable_table_length;     
+
+  ​	{   
+
+  ​		u2 start_pc;         
+
+  ​		u2 length;         
+
+  ​		u2 name_index;         
+
+  ​		u2 descriptor_index;         
+
+  ​		u2 index;     
+
+  ​	} 
+
+  ​	local_variable_table[local_variable_table_length];
+
+   }
+
+  index：这个是局部变量在栈帧里的局部变量区里的下标
+  name_index：这个是代表局部变量的名字的 CONSTANT_Utf8_info 在常量池里的下标
+  descriptor_index：这个是代表局部变量的类型的 CONSTANT_Utf8_info 在常量池里的下标
+
 - 字节码查看工具：jclasslib
   http://github.com/ingokegel/jclasslib
 
@@ -252,7 +322,7 @@ catch_type：表示会被处理的异常类型，它指向常量池中的一个�
 package com.poplar.bytecode;
 
 /**
- * Created By poplar on 2019/11/9
+ *
  * 从字节码分析得出的结论：
  * 成员变量的初始化是在构造方法中完成的，有多少个构造方法，初始化指令就会调用几次
  * 静态成员变量同样是在clinit方法完成的，不管有多少个静态变量都是在该方法完成初始化
@@ -317,7 +387,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 
 /**
- * Created By poplar on 2019/11/10
+ *
  * 对于Java类中的每一个实例方法(非static方法) ,其在编译后所生成的字节码当中,方法参数的数量总是会比源代码中方法数的数量多一个(this) ,
  * 它位于方法的第一个参数位置处;这样,我们就可以在Java的实例方法中使用this来去访问当前对象的属性以及其他方法。
  * 这个操作是在编译期间完成的,即由javac编译器在编译的时候将对this的访问转化为对一个普通实例方法参数的访问;
@@ -367,22 +437,20 @@ public class ByteCodeTest3 {
   2.在jdk1.4.2之前的版本中，并不是使用异常表的方式对异常进行处理的，而是采用特定的指令方式；
   3.当异常处理存在finally语句块时，现代化的JVM采取的处理方式是将finally语句内的字节码拼接到每个catch语句块后面。
   也就是说，程序中存在多少个catch，就存在多少个finally块的内容。
-
 - 栈帧（stack frame）：
   用于帮助虚拟机执行方法调用和方法执行的数据结构
   栈帧本身是一种数据结构，封装了方法的局部变量表，动态链接信息，方法的返回地址以及操作数栈等信息。
   符号引用：符号引用以一组符号来描述所引用的目标。符号引用可以是任何形式的字面量，只要使用时能无歧义地定位到目标即可，符号引用和虚拟机的布局无关。（在编译的时候一个每个java类都会被编译成一个class文件，但在编译的时候虚拟机并不知道所引用类的地址，多以就用符号引用来代替，而在这个解析阶段就是为了把这个符号引用转化成为真正的地址的阶段。）
   直接引用：（1）直接指向目标的指针（指向对象，类变量和类方法的指针）（2）相对偏移量。（指向实例的变量，方法的指针）（3）一个间接定位到对象的句柄。
-  有些符号引用在加载阶段或者或是第一次使用时，转换为直接引用，这种转换叫做静态解析；另外一些符号引用则是在运行期转换为直接引用，这种转换叫做动态链接。
+- 有些符号引用在加载阶段或者或是第一次使用时，转换为直接引用，这种转换叫做**静态解析**；另外一些符号引用则是在运行期转换为直接引用，这种转换叫做**动态链接**，这体现为java的多态性。
 - 助记符：
-  1.invokeinterface：调用接口的方法，在运行期决定调用该接口的哪个对象的特定方法。
+  1.invokeinterface：调用接口的方法，实际上在运行期决定调用该接口的哪个实现了该接口的对象的特定方法。
   2.invokestatic：调用静态方法
-  3.invokespecial：调用私有方法， 构造方法（），父类的方法
+  3.invokespecial：调用自己私有方法， 构造方法（<init>），父类的方法
   4.invokevirtual：调用虚方法，运行期动态查找的过程
-  5.invokedynamic：动态调用方法
-
-- 静态解析的四种场：静态方法、父类方法、构造方法、私有方法。
-- 以上四种方法称为非虚方法，在类加载阶段将符号引用转换为直接引用。
+  5.invokedynamic：动态调用方法，1.7后引入
+- 静态解析的四种情形：静态方法、父类方法、构造方法、私有方法。
+- 以上四种方法称为非虚方法，在类加载阶段将符号引用转换为直接引用。final方法也是非虚方法。
 
 ### 测试5：
 
@@ -445,7 +513,7 @@ class Son extends Father {
 package com.poplar.bytecode;
 
 /**
- * Created By poplar on 2019/11/10
+ *
  * 方法的动态分派
  * 方法的动态分派涉及到一个重要概念:方法接收者。
  * invokevirtua1字节码指令的多态查找流程
@@ -490,7 +558,7 @@ class Orange extends Fruit {
 package com.poplar.bytecode;
 
 /**
- * Created BY poplar ON 2019/12/4
+ * 
  * 基于栈的解释器的执行过程概念模型
  */
 public class BasicStackExecutionProcess {
@@ -547,7 +615,7 @@ public class BasicStackExecutionProcess {
 package com.poplar.bytecode;
 
 /**
- * Created BY poplar ON 2019/12/4
+ * 
  * 动态分派的演示与证明：
  * 在动态分派中虚拟机是如何知道要调用那个方法的？
  */
@@ -627,9 +695,6 @@ public class DynamicDispatch {
 
     比较方法重载（overload）和方法重写（overwrite），我们可以得出这样的结论：
     方法重载是静态的，是编译器行为；方法重写是动态的，是运行期行为。
-    ————————————————
-    版权声明：本文为CSDN博主「魔鬼_」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
-    原文链接：https://blog.csdn.net/wzq6578702/article/details/82712042
        */
     }
 }
@@ -642,7 +707,7 @@ public class DynamicDispatch {
 package com.poplar.bytecode;
 
 /**
- * Created BY poplar ON 2019/12/4
+ * 
  * 静态分派的演示与证明：
  */
 public class StaticDispatch {
