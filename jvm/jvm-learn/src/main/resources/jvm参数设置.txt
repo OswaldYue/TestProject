@@ -1,15 +1,72 @@
+修改java系统属性的方式:
+java -Djava.ext.dirs=./ com.poplar.classload.ClassLoadTest19
+
+jvmUI工具的使用:
+1.jvisoulvm
+2.jconsole
+3.jmc: java mission control java任务控制
+    jfr:java flight recoder java实时统计数据
+
+
+
+jvm命令行工具的使用:
+1.jmap -clstats PID:    打印类加载器数据(-clstats 是 -permstat 的替代方案，在 JDK8 之前，-permstat 用来打印类加载器的数据)
+2.jmap -heap PID:   打印堆的一些信息
+3.jstat -gc LVMID:    用来打印元空间的信息  其中输出信息中的: MC元空间总大小，MU元空间已使用的大小，单位,KB
+4.jcmd PID 参数命令
+    jcmd PID VM.flags:     查看jvm的启动参数
+    jcmd PID help:  列出当前java应用，我们可以对其可执行的操作
+    jcmd PID help 参数命令:   查看具体的参数命令的使用说明
+    jcmd PID PerfCounter.print:     查看jvm性能相关的参数
+    jcmd PID VM.uptime:     查看jvm的启动时长
+    jcmd PID GC.class_histogram:    查看系统中类的统计信息
+    jcmd PID Thread.print:  查看当前进程的线程的堆栈信息，此命令可以使用jvmUI(jconsole,jvisoulvm)来查看
+    jcmd PID GC.heap_dump filename(文件后缀名：.hprof):导出当前进程的heap dump文件，可以通过jvisoulvm查看
+    jcmd PID VM.system_properties:  查看jvm的属性信息
+    jcmd PID VM.version:    查看目标vm的版本信息
+    jcmd PID VM.command_line:   查看jvm启动时的命令行参数
+    jcmd PID GC.class_stats:    一个新的诊断命令，用来连接到运行的 JVM 并输出详尽的类元数据的柱状图
+5.jstack PID:   可以查看或是导出java应用程序中线程的堆栈
+6.jhat：查看堆储存的文件 .hprof文件 使用浏览器查看结果 默认为:localhost:7000
+
+
+
 jvm参数设置:
 -XX:+<option>，表示开启option选项
 -XX:-<option>，表示关闭option选项
 -XX:<option>=value，表示将option的值设置为value
 
-修改java系统属性的方式:
-java -Djava.ext.dirs=./ com.poplar.classload.ClassLoadTest19
-
-
 1.-XX:+TraceClassLoading，用于追踪类的加载信息并打印出来
 2.-XX:+TraceClassUnloading，用于追踪类的卸载信息并打印出来
 3.-XX:+PrintCompilation，  要求虚拟机在即时编译时将被编译成本地代码的 方法名称打印出来 其中带有“%”的输出说明是由回边计数器触发的 OSR编译
+4.-Xms20M 堆初始化大最小容量  -Xmx20M 堆初始化最大容量 一般设置为一样，避免出现gc后的内存抖动
+5.-XX:+HeapDumpOnOutOfMemoryError 设置jvm对空间最小和最大以及遇到错误时把堆存储文件打印出来
+6.-Xss160k 设置虚拟机栈的大小，满足jvm运行的最小栈大小对于不同的jdk版本是不同的
+7.-XX:MaxMetaspaceSize=100m，设置元空间大小，默认元空间大小是21M
+8.‑XX:MinMetaspaceFreeRatio 和 ‑XX:MaxMetaspaceFreeRatio，他们类似于 GC 的 FreeRatio 选项，用来设置元空间空闲比例的最大值和最小值
+9.-XX:ParallelGCThreads， 来控制GC线程数的多少
+10.-XX:+UseConcMarkSweepGC，打开CMS垃圾收集器
+11.-verbose:gc， 输出冗余的gc信息
+12.-Xmn10M， 新生代容量
+13.-XX:+PrintGCDetails， 打印GC信息的详情
+14.-XX:SurvivorRatio=8，  配置新生代和survivor的大小比例为8：1：1
+15.-XX:PrintCommandLineFlags -version，打印出当前jvm的默认启动参数，且包括当前java的版本信息
+16.-XX:PretenureSizeThreshold=1111111，当在创建的对象大小如果超过PretenureSizeThreshold指定的值，
+    对象直接分配进进老年代，默认是字节，例如:1024 * 1024 * 4 表示4M大小，注意:这个需要搭配串行的垃圾收集器，Serial类型的GC
+17.-XX:MaxTenuringThreshold=5，在可以自动调节对象晋升(Promote) 到老年代阀值的GC中，设置该阀值的最大值
+18.-XX:+PrintTenuringDistribution，指定JVM 在每次新生代GC时，输出幸存区中对象的年龄分布
+19.-XX:TargetSurvivorRatio=60， 表明所有age的survivor space对象的大小如果超过Desired survivor size，则重新计算threshold阈值
+20.-XX:+PrintTenuringDistribution， 打印对象年龄
+21.-XX:+UseConcMarkSweepGC， 老年代使用cms收集器
+22.-XX:+UseParNewGC， 新生代使用ParNew收集器
+23.-Xss， 是指设定每个线程的堆栈大小
+
+
+
+
+
+
+
 
 
 

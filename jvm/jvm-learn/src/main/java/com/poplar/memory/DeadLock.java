@@ -1,7 +1,7 @@
 package com.poplar.memory;
 
 /**
- * Created BY poplar ON 2019/11/25
+ *
  * 死锁检测
  */
 public class DeadLock {

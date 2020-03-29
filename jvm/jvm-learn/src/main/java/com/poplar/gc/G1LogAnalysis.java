@@ -1,7 +1,7 @@
 package com.poplar.gc;
 
 /**
- * Created BY poplar ON 2019/11/30
+ *
  * G1日志分析
  * 虚拟机相关参数：
  * -verbose:gc

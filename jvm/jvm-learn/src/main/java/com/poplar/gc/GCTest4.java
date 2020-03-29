@@ -1,10 +1,11 @@
 package com.poplar.gc;
 
 /**
- * Created BY poplar ON 2019/11/28
+ * 对应82集
+ *
  * -verbose:gc
- * -Xmx200M
- * -Xmn50M
+ * -Xmx200M  新生代50M  老年代150M
+ * -Xmn50M 新生代50M Eden区40M  两个survivor各5M
  * -XX:TargetSurvivorRatio=60 表明所有age的survivor space对象的大小如果超过Desired survivor size，则重新计算threshold
  * -XX:+PrintTenuringDistribution 打印对象年龄
  * -XX:+PrintGCDetails
@@ -16,8 +17,8 @@ package com.poplar.gc;
 public class GCTest4 {
 
     public static void main(String[] args) throws InterruptedException {
-        byte[] bytes1 = new byte[1024 * 1024];
-        byte[] bytes2 = new byte[1024 * 1024];
+        byte[] bytes1 = new byte[512 * 1024];
+        byte[] bytes2 = new byte[512 * 1024];
 
         method();
         Thread.sleep(1000);

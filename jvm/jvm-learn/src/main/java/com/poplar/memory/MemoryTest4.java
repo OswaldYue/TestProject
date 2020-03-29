@@ -1,10 +1,11 @@
 package com.poplar.memory;
 
 /**
- * Created BY poplar ON 2019/11/26
+ *
  * jmam命令的使用 -clstats<pid>进程id  to print class loader statistics
- * jmap -clstats 3740
- * <p>
+ * jmap -clstats 19464
+ *
+ *
  * jstat -gc 3740
  * S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
  * 512.0  512.0   0.0    0.0   24064.0   9626.0   86016.0     1004.1   4864.0 3758.2 512.0  409.1     144    0.064   0      0.000    0.064
@@ -16,6 +17,7 @@ public class MemoryTest4 {
             System.out.println("hello world");
     }
     //查看java进程id jps -l
+
     // 使用jcmd查看当前进程的可用参数：jcmd 10368 help
     //查看jvm的启动参数 jcmd 10368 VM.flags
     // 10368:-XX:CICompilerCount=3 -XX:InitialHeapSize=132120576 -XX:MaxHeapSize=2111832064 -XX:MaxNewSize=703594496

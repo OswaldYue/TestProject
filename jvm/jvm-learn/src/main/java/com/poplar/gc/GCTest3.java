@@ -1,7 +1,7 @@
 package com.poplar.gc;
 
 /**
- * Created BY poplar ON 2019/11/27
+ *
  * MaxTenuringThreshold作用:在可以自动调节对象晋升(Promote) 到老年代阀值的GC中，设置该阀值的最大值。
  * 该参数的默认值为15，CMS中默认值为6, G1中默认为15 (在JVM中，该数值是由4个bit来表示的， 所以最大值1111，即15)
  * 经历了多次GC后，存活的对象会在From. Survivor与To Survivor之间来回存放，而这里面的一个前提则是这两个空间有足够的大小来存放这些数据，在GC算法中，

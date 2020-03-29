@@ -3,7 +3,7 @@ package com.poplar.memory;
 import java.util.Map;
 
 /**
- * Created BY poplar ON 2019/12/2
+ *
  * 下面的代码相当于jstack命令的大部分功能
  * jstack用于生成虚拟机当前时刻的快照
  */

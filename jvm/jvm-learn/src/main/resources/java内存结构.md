@@ -10,7 +10,7 @@
 
 ```java
 /**
- * Created BY poplar ON 2019/11/25
+ * 
  * 关于Java对象创建的过程:
  * new关键字创建对象的3个步骤:
  * 1.在堆内存中创建出对象的实例。
@@ -44,7 +44,7 @@ public class MemoryTest1 {
 
 ```java
 /**
- * Created BY poplar ON 2019/11/25
+ * 
  * 虚拟机栈溢出测试
  */
 public class MemoryTest2 {
@@ -67,7 +67,7 @@ public class MemoryTest2 {
         try {
             memoryTest2.test();
         } catch (Throwable e) {
-            System.out.println(memoryTest2.getLength());//打印最终的最大栈深度为：2587
+            System.out.println(memoryTest2.getLength());//打印最终的最大栈深度为：2569
             e.printStackTrace();
         }
     }
@@ -78,7 +78,7 @@ public class MemoryTest2 {
 
 ```java
 /**
- * Created BY poplar ON 2019/11/26
+ *
  * 元空间内存溢出测试
  * 设置元空间大小：-XX:MaxMetaspaceSize=100m
  * 关于元空间参考：https://www.infoq.cn/article/java-permgen-Removed
@@ -101,7 +101,7 @@ public class MemoryTest3 {
 
 ```java
 /**
- * Created BY poplar ON 2019/11/26
+ * 
  * jmam命令的使用 -clstats<pid>进程id  to print class loader statistics
  * jmap -clstats 3740
  *
@@ -116,6 +116,8 @@ public class MemoryTest4 {
             System.out.println("hello world");
     }
     //查看java进程id jps -l
+    
+    
     // 使用jcmd查看当前进程的可用参数：jcmd 10368 help
     //查看jvm的启动参数 jcmd 10368 VM.flags
    // 10368:-XX:CICompilerCount=3 -XX:InitialHeapSize=132120576 -XX:MaxHeapSize=2111832064 -XX:MaxNewSize=703594496
@@ -161,25 +163,43 @@ jcmd (从JDK 1. 7开始增加的命令)
 
 
 
-### JVM垃圾识别（根搜索算法( GC RootsTracing )）
+### JVM垃圾回收(GC)模型
+
+垃圾判断算法
+
+GC算法
+
+垃圾回收器的实现和选择
+
+### 垃圾判断的算法
+
+引用计数算法(Reference Counting)
+
+根搜索算法(Root Tracing)
+
+### JVM垃圾识别 (引用计数算法 (GC Reference Counting))
+
+给对象添加一个引用计数器，当有一个地方引用它，计数器加1，当引用失效，计数器减1，任何时刻计数器为0的对象就是不可能再被使用的
+
+引用计数算法无法解决对象循环引用的问题
+
+### JVM垃圾识别（根搜索算法( GC Roots Tracing )）
 
 - 在实际的生产语言中(Java、 C#等)，都是使用根搜索算法判定对象是否存活。
 
-- 算法基本思路就是通过一系列的称为“GCRoots"的点作为起始进行向下搜索，当一个对象到GCRoots没有任何引用链( Reference Chain)相连，则证明此对象
-  是不可用的
+- 算法基本思路就是通过一系列的称为“GCRoots"的点作为起始进行向下搜索，当一个对象到GCRoots没有任何引用链( Reference Chain)相连，则证明此对象是不可用的
 
 - 在Java语言中，GC Roots包括
-  ●在VM栈(帧中的本地变量)中的引用
+  ●在VM栈(栈帧中的本地变量)中的引用
   ●方法区中的静态引用
   ●JNI (即一般说的Native方法) 中的引用
 
 ### 方法区
 
-- Java虛拟机规范表示可以不要求虚拟机在这区实现GC,这区GC的“性价比”一般比较低
+- Java虛拟机规范表示可以不要求虚拟机在这区实现GC,这个区GC的“性价比”一般比较低
   在堆中，尤其是在新生代，常规应用进行I次GC一般可以回收70%~95%的空间，而方法区的GC效率远小于此
 - 当前的商业JVM都有实现方法区的GC,主要回收两部分内容:废弃常量与无用类
 
-- 主要回收两部分内容:废弃常量与无用类
 - 类回收需要满足如下3个条件：
   - 该类所有的实例都已经被GC,也就是JVM中不存在该Class的任何实例
   - 加载该类的ClassL oader已经被GC
@@ -187,7 +207,7 @@ jcmd (从JDK 1. 7开始增加的命令)
 
 - 在大量使用反射、动态代理、CGLib等字节码框架、动态生成JSP以及OSGi这类频繁自定义Classloader的场景都需要JVM具备类卸载的支持以保证方法区不会溢出
 
-### 垃圾判断与GC算法
+### 垃圾判断
 
 - 垃圾判断的算法
   - 引用计数算法(Reference Counting)
@@ -203,8 +223,10 @@ jcmd (从JDK 1. 7开始增加的命令)
 
 ![根搜索算法(Root Tracing)](./images/gcroot.png)
 
+### JVM常见GC算法
+
 - 标记-清除算法(Mark Sweep)
-- 标记-整理算法(Mark-Compact)
+- 标记-整理算法(Mark-Compact)(或者叫标记-压缩算法)
 - 复制算法(Copying)
 - 分代算法(Generational)
 
@@ -226,18 +248,24 @@ jcmd (从JDK 1. 7开始增加的命令)
 
   ![标记一清除算法(Mark-Sweep)](./images/1574823017674.gif)
 
+### 标记一整理( Mark-Compact )算法
+
+- 标记过程仍然一样，但后续步骤不是进行直接清理，而是令所有存活的对象向一端移动，然后直接清理掉这端边界以外的内存。
+- 没有内存碎片
+- 比Mark-Sweep耗费更多的时间进行整理(compact)
+
 ### 复制(Copying) 搜集算法
 
 - 将可用内存划分为两块，每次只使用其中的一块，当一半区内存用完了，仅将还存活
-  的对象复制到另外一块上面，然后就把原来整块内存空间一次性清理掉，
+  的对象复制到另外一块上面，然后就把原来整块内存空间一次性清理掉
 - 这样使得每次内存回收都是对整个半区的回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存就可以了，实现简单，运行高效。<font color=red>只是这种算法的代价是将内存缩小为原来的一半，代价高昂</font>
 
-- 现在的商业虚拟机中都是用了这一种收集算法来回收新生代
+- 现在的商业虚拟机中都是用了这一种收集算法来**回收新生代**
 - 将内存分为一块较大的eden空间和2块较少的survivor空间，每次使用eden和其中一块
   survivor, 当回收时将eden和survivor还存活的对象一次性拷 贝到另外一块survivor空间上，然后清理掉eden和用过的survivor
 - Oracle Hotspot虚拟机默认eden和survivor的大小比例是8:1，也就是每次只有10%的内存是“浪费”的
 
-- 复制收集算法在对象存活率高的时候，效率有所下降
+- 复制收集算法在对象存活率高的时候，就是每次回收，回收的较少，效率有所下降
 - 如果不想浪费50%的空间，就需要有额外的空间进行分配担保用于应付半区内存中所有对象都100%存活的极端情况，所以在老年代一般不能直接选用这种算法
 
 ![复制(Copying) 搜集算法](./images/1574824343266.gif)
@@ -249,22 +277,16 @@ jcmd (从JDK 1. 7开始增加的命令)
 - 根据IBM的专i研究，98%的Java对象只会存活1个GC周期，对这些对象很适合用复制算法。而且
   不用1: 1的划分工作区和复制区的空间
 
-### 标记一整理( Mark-Compact )算法
-
-- 标记过程仍然样，但后续步骤不是进行直接清理，而是令所有存活的对象一端移动，然后直接清理掉这端边界以外的内存。
-
-- 没有内存碎片
-- 比Mark-Sweep耗费更多的时间进行compact
-
-### 分代收集。( GenerationalCollecting)算法
+### 分代收集( Generational Collecting)算法
 
 - 当前商业虚拟机的垃圾收集都是采用“分代收集”( Generational Collecting)算法，根据对象不同的存活周期将内存划分为几块。
 - 一般是把Java堆分作新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法，譬如新生代每次GC都有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本，就可以完成收集。
+- 综合前面几种GC算法的优缺点，针对不同生命周期的对象采用不同的GC算法。 
 
-### Hotspot JVM 6中共划分为三个代:
+#### Hotspot JVM 6中共划分为三个代:
 
-- 年轻代(Young Generation)
-- 老年代(Old Generation)和
+- 年轻代(Young Generation)  默认比例:Eden:survivor:survivor 为 8:1:1
+- 老年代(Old Generation)
 - 永久代( Permanent Generation)
 
 ![Hotspot JVM 6中共划分为三个代](./images/drrrr.png)
@@ -280,7 +302,7 @@ jcmd (从JDK 1. 7开始增加的命令)
   - 一般采用Mark-Sweep或者Mark-Compact算法进行GC 
   - 有多种垃圾收集器可以选择。每种垃圾收集器可以看作一个GC算法的具体实现。可以根据具体应用的需求选用合适的垃圾收集器(追求吞吐量?追求最短的响应时间?)
 
-- ~~永久代~~
+- ~~永久代~~(jdk1.8后废除变为元空间)
   - 并不属于堆(Heap).但是GC也会涉及到这个区域
   - 存放了每个Class的结构信息， 包括常量池、字段描述、方法描述。与垃圾收集要收集的Java对象关系不大
 
@@ -289,11 +311,11 @@ jcmd (从JDK 1. 7开始增加的命令)
 - 堆上分配
   大多数情况在eden上分配，偶尔会直接在old上分配细节取决于GC的实现
 - 栈上分配
-  原子类型的局部变量
+  原子类型的局部变量，比如: int float等
 
 - GC要做的是将那些dead的对象所占用的内存回收掉
   - Hotspot认为没有引用的对象是dead的
-  - Hotspot将引用分为四种: Strong、 Soft、Weak、Phantom
+  - Hotspot将引用分为四种: Strong(强引用)、 Soft(软引用)、Weak(弱引用)、Phantom(虚引用)
     Strong 即默认通过Object o=new Object()这种方式赋值的引用
     Soft、Weak、 Phantom这 三种则都是继承Reference
 
@@ -302,36 +324,49 @@ jcmd (从JDK 1. 7开始增加的命令)
   - Weak: - 定会被GC， 当被mark为dead, 会在ReferenceQueue中通知
   -  Phantom: 本来就没引用，当从jvm heap中释放时会通知
 
-垃圾回收器
+#### 垃圾收集算法
 
 ![垃圾回收器](./images/qqq.png)
 
-### GC回收的时机
+### GC的时机
 
 - 在分代模型的基础上，GC从时机上分为两种: Scavenge GC和Full GC 
   - Scavenge GC (Minor GC)
     触发时机:新对象生成时，Eden空间满了理论上Eden区大多数对象会在ScavengeGC回收，复制算法的执
     行效率会很高，ScavengeGC时间比较短。
+
   - Full GC
-    对整个JVM进行整理，包括Young、Old 和Perm主要的触发时机: 1) Old满了2) Perm满了3) system.gc()效率很低，尽量减少Full GC。
+    对整个JVM进行整理，包括Young、Old 和Perm
+
+    主要的触发时机: 1) Old满了2) Perm满了3) system.gc()
+
+    效率很低，尽量减少Full GC
+
+    会导致STW出现，阻塞你的工作线程
 
 ### 垃圾回收器(Garbage Collector)
 
-- 分代模型: GC的宏观愿景;
+- 分代模型: GC的宏观愿景
 - 垃圾回收器: GC的具体实现
 - Hotspot JVM提供多种垃圾回收器，我们需要根据具体应用的需要采用不同的回收器
 - 没有万能的垃圾回收器，每种垃圾回收器都有自己的适用场景
 
-### 垃圾收集器的‘并行”和并发
+### 垃圾收集器的"并行"和"并发"
 
 - 并行(Parallel):指多个收集器的线程同时工作，但是用户线程处于等待状态
+
 - 并发(Concurrent):指收集器在工作的同时，可以允许用户线程工作。并发不代表解决了GC停顿的问题，在关键的步骤还是要停顿。比如在收集器标记垃圾的时候。但在清除垃圾的时候，用户线程可以和GC线程并发执行。
 
-### Serial收集器
+  并发不代表解决了GC停顿的问题，在关键的步骤还是要停顿。比如在收集器标记垃圾的时候。但在清除垃圾的时候，用户线程可以和GC线程并发执行。
 
-- 最早的收集器，单线程进行GC， New和Old Generation都可以使用，在新生代，采用复制算法;
-- 在老年代，采用Mark-Compact算法因为是单线程GC，没有多线程切换的额外开销，简单实用
-  Hotspot Client模式默认的收集器
+### Serial(串行)收集器
+
+- 单线程收集器，收集时会暂停所有工作线程(Stop The World，简称STW)，使用复制收集算法，虚拟机运行在client模式时的默认新生代收集器
+- 最早的收集器，单线程进行GC
+- New和Old Generation都可以使用
+- 在新生代，采用复制算法; 在老年代，采用Mark-Compact算法
+- 因为是单线程GC，没有多线程切换的额外开销，简单实用
+- Hotspot Client模式默认的收集器
 
 ![Serial收集器](./images/serial.png)
 
@@ -342,7 +377,7 @@ jcmd (从JDK 1. 7开始增加的命令)
 
 - Serial收集器在新生代的多线程版本
 - 使用复制算法(因为针对新生代)只有在多CPU的环境下，效率才会比Serial收集器高
-- 可以通过-XX:ParallelGC Threads来控制GC线程数的多少。需要结合具体CPU的个数Server模式下新生代的缺省收集器
+- 可以通过-XX:ParallelGCThreads来控制GC线程数的多少。需要结合具体CPU的个数Server模式下新生代的缺省收集器
 
 ![ParNew收集器](./images/parnew.png)
 
@@ -350,9 +385,98 @@ jcmd (从JDK 1. 7开始增加的命令)
 
 - Parallel Scavenge收集器也是一个多线程收集器，也是使用复制算法，但它的对象分配规则与回收策略都与ParNew收集器有所不同，它是以吞吐量最大化(即GC时间占总运行时间最小)为目标的收集器实现，它允许较长时间的STW换取总吞吐量最大化
 
-### CMS ( Concurrent Mark Sweep )收集器
+### Parallel Old
 
-- CMS是一种以最短停顿时间为目标的收集器，使用CMS并不能达到GC效率最高(总体GC时间最小)，但它能尽可能降低GC时服务的停顿时间，CMS收集器使用的是标记一清除算法
+Parallel Scavenge在老年代的实现
+
+在jvm1.6才出现Parallel Old
+
+采用多线程，Mark-Compact算法
+
+更注重吞吐量
+
+Parallel Scavenge + Parallel Old = 高吞吐量，但GC停顿可能不理想
+
+### Serial Old收集器
+
+Serial Old是单线程收集器，使用标记-整理算法，是老年代的收集器
+
+老年代版本吞吐量优先收集器，使用多线程和标记-整理算法,jvm1.6提供，在此之前，新生代使用了PS收集器的话，老年代除了Serial Old外别无选择，因为PS无法与CMS收集器配合工作
+
+### CMS ( Concurrent Mark Sweep 并行标记清除)收集器
+
+- CMS是一种以**最短停顿时间**(STW)为目标的收集器，使用CMS并不能达到GC效率最高(总体GC时间最小)，但它能尽可能降低GC时服务的停顿时间，多数应用于互联网站或者B/S系统的服务器上，CMS收集器使用的是标记一清除算法
+
+  分为4个步骤:
+
+  初始标记(CMS initial mark)
+
+  并发标记(CMS concurrent mark)
+
+  重新标记(CMS concurrent remark)
+
+  并发清除(CMS concurrent sweep)
+
+  1.初始标记，重新标记，都需要STW,初始标记只是标记一个GC Roots能直接关联到的对象，速度很快
+
+  2.并发标记阶段就是进行GC Roots Tracing的过程
+
+  3.重新标记阶段则是为了修正并发标记期间因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间一般会比初始标记阶段稍长一些，但远比并发标记的时间短
+
+  4.在整个过程中耗时最长的并发标记和并发清除过程，收集器都可以与用户线程一起工作，因此，从总体来看，CMS收集器的内存回收过程是与用户线程一起并发执行的
+
+  完整的7步骤:
+
+  1.Initial Mark
+
+  这个是CMS两次stop-the-world事件的其中一次，这个阶段的目标是：标记那些直接被GC root引用或者被年轻代存活对象所引用的所有对象
+
+  ![](./images/111.jpg)
+
+  2.Concurrent Mark
+
+  在这个阶段 Garbage Collector会遍历老年代，然后标记所有存活的对象，它会根据上个阶段找到的GC Roots遍历查找。并发标记阶段，它会与用户的应用程序并发运行。并不是老年代所有的存活对象都会被标记，因为在标记期间用户的程序可能会改变一些引用
+
+  ![](./images/222.jpg)
+
+  从上图看，与阶段1图进行对比，就会发现有一个对象的引用已经发生了变化
+
+  3.Concurrent Preclean 并发预先清理
+
+  这也是一个并发阶段，与应用的线程并发运行，并不会STW应用线程。在并发运行的过程中，一些对象的引用可能会发生变化，但是这种情况发生时，JVM会将包含这个对象的区域(Card)标记为Dirty，也就是Card Marking
+
+  在pre-clean阶段，那些能够从Dirty对象到达的对象也会被标记，这个标记做完之后，dirty card标记就会被清除了
+
+  ![](./images/333.jpg)
+
+  4.Concurrent Abortable Preclean  并发的可能失败的预先清理
+
+  这个阶段是个并发阶段，但是同样不会影响用户的应用线程，这个阶段是为了尽量承担STW中最终标记阶段的工作。这个阶段持续时间依赖于很多的因素，由于这个阶段是在重复做很多相同的工作，直接满足一些条件(比如：重复迭代的次数，完成的工作量或者时钟时间等)
+
+  5.Final Remark  
+
+  这个是第二个STW阶段，这个阶段的目标是标记老年代所有的存活对象，由于之前的阶段是并发执行的，gc线程可能跟不上应用程序的变化，为了完成标记老年代所有存活对象的目标，STW就非常有必要了
+
+  通常CMS的Final Remark阶段会在年轻代尽可能干净的时候运行，目的是为了减少连续STW发生的可能性(年轻代存活对象过多的话，也会导致老年代涉及的存活对象会很多)。这个阶段会比前面的几个阶段更复杂一些
+
+  经历过前5个阶段之后，老年代所有存活的对象都被标记过了，现在可以通过清除算法去清除那些老年代不再使用的对象。至此，标记阶段完成
+
+  6.Concurrent Sweep
+
+  这里不需要STW，它是与用户的应用程序并发运行，这个阶段是：清除那些不再使用的对象，回收他们的占用空间为将来使用
+
+  ![](./images/444.jpg)
+
+  7.Concurrent Reset  并发重置
+
+  这个阶段也是并发执行的，它会重设CMS内部的数据结构，为下次的GC做准备
+
+  
+
+- 空间分配担保
+
+  在发生Minor GC之前，虚拟机会先检查老年代最大可用的连续空间是否大于新生代所有对象总空间，如果这个条件成立，那么Minor GC可以确保是安全的。当大量对象在Minor GC后仍然存活，就需要老年代进行空间分配担保，把Survivor无法容纳的对象直接进入老年代。如果老年代判断到剩余空间不足(根据以往每一次回收晋升到老年代对象容量的平均值作为经验值)，则进行一次Full GC
+
 - 特点：
   - 追求最短停顿时间，非常适合Web应用
   - 只针对老年区，一般结合ParNew使用
@@ -668,5 +792,10 @@ public class G1LogAnalysis {
  */
 ```
 
+### Java内存泄漏的经典原因
 
+对象定义在错误的范围
 
+异常处理不当
+
+集合数据管理不当

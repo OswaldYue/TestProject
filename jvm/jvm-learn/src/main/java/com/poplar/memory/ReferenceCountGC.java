@@ -1,7 +1,7 @@
 package com.poplar.memory;
 
 /**
- * Created BY poplar ON 2019/12/1
+ *
  * 测试jvm是否是使用引用计数法判断对象是否存活
  * -verbose:gc
  * -Xms20M

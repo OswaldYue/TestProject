@@ -1,7 +1,14 @@
 package com.poplar.gc;
 
 /**
- * Created BY poplar ON 2019/11/28
+ *-verbose:gc
+ * -Xms20M
+ * -Xmx20M
+ * -Xmn10M
+ * -XX:+PrintGCDetails
+ * -XX:SurvivorRatio=8
+ * -XX:+UseConcMarkSweepGC
+ *
  */
 public class CMSGCTest {
     public static void main(String[] args) {
@@ -15,7 +22,7 @@ public class CMSGCTest {
         byte[] bytes3 = new byte[4 * size];
         System.out.println("33333333");
 
-        byte[] bytes4 = new byte[4 * size];
+        byte[] bytes4 = new byte[2 * size];
         System.out.println("4444444");
     }
 }

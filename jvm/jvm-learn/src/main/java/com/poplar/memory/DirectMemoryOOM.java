@@ -5,7 +5,7 @@ import sun.misc.Unsafe;
 import java.lang.reflect.Field;
 
 /**
- * Created BY poplar ON 2019/12/1
+ *
  * 本机直接内存溢出测试
  */
 public class DirectMemoryOOM {
